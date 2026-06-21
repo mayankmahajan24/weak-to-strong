@@ -15,7 +15,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style('whitegrid')
 
-RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results", "data", "baseline")
+RESULTS_PATHS = [
+    os.path.join(os.path.dirname(__file__), "results", "data", "baseline"),
+    os.path.join(os.path.dirname(__file__), "results", "data", "full_results", "default"),
+]
 MODELS_TO_PLOT = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 PLOT_ALL_SEEDS = False
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "results", "plots")
@@ -24,11 +27,18 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # --- Load results (identical to Plotting.ipynb) ---
 records = []
-for result_filename in glob.glob(os.path.join(RESULTS_PATH, "**/results_summary.json"), recursive=True):
+seen = set()
+for RESULTS_PATH in RESULTS_PATHS:
+  for result_filename in glob.glob(os.path.join(RESULTS_PATH, "**/results_summary.json"), recursive=True):
     config_file = os.path.join("/".join(result_filename.split("/")[:-1]), "config.json")
     config = json.load(open(config_file, "r"))
     if config["model_size"] not in MODELS_TO_PLOT:
         continue
+    # Deduplicate by folder name (same run may exist in multiple result dirs)
+    folder_name = os.path.basename(os.path.dirname(result_filename))
+    if folder_name in seen:
+        continue
+    seen.add(folder_name)
     if 'seed' not in config:
         config['seed'] = 0
     record = config.copy()
@@ -49,6 +59,8 @@ print(df[['model_size', 'ds_name', 'loss', 'accuracy', 'weak_model_size']].to_st
 datasets = df.ds_name.unique()
 for dataset in datasets:
     cur_df = df[(df.ds_name == dataset)].copy()
+    # Drop logconf ground truth — ground truth baseline should always be xent
+    cur_df = cur_df[~((cur_df['weak_model_size'].isna()) & (cur_df['loss'] == 'logconf'))]
     base_accuracies = cur_df[cur_df['weak_model_size'].isna()].groupby('model_size').agg({'accuracy': 'mean', 'seed': 'count'}).sort_values('accuracy')
     base_accuracy_lookup = base_accuracies['accuracy'].to_dict()
     base_accuracies = base_accuracies.reset_index()

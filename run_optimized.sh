@@ -1,7 +1,17 @@
 #!/bin/bash
+# Usage: SEED=1 LOSS=logconf bash run_optimized.sh
+#   SEED    — random seed (default: 0)
+#   LOSS    — loss function: xent, logconf, product (default: xent)
+#   RESULTS — results directory (default: /home/ubuntu/weak-to-strong/full_results)
+#   SWEEP   — subfolder name (default: seed_${SEED})
 set -e
-RESULTS=/home/ubuntu/weak-to-strong/results/data
+SEED=${SEED:-0}
+LOSS=${LOSS:-xent}
+RESULTS=${RESULTS:-/home/ubuntu/weak-to-strong/full_results}
+SWEEP=${SWEEP:-seed_${SEED}}
 cd /home/ubuntu/weak-to-strong
+
+echo "Running with SEED=$SEED LOSS=$LOSS RESULTS=$RESULTS SWEEP=$SWEEP"
 
 run_model() {
     local gpu=$1 ds=$2 model=$3 mbs=$4 weak_model=$5
@@ -11,6 +21,7 @@ run_model() {
     fi
     CUDA_VISIBLE_DEVICES=$gpu python train_simple.py \
         --model_size=$model --ds_name=$ds --results_folder=$RESULTS \
+        --sweep_subfolder=$SWEEP --seed=$SEED --loss=$LOSS \
         --minibatch_size_per_device=$mbs $weak_arg 2>&1
 }
 

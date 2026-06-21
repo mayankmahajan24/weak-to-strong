@@ -63,6 +63,28 @@ Run `--gt_fraction=0.25`, both losses, full GPT-2 family on BoolQ.
 - Generate plot → `results/plots/mix25_gpt2_boolq.png`
 - Write `RESULTS_phase0.md` with PGR comparison
 
+### Validation checks (run after each milestone and periodically during sweeps)
+
+Catch silent errors early by verifying outputs after every run or batch of runs:
+
+1. **After each run completes:**
+   - Confirm the output directory exists and contains all expected files: `config.json`, `results_summary.json`, `log.jsonl`, `results.pkl`
+   - Check `results_summary.json` has a valid accuracy (not null, not 0.5 ± noise which would indicate random guessing / broken labels)
+   - Check `config.json` matches the intended parameters (correct model, dataset, loss, gt_fraction if applicable)
+   - Check `log.jsonl` has the expected number of steps (~295 for full BoolQ) and that loss decreased over training
+
+2. **After a batch of runs (e.g. all transfers for one dataset):**
+   - Verify all expected run directories exist (no silently skipped runs)
+   - Spot-check that GT runs have higher accuracy than transfer runs (basic sanity)
+   - For mixing runs: verify `gt_fraction_actual` in `results_summary.json` is close to `gt_fraction_requested`
+
+3. **Before plotting:**
+   - Count records loaded by `plot_smoke_test.py` — should match expected number of runs
+   - Check for NaN/missing values in the DataFrame (indicates a corrupt or incomplete result)
+
+4. **Quick smoke validation script** (add to repo):
+   - A small script `validate_results.py` that takes a results directory, runs checks 1-2 above, and prints a pass/fail summary. Run this after every sweep before moving on.
+
 ---
 
 ## Implementation plan
@@ -155,7 +177,24 @@ Before running milestones 5+ and Phase 1, determine the optimal GPU to rent on V
 | `run_optimized.sh` | Extend `run_model()` for gt_fraction |
 | `NOTES_phase0.md` | **New** — code map + invariant doc |
 
-**Unchanged**: `sweep.py` (kwargs pass-through works), `weak_to_strong/train.py`, `loss.py`, `datasets.py`, `plot_smoke_test.py`.
+**Unchanged**: `sweep.py` (kwargs pass-through works), `weak_to_strong/train.py`, `loss.py`, `datasets.py`.
+
+### Plotting updates (`plot_smoke_test.py`)
+
+Produce two charts per dataset, matching the format from the paper's reference plots. Both share the same x-axis (strong model accuracy / model size) with one line per weak model size, colored by weak model:
+
+**Line style convention (matches reference chart):**
+- **xent**: solid lines, circle markers (`-o`)
+- **logconf**: dashed lines, x markers (`--x`)
+- **Ground truth ceiling**: solid black line (as before)
+
+**Legend:** Two sections — `weak_model_size` (color) and `loss` (line style with marker glyphs: `●—` xent, `✕--` logconf)
+
+**PGR inset table** in lower right showing median PGR per loss.
+
+1. **Test accuracy chart** (y-axis = accuracy): both losses on same chart, distinguished by line style/marker. Saved as e.g. `boolq_accuracy.png`.
+
+2. **PGR chart** (y-axis = PGR): same layout. Saved as e.g. `boolq_pgr.png`.
 
 ## Deliverables
 
