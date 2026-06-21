@@ -42,7 +42,8 @@ MODEL_CONFIGS = [
         # but if you have multiple it won't run without model_parallel because of the overhead of data
         # parallel training).
         model_parallel=(
-            torch.cuda.get_device_properties(0).total_memory < 35e9
+            torch.cuda.is_available()
+            and torch.cuda.get_device_properties(0).total_memory < 35e9
             and torch.cuda.device_count() > 1
         ),
     ),
@@ -52,13 +53,14 @@ MODEL_CONFIGS = [
         eval_batch_size=2,
         gradient_checkpointing=True,
         model_parallel=(
-            torch.cuda.get_device_properties(0).total_memory < 35e9
+            torch.cuda.is_available()
+            and torch.cuda.get_device_properties(0).total_memory < 35e9
             and torch.cuda.device_count() > 1
         ),
         custom_kwargs={
             "trust_remote_code": True,
-            "bf16": torch.cuda.is_bf16_supported(),
-            "fp32": not torch.cuda.is_bf16_supported(),
+            "bf16": torch.cuda.is_available() and torch.cuda.is_bf16_supported(),
+            "fp32": not (torch.cuda.is_available() and torch.cuda.is_bf16_supported()),
             "revision": "5fde88dff770a7d036847211f5d9d9705f0caa69",
         },
     ),
@@ -71,8 +73,8 @@ MODEL_CONFIGS = [
         # note: you will probably not be able to run this without many gpus
         custom_kwargs={
             "trust_remote_code": True,
-            "bf16": torch.cuda.is_bf16_supported(),
-            "fp32": not torch.cuda.is_bf16_supported(),
+            "bf16": torch.cuda.is_available() and torch.cuda.is_bf16_supported(),
+            "fp32": not (torch.cuda.is_available() and torch.cuda.is_bf16_supported()),
             "revision": "d4efd21e866b9cb3466cb65b963933f5e98016d1",
         },
     ),
@@ -85,8 +87,8 @@ MODEL_CONFIGS = [
         # note: you will probably not be able to run this bf16 support and without many gpus
         custom_kwargs={
             "trust_remote_code": True,
-            "bf16": torch.cuda.is_bf16_supported(),
-            "fp32": not torch.cuda.is_bf16_supported(),
+            "bf16": torch.cuda.is_available() and torch.cuda.is_bf16_supported(),
+            "fp32": not (torch.cuda.is_available() and torch.cuda.is_bf16_supported()),
             "revision": "8be2854218fea9054331e217fd26a06f3fd02004",
         },
     ),
@@ -99,8 +101,8 @@ MODEL_CONFIGS = [
         # note: you will probably not be able to run this without bf16 support and many gpus
         custom_kwargs={
             "trust_remote_code": True,
-            "bf16": torch.cuda.is_bf16_supported(),
-            "fp32": not torch.cuda.is_bf16_supported(),
+            "bf16": torch.cuda.is_available() and torch.cuda.is_bf16_supported(),
+            "fp32": not (torch.cuda.is_available() and torch.cuda.is_bf16_supported()),
             "revision": "fec78c0e3b3b10dd9f0ce775c34a686a3255a7d1",
         },
         # This model is really big, save space by using adafactor.

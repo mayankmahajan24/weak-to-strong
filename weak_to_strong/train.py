@@ -86,7 +86,7 @@ def train_model(
     # If the model is wrapped by DataParallel, it doesn't have a device. In this case,
     # we use GPU 0 as the output device. This sadly means that this device will store
     # a bit more data than other ones, but hopefully should not be too big of a deal.
-    io_device = model.device if hasattr(model, "device") else 0
+    io_device = model.device if hasattr(model, "device") else ("cuda:0" if torch.cuda.is_available() else "cpu")
 
     while step < nsteps:
         loss_tot = 0
@@ -228,13 +228,12 @@ def train_and_save_model(
     else:
         model = TransformerWithHead.from_pretrained(
             model_config.name, num_labels=2, linear_probe=linear_probe, **custom_kwargs
-        ).to("cuda")
+        ).to("cuda" if torch.cuda.is_available() else "cpu")
         already_trained = maybe_load_model(model)
         # data parallel:  currently not supported with model parallel
 
-        minibatch_size = min(minibatch_size_per_device * torch.cuda.device_count(), batch_size)
-
-        if torch.cuda.device_count() > 1:
+        if torch.cuda.is_available() and torch.cuda.device_count() > 1:
+            minibatch_size = min(minibatch_size_per_device * torch.cuda.device_count(), batch_size)
             model = torch.nn.DataParallel(model, output_device=0)
             print(
                 "Using",
@@ -269,7 +268,7 @@ def train_and_save_model(
         if save_path:
             # Note: If the model is wrapped by DataParallel, we need to unwrap it before saving
             (model if hasattr(model, "save_pretrained") else model.module).save_pretrained(
-                save_path
+                save_path, safe_serialization=False
             )
             print("saved", save_path)
 

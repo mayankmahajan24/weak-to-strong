@@ -28,10 +28,11 @@ def clear_mem(verbose: bool = False):
     """
 
     gc.collect()
-    torch.cuda.empty_cache()
-    print(
-        f"torch.cuda.memory_allocated: {torch.cuda.memory_allocated(0) / 1024**3:.2f}GB"
-    )
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        print(
+            f"torch.cuda.memory_allocated: {torch.cuda.memory_allocated(0) / 1024**3:.2f}GB"
+        )
 
     if verbose:
 
