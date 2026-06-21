@@ -15,10 +15,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style('whitegrid')
 
-RESULTS_PATH = os.path.join(os.path.dirname(__file__), "full_results", "default")
+RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results", "data", "baseline")
 MODELS_TO_PLOT = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 PLOT_ALL_SEEDS = False
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "plots")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "results", "plots")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

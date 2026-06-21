@@ -167,7 +167,7 @@ def main(
     # If you pass neither, we will train on ground truth.
     weak_model_size: Optional[str] = None,
     weak_labels_path: Optional[str] = None,
-    sweep_subfolder: str = "default",
+    sweep_subfolder: str = "baseline",
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,

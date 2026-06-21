@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-RESULTS=/home/ubuntu/weak-to-strong/full_results
+RESULTS=/home/ubuntu/weak-to-strong/results/data
 cd /home/ubuntu/weak-to-strong
 
 run_model() {
