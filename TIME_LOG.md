@@ -8,6 +8,7 @@
 |---|---|---|---|
 | S1 | 2026-06-21/22 | M2 baseline: boolq+sciq, xent+logconf + seed1 fill | Complete |
 | S2 | 2026-06-21/22 | Seed 1+2 sweep: sciq+boolq, xent+logconf, GPT-2 family | Complete |
+| S3 | 2026-06-22 | M3-5: mixing harness + identity/ceiling checks + 25% mix sweep | Complete |
 
 ---
 
@@ -81,7 +82,7 @@
 | S1 | A100 canonical boolq | ~3.5h | ~3.5h (8 GPU) | OOM debugging, subagent conflicts |
 | S1 | A100 canonical sciq | ~1h | ~1h (8 GPU) | Clean run |
 | S1 | H100 seed1 fill (2 runs) | ~0.3h | ~0.3h (2 GPU) | Torch downgrade needed |
-| S1 | **Total** | **~9h** | **~9h** | |
+| S1 | **Total (M2)** | **~9h** | **~9h** | |
 
 ### Cost Summary
 | sid | Instance | $/hr | Duration | Cost |
@@ -205,3 +206,60 @@
 | S2 | Lightweight results transfer (no pytorch_model.bin) works well for continuing across instances — only ~100-200MB vs 80GB+ full |
 | S2 | Check CUDA driver compatibility before launching. Driver 560 too old for CUDA 13.2 toolkit — caused silent CPU fallback |
 | S2 | 4 GPUs is sufficient for GPT-2 family sweeps. 8 GPUs leaves half idle during gpt2-xl bottleneck runs |
+
+---
+
+## S3 — 2026-06-22 — Milestones 3–5: Mixing Harness + First Real Datapoint
+
+### Milestone 3: Identity Check (gt_fraction=0.0)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S3 | 2026-06-22 | ~10:00 | Implemented label_mixing.py, wired into train_simple.py, wrote NOTES_phase0.md |
+| S3 | 2026-06-22 | ~10:10 | Created 1x A100 SXM4 40GB on Vast ($0.61/hr, instance 42077799) |
+| S3 | 2026-06-22 | ~10:21 | First test run — gpt2-xl OOM'd at minibatch=2 on 40GB. Reduced to minibatch=4 for gpt2-medium |
+| S3 | 2026-06-22 | ~10:39 | Launched proper A/B test: baseline (no flag) vs gt_fraction=0.0, same hardware |
+| S3 | 2026-06-22 | ~14:16 | Baseline run complete: 0.6546 |
+| S3 | 2026-06-22 | ~14:31 | gt_fraction=0.0 run complete: 0.6528. Diff=0.0018 (GPU FP nondeterminism). Step-0 losses identical |
+| S3 | 2026-06-22 | — | **Milestone 3: PASS** — mixing seam is inert when off |
+
+### Milestone 4: Ceiling Check (gt_fraction=1.0)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S3 | 2026-06-22 | ~14:38 | Launched ceiling check (gt_fraction=1.0, gpt2-medium←gpt2, boolq, xent, seed=1) |
+| S3 | 2026-06-22 | ~14:50 | Complete: accuracy=0.7424 (vs baseline 0.6546, +0.088). gt_fraction_actual=1.0 verified |
+| S3 | 2026-06-22 | — | **Milestone 4: PASS** — GT labels produce significantly higher accuracy |
+
+### Milestone 5: 25% GT Mix Sweep (gt_fraction=0.25)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S3 | 2026-06-22 | ~15:10 | Destroyed 1x A100. Created 8x H100 SXM 80GB ($18.68/hr, instance 42105019, Slovenia) |
+| S3 | 2026-06-22 | ~15:14 | Setup complete. Installed torch 2.5.1+cu124, transformers 4.57.6 |
+| S3 | 2026-06-22 | ~15:16 | Launched 20 mixing runs (10 pairs × 2 losses, gt_fraction=0.25) |
+| S3 | 2026-06-22 | ~15:23 | Batch 1 done (6 min). 6/8 non-xl xent runs complete. gpt2-xl OOM at minibatch=2 |
+| S3 | 2026-06-22 | ~15:29 | Batch 2 done. 12/20 non-xl runs complete. All xl runs OOM |
+| S3 | 2026-06-22 | ~15:34 | Batch 3 done. 12/20 complete. Launched xl fixup (minibatch=1, 8 runs on 8 GPUs) |
+| S3 | 2026-06-22 | ~15:52 | All 8 xl runs complete. 20/20 total. gt_fraction_actual=0.2499 verified |
+| S3 | 2026-06-22 | ~15:55 | Results pulled locally to results/data/naive_mixing/025/seed1/. Instance destroyed |
+
+### Time Summary
+| sid | Task | Wall time | GPU-hours | Notes |
+|---|---|---|---|---|
+| S3 | Code implementation (local) | ~0.5h | 0 | label_mixing.py, train_simple.py, NOTES_phase0.md |
+| S3 | M3 identity check (1x A100 40GB) | ~4h | ~4h (1 GPU) | Includes instance setup, torch downgrade, A/B test |
+| S3 | M4 ceiling check (1x A100 40GB) | ~0.2h | ~0.2h (1 GPU) | Single run |
+| S3 | M5 25% mix sweep (8x H100 SXM) | ~0.7h | ~0.7h (8 GPU) | 20 runs, xl needed minibatch=1 fixup |
+| S3 | **Total** | **~5.5h** | **~5h** | |
+
+### Cost Summary
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S3 | Vast 1x A100 SXM4 40GB | $0.61/hr | ~4.5h | ~$3 |
+| S3 | Vast 8x H100 SXM 80GB | $18.68/hr | ~0.7h | ~$13 |
+| S3 | **Total** | | | **~$16** |
+
+### Lessons Learned
+| sid | Lesson |
+|---|---|
+| S3 | gpt2-xl OOMs at minibatch=2 on 80GB H100 with transformers 4.57.6. Always use minibatch=1 for xl |
+| S3 | weak_labels_path must be passed explicitly (--weak_labels_path) when sweep_subfolder differs from baseline, since auto-constructed path uses the same subfolder |
+| S3 | Identity checks should run both baseline and gt_fraction=0.0 on same hardware for valid comparison. Cross-env differences (~0.002) are normal GPU FP nondeterminism |

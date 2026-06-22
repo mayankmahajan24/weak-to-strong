@@ -170,6 +170,7 @@ def main(
     sweep_subfolder: str = "baseline",
     gt_fraction: float = 0.0,
     gt_seed: int = 42,
+    gt_only: bool = False,
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,
@@ -264,12 +265,17 @@ def main(
         if gt_fraction > 0.0:
             from weak_to_strong.label_mixing import apply_label_mixing
             train1_ds = apply_label_mixing(train1_ds, gt_fraction, gt_seed)
+            if gt_only:
+                train1_ds = train1_ds.filter(lambda ex: ex["label_source"] == "gt")
+                print(f"gt_only: filtered to {len(train1_ds)} GT-only rows")
 
         weak_model_config = json.load(open(weak_labels_path.replace("weak_labels", "config.json")))
         config["weak_model_size"] = weak_model_config["model_size"]
         if gt_fraction > 0.0:
             config["gt_fraction"] = gt_fraction
             config["gt_seed"] = gt_seed
+            if gt_only:
+                config["gt_only"] = True
         config_name = get_config_foldername(config)
         config["weak_model"] = weak_model_config
 

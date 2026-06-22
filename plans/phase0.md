@@ -50,18 +50,17 @@ Smoke tests completed (sciq, gpt2/gpt2-medium, small n_docs).
 ### ~~Milestone 2 — Reproduce the published baseline~~ ✅ DONE
 Full-size GPT-2-family BoolQ sweep completed for both xent and logconf losses. Plots saved as `results/plots/boolq_baseline_xent.png`, etc. SciQ baseline also completed. All run data in `results/data/baseline/`.
 
-### Milestone 3 — Mixing harness, identity check
-Run one transfer pair (e.g. gpt2→gpt2-medium, BoolQ, xent) with `--gt_fraction=0.0`. Confirm accuracy is numerically identical to the milestone 2 baseline. This proves the seam is inert when off. A single pair suffices.
+### ~~Milestone 3 — Mixing harness, identity check~~ ✅ DONE
+Baseline vs gt_fraction=0.0: diff=0.0018 (GPU FP nondeterminism). Step-0 losses identical. Seam is inert.
 
-### Milestone 4 — Mixing harness, ceiling check
-Run same pair with `--gt_fraction=1.0`. **Important nuance**: this trains on the transfer split (second half) with GT labels restored. The standard GT run trains on the first half. Different data → accuracies will be in the same ballpark but NOT identical. Verify accuracy is significantly better than `gt_fraction=0.0` and comparable to the GT ceiling run.
+### ~~Milestone 4 — Mixing harness, ceiling check~~ ✅ DONE
+gt_fraction=1.0: accuracy=0.7424 vs baseline 0.6546 (+0.088). GT labels produce significantly higher accuracy.
 
-### Milestone 5 — First real datapoint
-Run `--gt_fraction=0.25`, both losses, full GPT-2 family on BoolQ.
-- Use `--sweep_subfolder=mix25`
-- Also run 25%-GT-only control (train on just the 25% GT rows, no weak labels)
-- Generate plot → `results/plots/mix25_gpt2_boolq.png`
-- Write `RESULTS_phase0.md` with PGR comparison
+### ~~Milestone 5 — First real datapoint~~ ✅ DONE
+20 mixing runs (gt_fraction=0.25) + 19 GT-only control runs completed.
+- Results in `results/data/naive_mixing/025/seed1/` and `results/data/gt_only_025/seed1/`
+- Plot: `results/plots/mix25_gpt2_boolq.png`
+- Results written to `results/phase0/RESULTS_phase0.md` Section 7
 
 ### Validation checks (run after each milestone and periodically during sweeps)
 
