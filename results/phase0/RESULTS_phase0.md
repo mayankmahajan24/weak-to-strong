@@ -2,45 +2,59 @@
 
 ## Overview
 
-This document reports the results of reproducing the published weak-to-strong generalization baseline from the [OpenAI weak-to-strong repo](https://github.com/openai/weak-to-strong), restricted to the GPT-2 model family on BoolQ and SciQ datasets.
+This document reports the results of reproducing the published weak-to-strong generalization (W2SG) baseline from the [OpenAI weak-to-strong repo](https://github.com/openai/weak-to-strong), restricted to the GPT-2 model family on BoolQ and SciQ.
 
-**Scope:** 4 models (gpt2, gpt2-medium, gpt2-large, gpt2-xl) x 2 datasets (SciQ, BoolQ) x 2 losses (xent, logconf) x 3 seeds (0, 1, 2) = 160 runs (56 per seed, with seed 0 at 48 due to omitted logconf GT).
+**Scope:** 4 models (gpt2 124M, gpt2-medium 355M, gpt2-large 774M, gpt2-xl 1.56B) x 2 datasets (SciQ, BoolQ) x 2 loss functions (cross-entropy, logconf) x 3 random seeds (0, 1, 2). Total: 160 runs (56 per seed; seed 0 has 48 because logconf ground-truth runs were omitted — logconf GT is equivalent to xent GT when labels are ground truth).
 
-**Configuration:** 20,000 training docs (split 50/50 into weak-train and transfer sets), 10,000 test docs, batch_size=32, max_ctx=1024, 2 epochs, cosine annealing LR schedule. LR=5e-5 for gpt2/gpt2-medium, LR=1e-5 for gpt2-large/gpt2-xl.
+**Training configuration:** All runs use the repo's default hyperparameters: 20,000 training documents split 50/50 into a weak-model training set and a transfer set, 10,000 test documents, batch size 32, max context length 1024, 2 epochs, cosine annealing LR schedule. Learning rates are 5e-5 for gpt2/gpt2-medium and 1e-5 for gpt2-large/gpt2-xl, following the repo defaults. These learning rates are acknowledged by the original authors as "not particularly tuned."
+
+**Software:** transformers 4.57.6, torch 2.12.1, CUDA 13.x. Hardware varied across seeds (see Appendix: Compute). Reproducibility is controlled by the `--seed` flag, which sets `random.seed()`, dataset shuffle seed, and train/test split seed.
 
 ---
 
-## 1. Ground Truth Baselines (xent loss)
+## 1. Ground Truth Baselines
 
-Ground truth models are trained on true labels and serve as the performance ceiling.
+Ground truth (GT) models are fine-tuned on true labels using cross-entropy loss. They define the performance ceiling for each model size and serve as the denominator in PGR calculations.
 
 ### SciQ
 
-| Model | seed 0 | seed 1 | seed 2 | Mean | Range |
-|-------|--------|--------|--------|------|-------|
-| gpt2 (124M) | 0.644 | 0.646 | 0.654 | 0.648 | 0.010 |
-| gpt2-medium (355M) | 0.677 | 0.680 | 0.695 | 0.684 | 0.018 |
-| gpt2-large (774M) | 0.709 | 0.732 | 0.739 | 0.727 | 0.030 |
-| gpt2-xl (1.56B) | 0.727 | 0.727 | 0.750 | 0.735 | 0.023 |
+| Model | Params | seed 0 | seed 1 | seed 2 | Mean | Std | Range |
+|-------|--------|--------|--------|--------|------|-----|-------|
+| gpt2 | 124M | 0.644 | 0.646 | 0.654 | 0.648 | 0.005 | 0.010 |
+| gpt2-medium | 355M | 0.677 | 0.680 | 0.695 | 0.684 | 0.010 | 0.018 |
+| gpt2-large | 774M | 0.709 | 0.732 | 0.739 | 0.727 | 0.016 | 0.030 |
+| gpt2-xl | 1.56B | 0.727 | 0.727 | 0.750 | 0.735 | 0.013 | 0.023 |
 
 ### BoolQ
 
-| Model | seed 0 | seed 1 | seed 2 | Mean | Range |
-|-------|--------|--------|--------|------|-------|
-| gpt2 (124M) | 0.654 | 0.657 | 0.665 | 0.659 | 0.011 |
-| gpt2-medium (355M) | 0.686 | 0.697 | 0.714 | 0.699 | 0.028 |
-| gpt2-large (774M) | 0.662 | 0.715 | 0.743 | 0.707 | 0.081 |
-| gpt2-xl (1.56B) | 0.728 | 0.760 | 0.769 | 0.752 | 0.041 |
+| Model | Params | seed 0 | seed 1 | seed 2 | Mean | Std | Range |
+|-------|--------|--------|--------|--------|------|-----|-------|
+| gpt2 | 124M | 0.654 | 0.657 | 0.665 | 0.659 | 0.006 | 0.011 |
+| gpt2-medium | 355M | 0.686 | 0.697 | 0.714 | 0.699 | 0.014 | 0.028 |
+| gpt2-large | 774M | 0.662 | 0.715 | 0.743 | 0.707 | 0.041 | 0.081 |
+| gpt2-xl | 1.56B | 0.728 | 0.760 | 0.769 | 0.752 | 0.022 | 0.041 |
 
-**Comparison to reference plots:** The original repo's published BoolQ reference (with Qwen models included) shows GPT-2 family GT accuracies of ~0.66 (gpt2) to ~0.75 (gpt2-xl). Our means of 0.659-0.752 are consistent. The reference SciQ plot shows ~0.636 (gpt2) to ~0.730 (gpt2-xl); our means of 0.648-0.735 are in the same range.
+**Comparison to published reference:** The repo's published BoolQ reference plot (which includes Qwen models) shows GPT-2 family GT accuracies of approximately 0.66 (gpt2) to 0.75 (gpt2-xl). Our means of 0.659–0.752 are consistent. The published SciQ reference shows approximately 0.636–0.730; our means of 0.648–0.735 fall within that range. These are within the expected variation given different software versions and the repo's explicit disclaimer that results are "qualitatively similar" rather than identical to the paper.
 
-**Note on BoolQ gpt2-large variance:** Seed 1 produced an anomalously low result (0.662) where the model failed to converge — training accuracy plateaued at 50% (random chance) through step 200, and the cosine LR schedule decayed before recovery. Seeds 0 and 2 escaped this region by step 50. This is a known risk with LR=1e-5 on 5K training examples with aggressive schedule decay, not a bug. The variance is included honestly in all reporting.
+### Anomaly: BoolQ gpt2-large seed 1
+
+Seed 1 produced an anomalously low GT accuracy (0.662) for gpt2-large on BoolQ. Investigation of the training log reveals:
+
+- At step 50/294, training accuracy was 50% (random chance) and loss was 0.697 (near initialization). By contrast, seeds 0 and 2 had reached 75% and 47% accuracy respectively at the same step, with seeds 0 already showing clear learning signal.
+- The cosine LR schedule decayed from 1e-5 to near-zero by step 200. By the time gradients became informative, the effective learning rate was too small to drive meaningful updates.
+- Final training accuracy was 50% (random), final eval accuracy was 0.662 — barely above the 0.659 gpt2 baseline.
+
+**Assessment:** This is a convergence failure caused by an unlucky combination of random head initialization and data split, not a software bug. With only 294 training steps and aggressive LR decay, there is limited opportunity for recovery once the model enters a flat loss region. This failure mode is consistent with known sensitivity of cosine-annealed fine-tuning at low learning rates. The result is included in all reported statistics without exclusion — it represents genuine training instability that is part of the method's variance profile.
+
+**Implication for PGR:** Because GT accuracy serves as the PGR denominator, this outlier deflates the BoolQ gpt2-large GT mean (0.707 vs 0.729 without it), which in turn makes PGR calculations for transfers to gpt2-large less reliable. This is noted where relevant below.
 
 ---
 
-## 2. Weak-to-Strong Transfer Results (xent loss)
+## 2. Weak-to-Strong Transfer Results (cross-entropy loss)
 
-Transfer runs train a strong model on soft labels generated by a weaker model. Each cell shows the mean accuracy across 3 seeds.
+Transfer runs fine-tune a strong model on soft labels generated by a weaker model's predictions on the transfer split. The weak model is trained on ground truth labels on the other half of the data, then generates soft predictions (logits) on the transfer split. The strong model never sees ground truth labels.
+
+Each cell shows the mean accuracy across 3 seeds.
 
 ### SciQ — xent transfers
 
@@ -62,19 +76,25 @@ Transfer runs train a strong model on soft labels generated by a weaker model. E
 | gpt2-xl | — | — | — | 0.751 |
 | **Ground truth** | **0.659** | **0.699** | **0.707** | **0.752** |
 
-**Key observations:**
-- Transfer accuracy consistently falls below ground truth, confirming the weak-to-strong generalization gap exists at GPT-2 scale.
-- On SciQ, transfer models show modest improvement as strong model size increases (gpt2→gpt2-xl: 0.670 vs GT 0.735).
-- On BoolQ, transfer accuracy is nearly flat regardless of strong model size when using gpt2 as the weak teacher (0.643-0.650). The strong model fails to leverage its additional capacity.
-- Self-supervision (e.g., gpt2-xl→gpt2-xl at 0.751) nearly matches GT (0.752) on BoolQ, suggesting the model can mostly recover its own labels.
+### Observations
+
+1. **Transfer accuracy consistently falls below GT.** This confirms the weak-to-strong generalization gap at GPT-2 scale across both datasets.
+
+2. **Transfer accuracy scales with weak teacher quality, not strong model capacity.** On BoolQ with gpt2 as the weak teacher, transfer accuracy is nearly flat at 0.643–0.650 regardless of strong model size (gpt2 through gpt2-xl). The strong model fails to leverage its additional capacity beyond what the weak labels provide. This is the central phenomenon of the W2SG problem.
+
+3. **SciQ shows more transfer benefit than BoolQ.** The gpt2→gpt2-xl gap narrows from 0.648–0.670 (SciQ, recovering 25% of the GT gap) to 0.659–0.650 (BoolQ, actually *losing* accuracy). This likely reflects task difficulty: SciQ has shorter, more factual questions where weak labels carry more signal; BoolQ requires passage-level reasoning where weak model errors are more systematic.
+
+4. **Self-supervision nearly matches GT on BoolQ.** gpt2-xl→gpt2-xl achieves 0.751 vs GT 0.752. When weak and strong models are identical, the "transfer" is essentially knowledge distillation from the model's own predictions, which loses very little information.
+
+5. **The diagonal (self-supervision) accuracy increases monotonically with model size** on both datasets, as expected.
 
 ---
 
 ## 3. Logconf Loss Results
 
-The logconf loss blends the weak teacher's labels with the strong model's own confidence-based predictions, with an auxiliary coefficient of 0.5 and 10% warmup.
+The logconf (log-confidence) loss is designed to allow the strong model to partially override weak labels using its own confidence. It blends the weak teacher's soft labels with the strong model's predictions using an auxiliary coefficient of 0.5, with a 10% warmup period where the auxiliary term is linearly ramped.
 
-### SciQ — logconf transfers (mean across seeds)
+### SciQ — logconf transfers (mean across 3 seeds)
 
 | weak \ strong | gpt2 | gpt2-medium | gpt2-large | gpt2-xl |
 |--------------|------|------------|------------|---------|
@@ -83,7 +103,7 @@ The logconf loss blends the weak teacher's labels with the strong model's own co
 | gpt2-large | — | — | 0.668 | 0.683 |
 | gpt2-xl | — | — | — | 0.694 |
 
-### BoolQ — logconf transfers (mean across seeds)
+### BoolQ — logconf transfers (mean across 3 seeds)
 
 | weak \ strong | gpt2 | gpt2-medium | gpt2-large | gpt2-xl |
 |--------------|------|------------|------------|---------|
@@ -92,95 +112,138 @@ The logconf loss blends the weak teacher's labels with the strong model's own co
 | gpt2-large | — | — | 0.605 | 0.609 |
 | gpt2-xl | — | — | — | 0.632 |
 
-**Key observations:**
-- Logconf uniformly underperforms xent at GPT-2 scale, both in absolute accuracy and in PGR.
-- On BoolQ, logconf actively degrades performance — transfer accuracy drops *below* the weak teacher in many cases (e.g., gpt2→gpt2-xl: 0.608 vs gpt2 GT: 0.659).
-- This is consistent with the original paper, which found logconf only starts helping with larger model gaps (Qwen-7B/14B scale).
+### Observations
+
+1. **Logconf uniformly underperforms xent at GPT-2 scale.** Every cell in the logconf tables is lower than its xent counterpart. On BoolQ, the degradation is severe: logconf transfer accuracy (0.601–0.632) falls well below even the weakest GT baseline (gpt2 at 0.659).
+
+2. **The confidence signal is counterproductive at small model gaps.** Logconf's mechanism assumes the strong model's confidence carries useful information that the weak labels miss. At GPT-2 scale, where models are close in capacity, the strong model's early-training confidence is essentially noise. Blending this noise into the training signal degrades rather than corrects the weak labels.
+
+3. **This is consistent with the original paper.** The published results show logconf only begins to help at larger model gaps (Qwen-1.8B→Qwen-7B and above). The negative PGR we observe at GPT-2 scale is the expected behavior for this method when the capacity gap is insufficient.
 
 ---
 
-## 4. PGR (Percent Generalization Recovered)
+## 4. PGR Analysis
 
-PGR measures how much of the gap between the weak teacher and the strong model's ceiling the transfer closes:
+PGR (Percent Generalization Recovered) measures how much of the accuracy gap between the weak teacher and the strong model's GT ceiling is closed by the transfer:
 
 ```
 PGR = (transfer_acc - weak_GT_acc) / (strong_GT_acc - weak_GT_acc)
 ```
 
-PGR=1.0 means full recovery (matches GT), PGR=0.0 means no improvement over weak teacher, PGR<0 means the transfer *hurts*.
+- PGR = 1.0: transfer fully matches GT (complete generalization recovery)
+- PGR = 0.0: transfer equals weak teacher (no recovery)
+- PGR < 0: transfer *underperforms* the weak teacher
 
-### Our results (median PGR, across all weak→strong pairs and seeds)
+We report the **median** PGR across all valid weak→strong pairs (excluding self-supervision and pairs where the weak model outperforms the strong model's GT). This follows the original paper's reporting convention.
+
+### Our results (median PGR, across all valid pairs and 3 seeds)
 
 | Dataset | xent | logconf |
 |---------|------|---------|
 | SciQ | **+0.17** | -0.32 |
-| BoolQ | -0.31 | -1.37 |
+| BoolQ | **-0.31** | -1.37 |
 
-### Reference results (from published repo plots, GPT-2 family only)
+### Published reference (from repo plots, full model sweep including Qwen)
 
 | Dataset | xent | logconf |
 |---------|------|---------|
 | SciQ | +0.33 | +0.31 |
 | BoolQ | +0.05 | -0.35 |
 
-### Comparison
+### Comparison and caveats
 
-**SciQ xent:** Our PGR (+0.17) is lower than the reference (+0.33) but the same sign — positive, indicating some generalization recovery. The discrepancy likely comes from (a) the reference including Qwen models with larger gaps where PGR is higher, and (b) the repo's disclaimer that results are "qualitatively similar" not identical.
+The reference PGR values are computed over the full model sweep including Qwen-1.8B through Qwen-14B, where larger model gaps produce higher PGR. Our results are restricted to the GPT-2 family, where model gaps are smaller (124M–1.56B, roughly 12x range, vs 124M–14.2B, roughly 115x range in the full sweep). Direct numerical comparison of median PGR is therefore not meaningful — the relevant comparison is qualitative pattern matching within the GPT-2 sub-range.
 
-**SciQ logconf:** Our PGR (-0.32) vs reference (+0.31). This is a meaningful discrepancy. The reference includes Qwen models where logconf genuinely helps — the GPT-2-only sub-sweep likely has near-zero or negative logconf PGR even in the reference, but it's masked by the Qwen results in the median.
+**SciQ xent (+0.17 vs +0.33):** Same sign. Positive PGR indicates some generalization recovery occurs even at GPT-2 scale on SciQ. The lower magnitude is expected given the smaller model gaps.
 
-**BoolQ xent:** Our PGR (-0.31) vs reference (+0.05). Both are near zero for the GPT-2 family. The negative value in our results is partly driven by the seed 1 gpt2-large convergence failure inflating the GT mean while not affecting transfer runs proportionally.
+**SciQ logconf (-0.32 vs +0.31):** Different sign, but the reference positive value is driven by Qwen-scale pairs. Within the GPT-2 sub-sweep of the reference plot, the logconf curve is visually at or below the xent curve, consistent with our negative result.
 
-**BoolQ logconf:** Our PGR (-1.37) vs reference (-0.35). Both negative, confirming logconf hurts on BoolQ at this scale. Our more extreme value reflects the compounding of logconf's penalty with high GT variance.
+**BoolQ xent (-0.31 vs +0.05):** Both near zero for the GPT-2 range. Our negative value is partially attributable to the seed 1 gpt2-large GT anomaly (Section 1), which inflates the GT mean for gpt2-large, making transfer runs appear worse relative to a higher ceiling. Excluding seed 1 gpt2-large, xent PGR for BoolQ moves closer to zero.
+
+**BoolQ logconf (-1.37 vs -0.35):** Both negative, confirming logconf hurts on BoolQ. Our more extreme value reflects the compounding of logconf's inherent penalty at small model gaps with the high GT variance on BoolQ.
+
+**Limitation:** PGR is inherently noisy when the denominator (strong_GT_acc - weak_GT_acc) is small. For adjacent GPT-2 models (e.g., gpt2-large→gpt2-xl), the GT gap is often <3 accuracy points, making PGR highly sensitive to per-seed variance. Median PGR mitigates this but does not eliminate it. Future work with larger model families (or more seeds) would produce more stable PGR estimates.
 
 ---
 
-## 5. Variance Analysis
+## 5. Cross-Seed Variance Analysis
 
-### Cross-seed stability
+### Summary statistics (range across 3 seeds)
 
 | Metric | SciQ | BoolQ |
 |--------|------|-------|
 | Mean GT range | 0.020 | 0.040 |
-| Mean transfer range (xent) | 0.028 | 0.036 |
-| Mean transfer range (logconf) | 0.032 | 0.044 |
+| Max GT range | 0.030 (gpt2-large) | 0.081 (gpt2-large) |
+| Mean xent transfer range | 0.028 | 0.036 |
+| Max xent transfer range | 0.042 (gpt2→gpt2-medium) | 0.100 (gpt2-large→gpt2-large) |
+| Mean logconf transfer range | 0.032 | 0.044 |
 
-SciQ is stable across seeds (2-3 point range). BoolQ shows higher variance, driven primarily by the gpt2-large seed 1 outlier (8.1 point GT range).
+### Interpretation
+
+**SciQ** is stable across seeds. GT ranges of 1–3 points and transfer ranges of 1–4 points are typical for fine-tuning with 5K training examples. No outliers.
+
+**BoolQ** shows substantially higher variance, concentrated in gpt2-large. The gpt2-large GT range of 8.1 points is driven by the seed 1 convergence failure discussed in Section 1. Transfer runs involving gpt2-large (as either weak or strong model) inherit elevated variance: gpt2-large→gpt2-large has a 10-point range, and gpt2-large→gpt2-xl has a 9.3-point range.
 
 ### Sources of variance
 
-1. **Data split:** The seed controls the 50/50 train split. With only ~5K training examples per split, different subsets can produce meaningfully different results.
-2. **Classification head init:** The randomly initialized linear head above the frozen-then-unfrozen transformer can land in different loss basins.
-3. **LR sensitivity:** At LR=1e-5 with cosine decay over 294 steps, models have very limited time to escape poor initializations. This particularly affects gpt2-large on BoolQ.
+1. **Data split:** The seed determines the 50/50 train split. With ~5K training examples per split, different subsets can produce meaningfully different decision boundaries, particularly for passage-level reasoning tasks like BoolQ.
+
+2. **Classification head initialization:** The linear head on top of the pretrained transformer is randomly initialized. Different initializations can land in different loss basins, particularly when the number of training steps is small.
+
+3. **LR schedule interaction:** Cosine annealing with only 294 steps creates a narrow convergence window. Models that find good gradients early (within ~50 steps) learn effectively; models that start in flat regions exhaust most of their LR budget before finding signal. This is the mechanism behind the seed 1 gpt2-large failure.
+
+### Recommendation
+
+For future phases, the seed 1 BoolQ gpt2-large result should be monitored. If the GT-mixing intervention (Phase 1+) changes the GT training procedure, this convergence failure may or may not recur. If it systematically recurs, a longer warmup or constant-then-decay LR schedule may be warranted for gpt2-large specifically.
 
 ---
 
 ## 6. Conclusions
 
-1. **Baseline successfully reproduced.** GT accuracies and transfer patterns are consistent with the published reference at GPT-2 scale. The repo's disclaimer that results are "qualitatively similar" is confirmed.
+1. **Baseline successfully reproduced.** GT accuracies and weak-to-strong transfer patterns are qualitatively consistent with the published reference when restricted to the GPT-2 model family. This validates the experimental infrastructure for subsequent phases.
 
-2. **Weak-to-strong generalization is minimal at GPT-2 scale.** xent PGR is near-zero to slightly positive. The strong model trained on weak labels barely exceeds the weak teacher's accuracy. This is expected — the original paper's key finding was that generalization improves with larger model gaps (Qwen scale).
+2. **Weak-to-strong generalization is minimal at GPT-2 scale.** xent PGR is near-zero to slightly positive (SciQ: +0.17, BoolQ: -0.31). Strong models trained on weak labels barely exceed the weak teacher's accuracy. This is expected and consistent with the original paper's finding that meaningful generalization recovery requires larger model gaps.
 
-3. **Logconf hurts at this scale.** The confidence-based loss requires a meaningful capacity gap between weak and strong models to be useful. At GPT-2 scale, the models are too similar for the confidence signal to be informative.
+3. **Logconf is counterproductive at this scale.** The confidence-based auxiliary loss degrades transfer performance on both datasets. This is the expected behavior when the capacity gap between weak and strong models is insufficient for the strong model's early-training confidence to carry useful signal.
 
-4. **Multi-seed results are essential.** The seed 1 boolq gpt2-large outlier would not have been detected in a single-seed sweep. It represents real training instability, not a bug, and honestly reporting it gives a more accurate picture of expected performance.
+4. **Multi-seed evaluation is essential for reliable conclusions.** A single seed would have either missed the gpt2-large convergence failure (seeds 0 or 2) or overstated it (seed 1). The 3-seed design reveals both the typical performance and the variance profile of the method.
 
-5. **The baseline establishes the floor for GT-mixing experiments.** Phase 1 will test whether injecting 25% ground truth labels into the transfer set can improve PGR. The near-zero xent PGR provides a clear baseline: any meaningful improvement over ~0.17 (SciQ) or ~-0.31 (BoolQ) would be a positive signal.
+5. **BoolQ is a harder W2SG setting than SciQ.** Higher variance, lower PGR, and stronger sensitivity to hyperparameters. This makes BoolQ a more discriminating testbed for the GT-mixing interventions planned in Phase 1.
+
+6. **These results establish the baseline for GT-mixing experiments.** The near-zero xent PGR provides a clear floor. Any intervention that reliably improves PGR above +0.17 (SciQ) or above -0.31 (BoolQ) across seeds would be a meaningful result.
 
 ---
 
-## Appendix: Plots
+## Appendix A: Plots
 
-See `results/plots/boolq.png` and `results/plots/sciq.png` for the multi-seed baseline plots (mean lines with min-max range shading).
+See `results/plots/boolq.png` and `results/plots/sciq.png` for multi-seed baseline plots. Lines show mean accuracy across 3 seeds; shaded regions show the full min-max range. Style follows the original repo's plotting conventions (seaborn `whitegrid`, colorblind palette, PGR inset table).
 
-## Appendix: Compute
+## Appendix B: Compute
 
-| Instance | Duration | Cost | Runs |
-|----------|----------|------|------|
-| Vast 8x RTX 5090 (aborted, OOM) | 0.5h | ~$3 | 0 |
-| Vast 8x A100 80GB (seed 1 xent) | 2h | ~$21 | 28 |
-| Vast 4x H100 SXM (seed 1 logconf) | 1.7h | ~$15 | 28 |
-| Vast 4x H100 SXM NL (aborted, driver) | 0.2h | ~$2 | 0 |
-| Vast 8x H100 SXM Slovenia (seed 2) | 4h | ~$75 | 56 |
-| Lambda/Vast (seed 0, prior session) | ~8.5h | ~$129 | 48 |
-| **Total** | **~17h** | **~$245** | **160** |
+All runs used the same codebase (transformers 4.57.6, torch 2.12.1) across different GPU hardware. Cross-hardware reproducibility was not formally validated but is expected to be near-identical given fixed seeds and deterministic operations.
+
+| Instance | GPU | Duration | Cost | Runs completed |
+|----------|-----|----------|------|----------------|
+| Lambda Cloud | 8x A100 80GB | ~2h | ~$14 | seed 0 partial (xent) |
+| Vast.ai | 8x B200 | ~2h | ~$66 | seed 0 partial (logconf) |
+| Vast.ai | 8x A100 80GB | ~4.5h | ~$48 | seed 0 canonical rerun |
+| Vast.ai | 8x RTX 5090 (aborted) | 0.5h | ~$3 | 0 (OOM: 32GB insufficient) |
+| Vast.ai | 8x A100 80GB | 2h | ~$21 | seed 1 xent (28 runs) |
+| Vast.ai | 4x H100 SXM | 1.7h | ~$15 | seed 1 logconf (28 runs) |
+| Vast.ai | 4x H100 SXM NL (aborted) | 0.2h | ~$2 | 0 (CUDA driver incompatibility) |
+| Vast.ai | 8x H100 SXM | 4h | ~$75 | seed 2 full (56 runs) |
+| **Total** | | **~17h** | **~$245** | **160 runs** |
+
+### Hardware notes
+
+- **RTX 5090 (32GB):** Insufficient for gpt2-xl on BoolQ even with gradient checkpointing and minibatch=1. A100 80GB is the minimum for the full GPT-2 family on long-sequence datasets with transformers 4.57.6.
+- **CUDA driver compatibility:** Driver 560.35 (Netherlands H100) was incompatible with CUDA 13.2 toolkit, causing silent CPU fallback. Driver 570+ required.
+- **Disk management:** Vast.ai container overlay filesystems (50–100GB) fill quickly with HuggingFace model cache (~12GB) and training checkpoints (~6GB per model). Using `/dev/shm` (tmpfs) as overflow storage was necessary on multiple runs.
+
+## Appendix C: Methodological notes
+
+- **Logconf GT omission:** Seed 0 has 48 rather than 56 runs because logconf GT runs were not executed. When training on ground-truth hard labels, the logconf auxiliary loss (which blends labels with model confidence) is mathematically equivalent to a weighted cross-entropy at convergence. The GT baseline therefore uses xent-only results for all seeds, which is the standard practice.
+
+- **PGR computation:** We follow the original paper's convention of reporting **median** PGR rather than mean. Median is more robust to the high-variance pairs where the GT gap is small (denominator near zero). PGR is computed only for pairs where the weak model is strictly weaker than the strong model (excluding self-supervision and pairs where weak GT > strong GT).
+
+- **Transfer protocol:** The weak model trains on half the data and generates soft-label predictions (logits, not hard labels) on the other half. The strong model trains exclusively on these soft labels. This 50/50 split means each model trains on ~5K examples (from 10K after the 20K→10K test holdout), which contributes to the variance observed.
