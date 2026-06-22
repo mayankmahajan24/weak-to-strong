@@ -9,6 +9,8 @@
 | S1 | 2026-06-21/22 | M2 baseline: boolq+sciq, xent+logconf + seed1 fill | Complete |
 | S2 | 2026-06-21/22 | Seed 1+2 sweep: sciq+boolq, xent+logconf, GPT-2 family | Complete |
 | S3 | 2026-06-22 | M3-5: mixing harness + identity/ceiling checks + 25% mix sweep | Complete |
+| S4 | 2026-06-22 | Seed 2 full sweep + seed 0 GT weak labels regeneration + RESULTS_phase0 writeup | Complete |
+| S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 mixing + GT-only results off orphaned instance | Complete |
 
 ---
 
@@ -263,3 +265,103 @@
 | S3 | gpt2-xl OOMs at minibatch=2 on 80GB H100 with transformers 4.57.6. Always use minibatch=1 for xl |
 | S3 | weak_labels_path must be passed explicitly (--weak_labels_path) when sweep_subfolder differs from baseline, since auto-constructed path uses the same subfolder |
 | S3 | Identity checks should run both baseline and gt_fraction=0.0 on same hardware for valid comparison. Cross-env differences (~0.002) are normal GPU FP nondeterminism |
+
+---
+
+## S4 — 2026-06-22 — Seed 2 Sweep + Seed 0 GT Weak Labels + Results Writeup
+
+### Seed 2 full sweep (8x H100 SXM, Slovenia)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S4 | 2026-06-22 | ~05:30 | Attempted 4x H100 Netherlands — CUDA driver 560 too old, training fell back to CPU |
+| S4 | 2026-06-22 | ~05:40 | Destroyed NL instance. Created 8x H100 SXM Slovenia ($18.69/hr, driver 570) |
+| S4 | 2026-06-22 | 05:46 | Launched seed 2 full sweep (56 runs: xent + logconf, sciq + boolq) |
+| S4 | 2026-06-22 | 05:58 | sciq xent GT done (12 min) |
+| S4 | 2026-06-22 | 06:19 | sciq xent complete (14/14, 33 min) |
+| S4 | 2026-06-22 | 06:58 | boolq xent complete (14/14). All 28 xent runs done |
+| S4 | 2026-06-22 | 06:58 | Logconf auto-started — disk full on model save (100GB overlay). gpt2 + medium GT failed |
+| S4 | 2026-06-22 | 08:28 | Moved cache + results to /dev/shm. Restarted logconf clean |
+| S4 | 2026-06-22 | 09:01 | sciq logconf complete (14/14) |
+| S4 | 2026-06-22 | 09:40 | boolq logconf complete (14/14). All 56 seed 2 runs done |
+| S4 | 2026-06-22 | 09:56 | Downloaded results (130MB). Extracted to results/data/baseline/seed2/. Instance destroyed |
+
+### RESULTS_phase0.md writeup
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S4 | 2026-06-22 | ~10:00 | Wrote RESULTS_phase0.md — full baseline analysis with 3-seed GT tables, transfer matrices, PGR comparison vs published reference, variance analysis, seed 1 gpt2-large anomaly investigation |
+| S4 | 2026-06-22 | ~10:30 | Revised for research rigor — added std devs, PGR denominator instability caveat, methodological appendix |
+| S4 | 2026-06-22 | ~10:45 | Committed and pushed (5b3ceb3, 101f09c) |
+
+### Seed 0 GT weak labels regeneration (4x H100 SXM)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S4 | 2026-06-22 | ~17:25 | Created 4x H100 SXM ($11.74/hr). Launched 8 GT runs (4 models × 2 datasets, seed=0) |
+| S4 | 2026-06-22 | 17:35 | sciq GT done (10 min) |
+| S4 | 2026-06-22 | 17:48 | boolq GT done (13 min). All 8 GT runs with weak_labels arrow files complete |
+| S4 | 2026-06-22 | ~17:50 | First instance exited unexpectedly. Spun up replacement, re-ran 8 GT runs |
+| S4 | 2026-06-22 | 19:02 | Replacement instance: launched 8 GT runs |
+| S4 | 2026-06-22 | 19:12 | sciq GT done |
+| S4 | 2026-06-22 | 19:25 | boolq GT done. Tarball created (12MB slim: config + log + results_summary + weak_labels arrows) |
+| S4 | 2026-06-22 | 19:32 | Downloaded and extracted to results/data/baseline/seed0/. Instance destroyed |
+
+### Time Summary
+| sid | Task | Wall time | GPU-hours | Notes |
+|---|---|---|---|---|
+| S4 | Seed 2 full sweep (8x H100) | ~4h | ~4h (8 GPU) | Disk full added ~1.5h idle |
+| S4 | RESULTS_phase0 writeup | ~1h | 0 | Local only |
+| S4 | Seed 0 GT weak labels (4x H100, two attempts) | ~1h | ~0.5h (4 GPU) | First instance exited, re-ran |
+| S4 | **Total** | **~6h** | **~4.5h** | |
+
+### Cost Summary
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S4 | Vast 4x H100 NL (aborted, driver) | $9.60/hr | ~0.2h | ~$2 |
+| S4 | Vast 8x H100 SXM Slovenia (seed 2) | $18.69/hr | ~4h | ~$75 |
+| S4 | Vast 4x H100 SXM (seed 0 GT, attempt 1) | $11.74/hr | ~0.5h | ~$6 |
+| S4 | Vast 4x H100 SXM (seed 0 GT, attempt 2) | $11.74/hr | ~0.5h | ~$6 |
+| S4 | **Total** | | | **~$89** |
+
+### Lessons Learned
+| sid | Lesson |
+|---|---|
+| S4 | results.pkl files are massive (up to 5.9GB for gpt2-xl). Exclude from tarballs — results_summary.json has the accuracy |
+| S4 | When tarring, use find + tar -T for precise file selection. --exclude with glob patterns is unreliable for nested dirs |
+| S4 | Vast instances can exit unexpectedly. Download results immediately after completion — don't leave data on ephemeral instances |
+
+---
+
+## S5 — 2026-06-22 — Recovery: Capture Seed-1 Phase 1 Results
+
+**Recovery session.** A prior session launched Phase 1 seed-1 mixing + GT-only runs on
+8× H200 instance `42131402` (ssh5.vast.ai:11402) but was interrupted before the results
+were pulled. Instance was found still running with no active jobs; run dirs timestamped
+~20:12–21:24 UTC. This session reconnected and captured the completed results.
+
+### Capture
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S5 | 2026-06-22 | ~22:00 | **Recovery start.** Confirmed VAST_API_KEY in env; v0 CLI deprecated, used v1 API to locate running instance 42131402 (8× H200) |
+| S5 | 2026-06-22 | ~22:05 | SSH'd in. No jobs running. Inventoried results: 108 results_summary.json (naive_mixing 025/050/100, gt_only 001–100) |
+| S5 | 2026-06-22 | ~22:10 | rsync'd naive_mixing + gt_only excluding *.pkl (pulled config.json + log.jsonl + results_summary.json only; ~1MB JSON vs 1.2GB with pkls) |
+| S5 | 2026-06-22 | ~22:15 | Verified: 050/100 pulled with 0 pkl; gt_only all 6 fractions × 8 runs present. Instance-origin data is seed1, gt_seed=1 |
+| S5 | 2026-06-22 | ~22:20 | Wrote consolidate_phase1.py → phase1_seed1_results.csv (196 rows, filtered to boolq/seed1/gt_seed=1; dropped Phase 0 gt_seed=42 artifacts) |
+| S5 | 2026-06-22 | ~22:25 | Wrote results/phase1/CAPTURE_seed1.md provenance manifest. xent mixing curve verified monotonic-increasing (0.657→0.743) |
+
+### Status after capture
+- Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** — all fractions present.
+- Still pending: seeds 0 & 2 sweep (M3), GT weak_labels regen for seeds 0/2 (M1), noise floor + plots (M5/M6).
+- Instance `42131402` left **running** (holds the results.pkl files) — destroy to stop billing once capture is confirmed.
+
+### Time / Cost Summary
+| sid | Task | Wall time | GPU-hours | Notes |
+|---|---|---|---|---|
+| S5 | Recovery capture (local + rsync) | ~0.4h | 0 | No new compute; data pull + consolidation only |
+
+Instance 42131402 (8× H200) billing accrues while left running — not counted here.
+
+### Lessons Learned
+| sid | Lesson |
+|---|---|
+| S5 | Bundled vastai CLI (0.3.1) hits deprecated v0 API (410 error). Use v1 endpoint directly: `curl -H "Authorization: Bearer $VAST_API_KEY" https://console.vast.ai/api/v1/instances/` |
+| S5 | Pull results immediately after a sweep — an interrupted session left a fully-computed instance billing idle. rsync --exclude='*.pkl' captures all the numbers (~1MB) without the 1.2GB prediction dumps |
+| S5 | macOS has no `timeout` cmd; use ssh -o ConnectTimeout instead for connection guards |
