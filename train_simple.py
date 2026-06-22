@@ -168,6 +168,8 @@ def main(
     weak_model_size: Optional[str] = None,
     weak_labels_path: Optional[str] = None,
     sweep_subfolder: str = "baseline",
+    gt_fraction: float = 0.0,
+    gt_seed: int = 42,
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,
@@ -258,8 +260,16 @@ def main(
         train1_ds = load_from_disk(weak_labels_path)
         train2_ds = None
 
+        # Mix ground-truth labels into weak labels if requested
+        if gt_fraction > 0.0:
+            from weak_to_strong.label_mixing import apply_label_mixing
+            train1_ds = apply_label_mixing(train1_ds, gt_fraction, gt_seed)
+
         weak_model_config = json.load(open(weak_labels_path.replace("weak_labels", "config.json")))
         config["weak_model_size"] = weak_model_config["model_size"]
+        if gt_fraction > 0.0:
+            config["gt_fraction"] = gt_fraction
+            config["gt_seed"] = gt_seed
         config_name = get_config_foldername(config)
         config["weak_model"] = weak_model_config
 
@@ -304,6 +314,11 @@ def main(
 
     acc = np.mean([x["acc"] for x in test_results])
     res_dict = {"accuracy": acc}
+    if gt_fraction > 0.0:
+        gt_count = sum(1 for ex in train1_ds if ex.get("label_source") == "gt")
+        res_dict["gt_fraction_actual"] = gt_count / len(train1_ds)
+        res_dict["gt_fraction_requested"] = gt_fraction
+        res_dict["gt_seed"] = gt_seed
     print("accuracy:", acc)
 
     with open(os.path.join(save_path, f"config.json"), "w") as f:
