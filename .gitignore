@@ -3,3 +3,7 @@ dump
 *.swp
 *.swo
 *.pem
+.DS_Store
+results/
+full_results/
+.ipynb_checkpoints/

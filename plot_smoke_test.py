@@ -16,8 +16,7 @@ import seaborn as sns
 sns.set_style('whitegrid')
 
 RESULTS_PATHS = [
-    os.path.join(os.path.dirname(__file__), "results", "data", "baseline"),
-    os.path.join(os.path.dirname(__file__), "results", "data", "full_results", "default"),
+    os.path.join(os.path.dirname(__file__), "results", "data", "baseline", "seed0"),
 ]
 MODELS_TO_PLOT = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 PLOT_ALL_SEEDS = False
