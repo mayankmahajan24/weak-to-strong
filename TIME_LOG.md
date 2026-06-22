@@ -10,7 +10,7 @@
 | S2 | 2026-06-21/22 | Seed 1+2 sweep: sciq+boolq, xent+logconf, GPT-2 family | Complete |
 | S3 | 2026-06-22 | M3-5: mixing harness + identity/ceiling checks + 25% mix sweep | Complete |
 | S4 | 2026-06-22 | Seed 2 full sweep + seed 0 GT weak labels regeneration + RESULTS_phase0 writeup | Complete |
-| S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 mixing + GT-only results off orphaned instance | Complete |
+| S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 results + analysis + pre-registration | Complete |
 
 ---
 
@@ -346,16 +346,27 @@ were pulled. Instance was found still running with no active jobs; run dirs time
 | S5 | 2026-06-22 | ~22:15 | Verified: 050/100 pulled with 0 pkl; gt_only all 6 fractions × 8 runs present. Instance-origin data is seed1, gt_seed=1 |
 | S5 | 2026-06-22 | ~22:20 | Wrote consolidate_phase1.py → phase1_seed1_results.csv (196 rows, filtered to boolq/seed1/gt_seed=1; dropped Phase 0 gt_seed=42 artifacts) |
 | S5 | 2026-06-22 | ~22:25 | Wrote results/phase1/CAPTURE_seed1.md provenance manifest. xent mixing curve verified monotonic-increasing (0.657→0.743) |
+| S5 | 2026-06-22 | ~22:30 | Committed + pushed capture (59ee63e): CSV + consolidate script + manifest + plan + S5 log |
 
-### Status after capture
-- Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** — all fractions present.
-- Still pending: seeds 0 & 2 sweep (M3), GT weak_labels regen for seeds 0/2 (M1), noise floor + plots (M5/M6).
+### Analysis (local, no GPU)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S5 | 2026-06-22 | ~22:40 | Wrote analyze_phase1.py. Computed PGR fraction curve, mixing-vs-GT-only, scale interaction (PGR = (xfer−weak_GT)/(strong_GT−weak_GT), median over valid pairs) |
+| S5 | 2026-06-22 | ~22:45 | Key reads: xent knee at 0.25 (PGR −0.21→+0.27); mixing beats GT-only at every frac<1.0 (+0.04–0.06); logconf null (flat ~0.60); scale interaction underpowered (gpt2-large GT anomaly removes large-as-student pairs) |
+| S5 | 2026-06-22 | ~22:55 | Wrote robustness_phase1.py — seed-independent checks. Knee unanimous (4/4 pairs flip at 0.25), survives metric choice, 18× FP noise floor. Validation clean (gt_fraction_actual OK; gt_only=1.0 by construction; 0 degenerate runs) |
+| S5 | 2026-06-22 | ~23:00 | Wrote NOTES_phase1.md pre-registration: froze pipeline (7 decisions) + 6 falsifiable predictions (P1–P6) against seed-1 only, anchored to commit 59ee63e before seeds 0/2 |
+| S5 | 2026-06-22 | ~23:05 | Committed + pushed pre-registration (773b2f2): NOTES_phase1.md + analyze + robustness scripts |
+
+### Status after S5
+- Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** + analyzed; pre-registration locked.
+- Still pending: seeds 0 & 2 sweep (M3), GT weak_labels regen for seeds 0/2 + seed-1 gpt2-large fix (M1), noise floor + plots (M5/M6), scoring P1–P6.
 - Instance `42131402` left **running** (holds the results.pkl files) — destroy to stop billing once capture is confirmed.
 
 ### Time / Cost Summary
 | sid | Task | Wall time | GPU-hours | Notes |
 |---|---|---|---|---|
 | S5 | Recovery capture (local + rsync) | ~0.4h | 0 | No new compute; data pull + consolidation only |
+| S5 | Seed-1 analysis + robustness + pre-registration | ~0.7h | 0 | Local only |
 
 Instance 42131402 (8× H200) billing accrues while left running — not counted here.
 
@@ -365,3 +376,5 @@ Instance 42131402 (8× H200) billing accrues while left running — not counted 
 | S5 | Bundled vastai CLI (0.3.1) hits deprecated v0 API (410 error). Use v1 endpoint directly: `curl -H "Authorization: Bearer $VAST_API_KEY" https://console.vast.ai/api/v1/instances/` |
 | S5 | Pull results immediately after a sweep — an interrupted session left a fully-computed instance billing idle. rsync --exclude='*.pkl' captures all the numbers (~1MB) without the 1.2GB prediction dumps |
 | S5 | macOS has no `timeout` cmd; use ssh -o ConnectTimeout instead for connection guards |
+| S5 | gt_fraction_actual is 1.0 for GT-only runs by construction (weak labels discarded → 100% of used labels are GT); only compare actual-vs-requested for mixing runs |
+| S5 | Pre-register predictions + freeze the pipeline against the first seed BEFORE collecting confirmation seeds, anchored to a git commit. Converts later seeds into a real out-of-sample test instead of post-hoc analysis. Seed-1 robustness (per-pair unanimity, metric-invariance, effect-vs-noise) is checkable without the other seeds |
