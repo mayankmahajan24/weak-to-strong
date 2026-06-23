@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.525,
+  "gt_fraction_actual": 0.1,
+  "gt_fraction_requested": 0.1,
+  "gt_seed": 1,
+  "mixing_strategy": "random_labels"
+}

@@ -542,3 +542,31 @@ Inserted Phase 1b as a GATE before Phase 2 (don't tune strategies until the test
 | S8 | Paired (same pair/seed, swap only the label condition) contrasts are cheap power: pair/seed variance cancels → MDE ~0.007 over 14–15 cells, so a within-noise result is a real null, not underpowered |
 | S8 | random_labels (Bernoulli noise on non-GT rows) is the clean row-count control for "mixing > GT-only"; it landed *below* gt_only (noise hurts), which is exactly what makes the weak-label-information conclusion airtight |
 | S8 | The pkill-self-kill footgun (S5/S7) avoided by launching without pkill; per-run `pytorch_model*.bin` cleanup kept overlay at 13/100 GB despite gpt2-xl sharded weights |
+
+### Component C — SciQ validity (8× H200, instance 42244966, Iceland, $25.79/hr)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S8 | 2026-06-23 | ~05:30 | Provisioned 8× H200; rsync code + 12 SciQ xent weak_labels (gpt2/medium/large/xl × 3 seeds); deps pinned. Armed 3h dead-man. Launched run_c_driver.py: 144 runs (mixing 120 + random_labels 24) |
+| S8 | 2026-06-23 | ~06:15 | 144/144 ok, 0 failed (~45 min; SciQ ~2× faster than BoolQ — xl ~335s vs 625s). 3 acc≈0.5 were random_labels@0.10 (control near chance, by design). Pulled slim, destroyed instance + confirmed via API |
+
+### Component C results
+- **SciQ vs BoolQ curve:** SciQ is *cleaner* (PGR positive & monotonic from 0.10: +0.16→+0.94;
+  BoolQ starts negative) but moves *less* in raw acc (+0.033 vs +0.055 at 1.0 — less headroom).
+  No-knee/gradual shape replicates on both tasks.
+- **Component A replicates on SciQ:** naive mixing − random_labels = +0.157 (0.10) / +0.109 (0.25),
+  18/18 pairs; random_labels ≈ chance (0.53/0.57). Weak labels informative on both tasks.
+- **Phase 1b complete (0+A+B+C):** which labels matters (A, both tasks); where you place GT does
+  not (B null); how much is gradual/no-knee (both tasks). Axis A killed; neither task high-signal.
+  → favor bounded cross-task write-up + larger-model-gap proposal over a broad Phase 2.
+
+### Cost (Component C)
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S8 | Vast 8× H200 (42244966) | $25.79/hr | ~0.85h (incl. setup) | ~$22 |
+
+### Lessons Learned (Component C)
+| sid | Lesson |
+|---|---|
+| S8 | random_labels@low-fraction legitimately collapses to ~chance (90% noise) — exclude the control from any acc≈0.5 "degenerate run" QC gate, same as gt_only is excluded from the gt_fraction_actual gate |
+| S8 | SciQ runs ~2× faster than BoolQ (shorter sequences): gpt2-xl ~335s vs ~625s. Budget SciQ sweeps accordingly |
+| S8 | "Cleaner" (PGR) and "larger" (raw acc) can diverge: SciQ has higher baseline W2SG signal (positive PGR, less raw headroom). Report both; don't let a positive PGR imply a bigger absolute effect |

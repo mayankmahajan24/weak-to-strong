@@ -11,7 +11,7 @@ Scoring table (filled as components complete):
 | 0 Power (MDE) | 0.01–0.02 | **MDE₁ = 0.0071** | **PASS — adequate** |
 | A mixing − random_labels | > floor | **+0.079 / +0.081, 15/15 pairs** | ✅ **weak labels INFORMATIVE** (confound resolved) |
 | B oracle − naive @{0.10,0.25} | > floor | **+0.0006 / −0.0049, ~coin-flip** | ❌ **allocation NULL** (no headroom) |
-| C SciQ vs BoolQ | SciQ larger | _pending_ | _pending_ |
+| C SciQ vs BoolQ | SciQ larger/earlier | **cleaner in PGR, smaller in raw acc; A replicates 18/18** | ◑ **testbed validated; findings replicate; no bigger effects** |
 
 **Phase 1b read (A+B, BoolQ):** *Which* labels matters; *where* you place the GT does not.
 Weak labels carry real information (de-confounds the Phase-1 mixing>GT-only headline), but even
@@ -116,4 +116,63 @@ to weak-error location is not directly bounded, but it is the weaker motivation.
    testbed. The "how much" (Phase 1 fraction curve) + "which labels" (A) results are the
    defensible core; "where" is a clean negative result.
 
-**Component C — SciQ validity: still pending** (the testbed-generality check).
+## Component C — SciQ validity ◑ (testbed validated; findings replicate; no larger effects)
+
+144 SciQ xent runs on 8×H200 (instance 42244966, destroyed after pull): mixing curve
+(10 pairs × {0.10,0.25,0.50,1.0} × 3 seeds = 120) + random_labels control (24). 144/144 ok.
+SciQ GT ceilings are healthy (gpt2-large is *not* anomalous on SciQ; one minor seed-1 xl←large
+inversion handled by the generic validity rule). Analysis: `results/phase1b/analyze_c.py`.
+
+**C.1 — Fraction curve, SciQ vs BoolQ (xent):**
+
+| frac | SciQ Δacc | SciQ PGR | BoolQ Δacc | BoolQ PGR |
+|---|---|---|---|---|
+| 0.10 | +0.003 | **+0.16** | +0.003 | −0.18 |
+| 0.25 | +0.007 | +0.44 | +0.018 | +0.30 |
+| 0.50 | +0.023 | +0.72 | +0.026 | +0.28 |
+| 1.00 | +0.033 | +0.94 | +0.055 | +1.04 |
+
+*(Δacc = median over all pairs×seeds vs frac0; PGR = median over valid strict pairs.)*
+SciQ is **cleaner** — PGR is **positive and monotonic from 0.10** (BoolQ starts negative and
+only crosses ~0.25) — confirming the phenomenon is real where baseline W2SG signal exists. But
+in **raw accuracy SciQ moves *less*** (smaller headroom; its weak transfer already sits closer
+to ceiling). So the plan's prediction ("larger") holds as *earlier/cleaner in PGR*, and is
+*reversed* in raw acc. **No-knee, gradual, back-loaded shape replicates on both tasks.**
+
+**C.2 — Component A replicates on SciQ (weak labels informative):**
+
+| frac | naive mixing − random_labels | #pairs>0 | random_labels median acc |
+|---|---|---|---|
+| 0.10 | **+0.157** | 18/18 | 0.527 (≈chance) |
+| 0.25 | **+0.109** | 18/18 | 0.569 |
+
+Even stronger than BoolQ (+0.08): random labels collapse SciQ to ~chance, so real weak labels
+add **11–16 points** at equal rows. The 3 near-0.5 runs flagged in QC were exactly these
+random_labels@0.10 cases — the control behaving as designed, not failures.
+
+**What Component C establishes:** the testbed is valid (SciQ has real positive-PGR W2SG signal),
+and the two load-bearing Phase-1/1b findings — **no knee / gradual curve** and **weak labels are
+informative** — **replicate across both tasks.** But SciQ offers *smaller* absolute effects, so
+it is not a higher-signal venue for a Phase-2 strategy bake-off. Cross-task robustness is the
+gain, not bigger effects.
+
+---
+
+## Phase 1b overall verdict (0 + A + B + C)
+
+| Question | Finding | Strength |
+|---|---|---|
+| Can the testbed resolve strategy effects? (0) | yes, MDE 0.007 | PASS |
+| Does *which* label matter? (A) | **yes — weak labels informative** | robust, **both tasks** (15/15, 18/18) |
+| Does *where* you place GT matter? (B) | **no — oracle ≈ naive** | confident null (BoolQ) |
+| Is BoolQ the right task? (C) | SciQ cleaner-PGR but smaller raw; findings replicate | validated; no bigger effects |
+
+**Decision for Phase 2.** Allocation (Axis A) is dead, and neither task is a high-signal venue,
+so a large Phase-2 strategy bake-off is unlikely to surface effects above noise. The defensible,
+intellectually-honest contribution is the **cross-task-replicated characterization**: *how much*
+GT (gradual, back-loaded, no knee), *which* labels (weak supervision is genuinely informative,
+de-confounded), and *where* (allocation does not matter) — plus the gpt2-large instability and
+the logconf null. If Phase 2 is run, it should be a **small, pre-registered** probe of
+combination/loss/reliability (Axes B/C/D) at {0.10,0.25}, framed as "even if it fails," not a
+broad sweep — and the honest default is to **write up the bounded result and propose a larger
+model gap** as the real next step.

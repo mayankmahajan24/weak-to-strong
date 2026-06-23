@@ -118,16 +118,21 @@ the effects and the **premises hold**. Four tests, each with a pre-registered ki
   teacher's wrong rows (verified 100% error-coverage). `oracle − naive = +0.0006 / −0.0049`,
   ~coin-flip sign — within noise at both budgets, and Component 0 says we'd have seen ≥0.007, so
   a **confident null.** Even perfect error-targeting gives no gain over random placement.
-- **Component C — SciQ validity** *(pending)*. BoolQ baseline PGR ≈ 0; SciQ ≈ +0.17. Is GT-mixing
-  larger/cleaner where the phenomenon actually exists? Decides whether BoolQ was the right primary.
+- **Component C — SciQ validity (done ◑).** 144 SciQ runs. The naive curve is **cleaner** on
+  SciQ (PGR positive & monotonic from 0.10: +0.16→+0.94; BoolQ starts negative) but moves **less
+  in raw accuracy** (+0.033 vs +0.055 at 1.0 — less headroom). The **no-knee/gradual shape and the
+  weak-label-informativeness (A) both replicate** — A even stronger on SciQ (+0.16/+0.11, 18/18;
+  random_labels collapses to ~chance). Testbed validated, but SciQ offers *smaller* effects, so
+  it's not a higher-signal venue for Phase 2.
 
-- **Informed.** A + B give a sharp, honest split: **which labels matters (weak labels are
-  informative), where you place GT does not (allocation is null).** This **kills Phase-2 Axis A
-  (allocation heuristics)** — they all approximate the error-targeting the oracle already bounds
-  at zero. Phase 2, if pursued, should drop allocation and test combination / loss-dynamics /
-  reliability axes (B/C/D). The defensible core is now: *how much* GT (Phase-1 fraction curve) +
-  *which* labels (weak labels informative); *where* is a clean negative result. Component C still
-  gates whether to run any of this on BoolQ vs SciQ.
+- **Informed.** A+B+C give a sharp, honest, **cross-task** story: *which* labels matters (weak
+  labels informative, both tasks), *where* you place GT does not (allocation null), *how much* is
+  gradual/back-loaded with no knee (both tasks). This **kills Phase-2 Axis A (allocation)** and —
+  since neither task is high-signal — argues against a broad Phase-2 bake-off. The defensible
+  contribution is the cross-task-replicated **characterization** + the allocation null + the
+  gpt2-large instability + the logconf null. Honest default: write up the bounded result and
+  propose a **larger model gap** as the real next step; any Phase 2 should be a small pre-registered
+  B/C/D probe ("interesting even if it fails"), not a sweep.
 
 ---
 
@@ -168,12 +173,12 @@ the effects and the **premises hold**. Four tests, each with a pre-registered ki
 | 0 | ✅ | Baseline reproduced; harness validated; BoolQ low-signal, SciQ higher |
 | 1 | ✅ | No knee (P1 refuted); mixing>GT-only (confounded); logconf null; scale inconclusive |
 | — | ✅ | gpt2-large GT ~27% unstable (S7) → exclusion principled, scale claim under-measured |
-| 1b | ▶ 0 PASS; A ✅ informative; B ❌ allocation null; C pending | Which labels matters; where you place GT doesn't |
-| 2–4 | ⛔ gated | Axis A (allocation) killed; pivot to B/C/D pending Component C |
+| 1b | ✅ 0 PASS; A informative (both tasks); B allocation null; C testbed validated, findings replicate | Which labels matters; where doesn't; gradual no-knee curve — cross-task |
+| 2–4 | ⛔ likely descoped | Axis A killed; neither task high-signal → favor bounded write-up + scale-up proposal |
 
-**Immediate next:** Component C (SciQ naive curve) — does the GT-mixing effect (and the
-weak-label-informativeness of A) hold where baseline W2SG signal is positive? That decides
-the primary task before any Phase-2 (B/C/D) work; Axis A is already dropped.
+**Immediate next:** Phase 1b is complete (0/A/B/C all run). The decision is whether to run a
+small pre-registered Phase-2 B/C/D probe at {0.10,0.25} or write up the bounded, cross-task
+characterization (recommended) with a larger-model-gap proposal as the real next step.
 
 ## Artifact index
 - Narrative spine / decision log: this file.
