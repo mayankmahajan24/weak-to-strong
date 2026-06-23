@@ -42,6 +42,7 @@ if OUT is None:
     OUT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 NGPU = int(opts.get("ngpu", 8))
+DS = opts.get("ds", "boolq")  # boolq (default) or sciq (winner replication / confirm)
 ORDER = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 RANK = {m: i for i, m in enumerate(ORDER)}
 MBS = {"gpt2": 16, "gpt2-medium": 8, "gpt2-large": 4, "gpt2-xl": 2}
@@ -72,7 +73,7 @@ if opts.get("pairs"):  # cap number of strict pairs (smallest-strong-model first
 
 
 def weak_labels_path(weak, seed):
-    d = (f"bs=32-dn=boolq-e=2-ee=1000000-lp=0-l=xent-l={LR[weak]}-ls=cosi_anne-mc=1024-"
+    d = (f"bs=32-dn={DS}-e=2-ee=1000000-lp=0-l=xent-l={LR[weak]}-ls=cosi_anne-mc=1024-"
          f"ms={weak}-nd=20000-ntd=10000-o=adam-s={seed}-twd=0")
     return f"{OUT}/results/data/baseline/seed{seed}/{d}/weak_labels"
 
@@ -82,8 +83,10 @@ for m in METHODS:
     for strong, weak in STRICT_PAIRS:
         for frac in FRACS:
             for seed in SEEDS:
+                # boolq → phase2_<method> (unchanged); sciq → phase2_sciq_<method>
+                prefix = "phase2" if DS == "boolq" else f"phase2_{DS}"
                 jobs.append(dict(m=m, strong=strong, weak=weak, frac=frac, seed=seed,
-                                 sub=f"phase2_{m['name']}/{FDIR[frac]}/seed{seed}"))
+                                 sub=f"{prefix}_{m['name']}/{FDIR[frac]}/seed{seed}"))
 
 print(f"OUT={OUT}  methods={[m['name'] for m in METHODS]}  pairs={len(STRICT_PAIRS)} "
       f"fracs={FRACS} seeds={SEEDS}  total jobs={len(jobs)}", flush=True)
@@ -111,7 +114,7 @@ def worker(gpu):
             return
         m = j["m"]
         cmd = ["python", "train_simple.py",
-               f"--model_size={j['strong']}", "--ds_name=boolq", f"--loss={m['loss']}",
+               f"--model_size={j['strong']}", f"--ds_name={DS}", f"--loss={m['loss']}",
                f"--seed={j['seed']}", f"--gt_seed={j['seed']}", f"--gt_fraction={j['frac']}",
                *m["flags"],
                f"--minibatch_size_per_device={MBS[j['strong']]}",
