@@ -12,6 +12,7 @@
 | S4 | 2026-06-22 | Seed 2 full sweep + seed 0 GT weak labels regeneration + RESULTS_phase0 writeup | Complete |
 | S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 results + analysis + pre-registration | Complete |
 | S6 | 2026-06-22/23 | Phase 1 seeds 0+2 fraction sweep (8× H200) + 3-seed re-analysis, figures, RESULTS_phase1 | Complete |
+| S7 | 2026-06-23 | gpt2-large GT variance study (8 seeds, 8× H100): confirms ~27% instability, not an outlier | Complete |
 
 ---
 
@@ -458,3 +459,39 @@ Weak_labels (boolq xent, 4 models/seed) already existed locally — no GT regene
 | S6 | gt_only at gt_fraction=1.0 trains on the full transfer split (nothing filtered), so those xl runs are as slow as full-data mixing (~625s), not fast like low-fraction gt_only — they gate sweep completion |
 | S6 | gt_only `gt_fraction_actual` is 1.0 by construction (dataset filtered to GT rows), so it will "violate" a naive actual≈requested check — exclude gt_only from that gate |
 | S6 | Resilience pattern for long remote sweeps: on-instance finalizer snapshots slim results to persistent disk at ALL DONE (survives /dev/shm RAM loss + local internet drops); kill stays gated on a verified local copy. Pull completed seeds incrementally rather than waiting for the whole run |
+
+---
+
+## S7 — 2026-06-23 — gpt2-large GT variance study (8× H100)
+
+Tested whether seed-1 gpt2-large GT = 0.662 (the Phase-1 anomaly) was a fluke or real
+instability. Ran 8 fresh seeds (11–18) of gpt2-large GT on BoolQ (ceiling only, same config,
+vary --seed). Results in `results/phase0/gpt2large_variance/` (+ `SUMMARY.md`).
+
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S7 | 2026-06-23 | ~00:31 | Created 8× H100 SXM (contract 42174643, Japan, $20.33/hr, driver 595) |
+| S7 | 2026-06-23 | ~00:43 | Setup: scp code-only tarball, pip deps. transformers 5.12 removed load_sharded_checkpoint → pinned 4.57.6; also needed torch_optimizer + wandb |
+| S7 | 2026-06-23 | ~00:45 | Launch self-killed repeatedly: `pkill -f train_simple` in my wrapper matched its own ssh shell (the S5 footgun, again). Removed pkill → launched clean |
+| S7 | 2026-06-23 | ~00:50 | 8 seeds training, one per GPU. Armed dual 15-min kill failsafes (on-instance self-destruct + local timer) per request |
+| S7 | 2026-06-23 | ~00:56 | All 8 done (~6 min). Pulled slim results, verified 8/8, destroyed instance immediately (well under failsafe) |
+
+### Result
+11 gpt2-large GT BoolQ accuracies (seeds 0–2 + 11–18): mean 0.709, std 0.030, range
+[0.649, 0.743]. **Low mode <0.70: 3/11 (27%)** {0.6485 (s12), 0.662 (s1), 0.6913 (s15)};
+3/11 fall below gpt2-medium GT (0.700). seed-1 is a representative draw from a recurring
+~27% failure mode — gpt2-large GT is optimization-unstable (likely lr=1e-5 too low). Confirms
+the Phase-1 failed-ceiling exclusion and independently supports "scale interaction inconclusive."
+
+### Cost
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S7 | Vast 8× H100 SXM (42174643) | $20.33/hr | ~0.4h (incl. setup) | ~$8 |
+
+### Lessons Learned
+| sid | Lesson |
+|---|---|
+| S7 | The `pkill -f <pattern>` self-kill footgun (logged in S5) bit again — any remote command whose own line contains the pattern dies mid-execution. Never put the target name in a pkill run over ssh; kill by PID or omit it |
+| S7 | transformers ≥5.x dropped `load_sharded_checkpoint` (and other APIs this 2023-era repo uses). Pin transformers==4.57.6 for this codebase; also requires torch_optimizer + wandb (run WANDB_MODE=disabled) |
+| S7 | "We reran it and got the same answer" only proves determinism if it's the *same seed* — re-running a fixed seed says nothing about variance. To probe variance you must vary the seed |
+| S7 | Hard-kill guarantee for a rented box: arm an on-instance detached self-destruct (`nohup sleep N; vastai destroy …`) so it dies even if the laptop drops, plus a local backup timer. Belt and suspenders |

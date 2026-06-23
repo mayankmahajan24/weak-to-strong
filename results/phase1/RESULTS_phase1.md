@@ -22,10 +22,18 @@ deterministic under fixed seed), so it is a real bad-optimization outcome for th
 I apply a **pre-stated, outcome-independent filter**: *drop any GT ceiling that fails to
 exceed the next-smaller model's GT accuracy.* Under this rule seed-1 `gpt2-large` is excluded
 as both weak teacher and strong student (`EXCLUDE = {(1, "gpt2-large")}` in `plot_phase1.py`).
-The honest framing of why this matters: it is one seed of one mid-scale model — its right
-"fix" is *more seeds*, not a re-roll, and `gpt2-large` scale claims should be treated as
-**2-seed** here. Excluding it **tightens** the noise floor (0.018 → 0.014) and makes seeds
-more consistent, so this removes noise, not an inconvenient signal.
+
+**Follow-up variance study (8 fresh seeds) confirms this is instability, not an outlier.**
+Re-running `gpt2-large` GT on BoolQ across seeds 11–18 (`results/phase0/gpt2large_variance/`)
+gives, with the existing seeds 0–2, **11 accuracies: mean 0.709, std 0.030, range [0.649,
+0.743]**, with a **recurring low mode: 3/11 seeds (27%) below `gpt2-medium`'s 0.700** (seed 12 =
+0.6485 is even lower than seed 1's 0.662). So seed-1's value is a representative draw from a
+~27% failure mode, not a fluke — `gpt2-large` GT training is **optimization-unstable** here
+(likely lr=1e-5 on the unstable edge). Consequences: the failed-ceiling filter cleanly catches
+all three low-mode seeds; the `gpt2-large` ceiling is unreliable at 3 seeds (a 3-seed sample
+has ~58% chance of containing a low draw), which **independently supports reporting the scale
+interaction as inconclusive** (Result 4). Phase-1 numbers use seeds 0/2 (both high-mode), so
+they reflect the stable mode, but gpt2-large carries this instability caveat throughout.
 
 ## Headline (what the data actually supports)
 
