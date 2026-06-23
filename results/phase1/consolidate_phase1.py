@@ -16,14 +16,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]  # repo root
 DATA = ROOT / "results" / "data"
-OUT = Path(__file__).resolve().parent / "phase1_seed1_results.csv"
+OUT = Path(__file__).resolve().parent / "phase1_results.csv"
 
 # (glob root, condition label, is_gt_only)
+# Seeds to include. Add 2 once seed-2 lands. gt_seed must equal seed (Phase 1 plan).
+SEEDS = [0, 1]
+
 SOURCES = [
     (DATA / "naive_mixing", "mixing", False),
     (DATA / "gt_only", "gt_only", True),
-    (DATA / "baseline" / "seed1", "baseline", False),
-]
+] + [(DATA / "baseline" / f"seed{s}", "baseline", False) for s in SEEDS]
 
 FIELDS = [
     "condition", "ds_name", "loss", "strong_model", "weak_model",
@@ -54,11 +56,12 @@ for src, condition, _ in SOURCES:
         cfg, summ = loaded
         if cfg.get("ds_name") != "boolq":
             continue  # Phase 1 is BoolQ only
-        if cfg.get("seed") != 1:
-            continue  # this consolidation is seed 1
-        # Canonical Phase 1 selection: gt_seed must equal seed (=1). Baseline runs
+        seed = cfg.get("seed")
+        if seed not in SEEDS:
+            continue
+        # Canonical Phase 1 selection: gt_seed must equal seed (per plan). Baseline runs
         # have no gt_seed (None) and are kept. This drops old Phase 0 gt_seed=42 artifacts.
-        if condition != "baseline" and cfg.get("gt_seed") != 1:
+        if condition != "baseline" and cfg.get("gt_seed") != seed:
             continue
         rows.append({
             "condition": condition,

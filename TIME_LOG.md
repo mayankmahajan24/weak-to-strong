@@ -357,18 +357,40 @@ were pulled. Instance was found still running with no active jobs; run dirs time
 | S5 | 2026-06-22 | ~23:00 | Wrote NOTES_phase1.md pre-registration: froze pipeline (7 decisions) + 6 falsifiable predictions (P1–P6) against seed-1 only, anchored to commit 59ee63e before seeds 0/2 |
 | S5 | 2026-06-22 | ~23:05 | Committed + pushed pre-registration (773b2f2): NOTES_phase1.md + analyze + robustness scripts |
 
+### Seed 0 integration + seed-1 gpt2-large GT regeneration
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S5 | 2026-06-23 | ~00:30 | Seed-0 Phase 1 data found local (120 mixing + 48 gt_only, gs=0). Generalized consolidate to multi-seed (phase1_results.csv, 388 rows); wrote compare_seeds_phase1.py |
+| S5 | 2026-06-23 | ~00:45 | Scored P1–P6 across seeds 0+1: P2/P3/P4 hold (mixing≫gt_only replicates tightly); P1 knee SHAKY (seed0 gradual, crosses @0.50 not 0.25); P5/P6 not supported. Seed0 gpt2-large GT healthy (0.743) vs seed1 anomaly (0.662) |
+| S5 | 2026-06-23 | ~01:00 | Decided to regenerate seed-1 gpt2-large GT to adjudicate anomaly (transient fail vs real seed variance). Existing 8×H200 (42131402) saturated by seed-2 sweep — GPU-share attempt OOM'd (orchestrator double-booked GPU 0) |
+| S5 | 2026-06-23 | ~01:15 | Provisioned dedicated GPU. A100 (42160326) → swapped to H100 SXM (42160540, $2.13/hr) for speed. rsync'd code, installed deps (transformers 4.57.6, datasets 5.0.0) |
+| S5 | 2026-06-23 | ~01:30 | Debugged: mbs=16 OOM on 80GB → mbs=4; pkill -f train_simple self-killed SSH shell (cmd contained the pattern) → launched without pkill |
+| S5 | 2026-06-23 | ~01:32 | GT run complete: accuracy=0.6619761394921995 — **bit-identical** to original. Verified fresh run (294 steps). weak_labels: hard labels identical (0/4714 mismatch), soft ≤0.007 diff |
+| S5 | 2026-06-23 | ~01:35 | Adjudication: anomaly is real/reproducible seed variance, not corruption. Keep as-is, validity rule excludes seed-1 large-as-student pairs. No downstream reruns. Pulled slim results; destroyed H100 (42160540) + confirmed A100 gone |
+
 ### Status after S5
 - Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** + analyzed; pre-registration locked.
-- Still pending: seeds 0 & 2 sweep (M3), GT weak_labels regen for seeds 0/2 + seed-1 gpt2-large fix (M1), noise floor + plots (M5/M6), scoring P1–P6.
-- Instance `42131402` left **running** (holds the results.pkl files) — destroy to stop billing once capture is confirmed.
+- Seed-0 Phase 1: mixing + GT-only **complete**, integrated into phase1_results.csv; scored vs P1–P6.
+- seed-1 gpt2-large GT anomaly **adjudicated** (regenerated → reproduced 0.66198 bit-for-bit → real seed variance, kept). See NOTES_phase0.md.
+- Still pending: seed 2 sweep (M3, in progress on 42131402), noise floor + plots (M5/M6), final 3-seed scoring of P1–P6.
+- Instance `42131402` (seed-2 sweep) left **running** at user request.
 
 ### Time / Cost Summary
 | sid | Task | Wall time | GPU-hours | Notes |
 |---|---|---|---|---|
 | S5 | Recovery capture (local + rsync) | ~0.4h | 0 | No new compute; data pull + consolidation only |
 | S5 | Seed-1 analysis + robustness + pre-registration | ~0.7h | 0 | Local only |
+| S5 | Seed-0 integration + P1–P6 scoring | ~0.3h | 0 | Local only |
+| S5 | seed-1 gpt2-large GT regeneration (1× H100 SXM) | ~0.5h | ~0.15h (1 GPU) | A100→H100 swap, OOM/pkill debugging; run itself ~6 min |
 
-Instance 42131402 (8× H200) billing accrues while left running — not counted here.
+### Cost Summary
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S5 | Vast 1× A100 SXM (42160326, swapped off) | $0.73/hr | ~0.05h | <$1 |
+| S5 | Vast 1× H100 SXM (42160540, regen) | $2.13/hr | ~0.5h | ~$1 |
+| S5 | **Total (S5 provisioned)** | | | **~$2** |
+
+Instance 42131402 (8× H200, seed-2 sweep) billing accrues separately while left running — not counted here.
 
 ### Lessons Learned
 | sid | Lesson |
@@ -378,3 +400,7 @@ Instance 42131402 (8× H200) billing accrues while left running — not counted 
 | S5 | macOS has no `timeout` cmd; use ssh -o ConnectTimeout instead for connection guards |
 | S5 | gt_fraction_actual is 1.0 for GT-only runs by construction (weak labels discarded → 100% of used labels are GT); only compare actual-vs-requested for mixing runs |
 | S5 | Pre-register predictions + freeze the pipeline against the first seed BEFORE collecting confirmation seeds, anchored to a git commit. Converts later seeds into a real out-of-sample test instead of post-hoc analysis. Seed-1 robustness (per-pair unanimity, metric-invariance, effect-vs-noise) is checkable without the other seeds |
+| S5 | `pkill -f <pattern>` over SSH self-terminates the launching shell when the remote command line itself contains `<pattern>` (e.g. pkill -f train_simple while launching train_simple). Kill by specific PID, or just don't pkill if the prior process already exited |
+| S5 | Don't manually slot a job onto an instance running an active multi-GPU sweep — the sweep's orchestrator grabs idle GPUs and double-books, causing OOM. Provision a dedicated box (1× H100 SXM ~$2/hr, <$2 for a single run) for isolated one-offs |
+| S5 | gpt2-large BoolQ at mbs=16/mc=1024 OOMs on 80GB; mbs=4 fits (~64GB). minibatch only chunks memory — effective batch_size=32 via grad accumulation, so results are identical |
+| S5 | Training is effectively deterministic under fixed seed: seed-1 gpt2-large GT reproduced bit-for-bit (0.6619761394921995) across A100→H100, mbs, and datasets 4.x→5.0.0. Re-running a suspected-bad run is a valid, cheap way to distinguish transient failure from real seed variance |
