@@ -108,23 +108,26 @@ the effects and the **premises hold**. Four tests, each with a pre-registered ki
 - **Component 0 — Power/MDE (done ✅ PASS).** Paired (pair,seed) contrasts give a minimum
   detectable effect of **0.0071 acc** (1-sided, 80% power) — below the 0.02 gate and below
   naive's own movement. ⇒ a null in A/B will be a *genuine* null, not underpowered.
-- **Component A — De-confound "mixing > GT-only"** *(harness ready + unit-tested; runs pending)*.
-  New `random_labels` strategy holds row/step count equal to mixing and removes weak-label
-  information; if mixing still beats it, weak labels are informative *beyond quantity*.
-- **Component B — Oracle-allocation ceiling** *(harness ready + unit-tested; runs pending)*.
-  New `oracle` strategy spends GT on the weak teacher's wrong rows. Real-data check:
-  oracle@10% = **100% error-coverage vs naive's ~33%** (weak error rate 0.346) — the lever is
-  large; B tests whether it converts to accuracy. If oracle ≈ naive, no realistic Phase 2
-  allocation strategy will help.
+- **Component A — De-confound "mixing > GT-only" (done ✅ INFORMATIVE).** `random_labels`
+  holds row/step count equal to mixing but replaces non-GT weak labels with noise.
+  `mixing − random_labels = +0.079 / +0.081` (10%/25%), **15/15 pairs, both fractions** (~11×
+  the floor). Ordering: `random 0.61 < gt_only 0.62 < mixing 0.67–0.69` — noise *hurts*, so
+  mixing's win is **real weak-label information, not row count.** Result-2 confound resolved;
+  P3 upheld cleanly.
+- **Component B — Oracle-allocation ceiling (done ❌ NULL).** `oracle` spends GT on the weak
+  teacher's wrong rows (verified 100% error-coverage). `oracle − naive = +0.0006 / −0.0049`,
+  ~coin-flip sign — within noise at both budgets, and Component 0 says we'd have seen ≥0.007, so
+  a **confident null.** Even perfect error-targeting gives no gain over random placement.
 - **Component C — SciQ validity** *(pending)*. BoolQ baseline PGR ≈ 0; SciQ ≈ +0.17. Is GT-mixing
   larger/cleaner where the phenomenon actually exists? Decides whether BoolQ was the right primary.
 
-- **Informed (decision tree).** Green-light full Phase 2 only if **B shows oracle headroom AND
-  power adequate**, on whichever task **C** says is higher-signal. If **A** collapses → reframe
-  from "weak labels are valuable" to "GT-budget effects." If **B** is null → allocation is dead
-  at this scale (pivot to combination methods, or escalate model scale). Worst case (B+C null) →
-  publish the **bounded-null** honestly and specify the larger model gap that would be required,
-  rather than tuning strategies on noise.
+- **Informed.** A + B give a sharp, honest split: **which labels matters (weak labels are
+  informative), where you place GT does not (allocation is null).** This **kills Phase-2 Axis A
+  (allocation heuristics)** — they all approximate the error-targeting the oracle already bounds
+  at zero. Phase 2, if pursued, should drop allocation and test combination / loss-dynamics /
+  reliability axes (B/C/D). The defensible core is now: *how much* GT (Phase-1 fraction curve) +
+  *which* labels (weak labels informative); *where* is a clean negative result. Component C still
+  gates whether to run any of this on BoolQ vs SciQ.
 
 ---
 
@@ -165,11 +168,12 @@ the effects and the **premises hold**. Four tests, each with a pre-registered ki
 | 0 | ✅ | Baseline reproduced; harness validated; BoolQ low-signal, SciQ higher |
 | 1 | ✅ | No knee (P1 refuted); mixing>GT-only (confounded); logconf null; scale inconclusive |
 | — | ✅ | gpt2-large GT ~27% unstable (S7) → exclusion principled, scale claim under-measured |
-| 1b | ▶ Component 0 PASS; A/B harness ready (unit-tested); A/B/C runs pending | Testbed resolves ≥0.007; premises under test |
-| 2–4 | ⛔ gated | Begin only if Phase 1b clears its kill criteria |
+| 1b | ▶ 0 PASS; A ✅ informative; B ❌ allocation null; C pending | Which labels matters; where you place GT doesn't |
+| 2–4 | ⛔ gated | Axis A (allocation) killed; pivot to B/C/D pending Component C |
 
-**Immediate next:** run Phase 1b Components A + B on BoolQ (harness implemented + unit-tested),
-then C on SciQ; score against kill criteria; update `phase1b/RESULTS_phase1b.md` and this file.
+**Immediate next:** Component C (SciQ naive curve) — does the GT-mixing effect (and the
+weak-label-informativeness of A) hold where baseline W2SG signal is positive? That decides
+the primary task before any Phase-2 (B/C/D) work; Axis A is already dropped.
 
 ## Artifact index
 - Narrative spine / decision log: this file.

@@ -13,6 +13,7 @@
 | S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 results + analysis + pre-registration | Complete |
 | S6 | 2026-06-22/23 | Phase 1 seeds 0+2 fraction sweep (8× H200) + 3-seed re-analysis, figures, RESULTS_phase1 | Complete |
 | S7 | 2026-06-23 | gpt2-large GT variance study (8 seeds, 8× H100): confirms ~27% instability, not an outlier | Complete |
+| S8 | 2026-06-23 | Phase 1b: Component 0 (power) + harness (oracle/random_labels) + A/B runs (8× H200) | Complete |
 
 ---
 
@@ -495,3 +496,49 @@ the Phase-1 failed-ceiling exclusion and independently supports "scale interacti
 | S7 | transformers ≥5.x dropped `load_sharded_checkpoint` (and other APIs this 2023-era repo uses). Pin transformers==4.57.6 for this codebase; also requires torch_optimizer + wandb (run WANDB_MODE=disabled) |
 | S7 | "We reran it and got the same answer" only proves determinism if it's the *same seed* — re-running a fixed seed says nothing about variance. To probe variance you must vary the seed |
 | S7 | Hard-kill guarantee for a rented box: arm an on-instance detached self-destruct (`nohup sleep N; vastai destroy …`) so it dies even if the laptop drops, plus a local backup timer. Belt and suspenders |
+
+---
+
+## S8 — 2026-06-23 — Phase 1b: testbed/premise validation (Component 0 + A/B)
+
+Inserted Phase 1b as a GATE before Phase 2 (don't tune strategies until the testbed can
+*detect* effects and the premises hold). Plan: `plans/phase1b.md`; results:
+`results/phase1b/RESULTS_phase1b.md`; spine: `results/RESEARCH_PATH.md`.
+
+### Component 0 — power/MDE (local, no GPU)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S8 | 2026-06-23 | ~03:00 | MDE analysis: paired (pair,seed) contrasts → MDE₁ = 0.0071 acc (1-sided, 80% power), below the 0.02 gate. PASS — a null in A/B will be genuine, not underpowered |
+
+### Harness (local) + A/B runs (8× H200, instance 42235643, Iceland, $25.79/hr)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S8 | 2026-06-23 | ~03:10 | Added `oracle` + `random_labels` strategies to label_mixing.py via a pure, unit-tested `select_gt_indices`; wired `--mixing_strategy` into train_simple.py (tags folder/summary only when ≠ naive → naive runs byte-identical). 17/17 unit tests pass (synthetic + real weak_labels) |
+| S8 | 2026-06-23 | ~03:30 | Provisioned 8× H200; rsync code + 9 boolq-xent weak_labels (gpt2/medium/large × 3 seeds); pinned transformers 4.57.6 + deps. Hit the GT-run-vs-transfer-dir selection bug (grep matched `-wms=` transfer dirs that lack weak_labels) → fixed with `grep -v wms=`. On-box smoke test of all 3 strategies passed |
+| S8 | 2026-06-23 | ~03:45 | Armed 3h dead-man (on-box detached curl DELETE via API key in 600 file). Launched GPU-pool driver: 60 runs (A random_labels=24, B oracle=36), 8 concurrent, /dev/shm-free output, pytorch_model*.bin + pkl cleaned per run |
+| S8 | 2026-06-23 | ~04:25 | 60/60 ok, 0 failed, 0 NaN (~38 min; gpt2-xl oracle ~10 min each was the long pole). Pulled slim results, verified local copy, destroyed instance + confirmed via API (no live instances) |
+
+### Results
+- **Component A (de-confound): weak labels are INFORMATIVE.** naive mixing − random_labels =
+  +0.079 (0.10), +0.081 (0.25), **15/15 pairs both fractions** (~11× the 0.014 floor). Ordering
+  `random 0.61 < gt_only 0.62 < mixing 0.67–0.69` — noise hurts, so mixing's win over GT-only is
+  real weak-label information, not training-set size. Resolves the Phase-1 Result-2 confound.
+- **Component B (oracle ceiling): allocation is NULL.** oracle − naive = +0.0006 (0.10),
+  −0.0049 (0.25), coin-flip sign — within noise, and Component 0 says we'd see ≥0.0071, so a
+  confident null. Even perfect error-targeting gives no gain over random placement.
+- **Decision:** *which* labels matters, *where* you place GT does not → **Phase-2 Axis A
+  (allocation heuristics) killed.** Pivot to combination/loss/reliability (B/C/D) only if
+  Component C (SciQ) confirms the testbed. Component C still pending.
+
+### Cost
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S8 | Vast 8× H200 (42235643) | $25.79/hr | ~0.9h (incl. setup) | ~$23 |
+
+### Lessons Learned
+| sid | Lesson |
+|---|---|
+| S8 | Selecting a weak-teacher's weak_labels dir: GT runs have NO `-wms=` token; transfer runs do (and lack weak_labels/). Filter with `grep -v wms=` or you grab a transfer dir and the path won't resolve |
+| S8 | Paired (same pair/seed, swap only the label condition) contrasts are cheap power: pair/seed variance cancels → MDE ~0.007 over 14–15 cells, so a within-noise result is a real null, not underpowered |
+| S8 | random_labels (Bernoulli noise on non-GT rows) is the clean row-count control for "mixing > GT-only"; it landed *below* gt_only (noise hurts), which is exactly what makes the weak-label-information conclusion airtight |
+| S8 | The pkill-self-kill footgun (S5/S7) avoided by launching without pkill; per-run `pytorch_model*.bin` cleanup kept overlay at 13/100 GB despite gpt2-xl sharded weights |
