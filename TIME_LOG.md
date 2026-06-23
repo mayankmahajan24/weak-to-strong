@@ -11,6 +11,7 @@
 | S3 | 2026-06-22 | M3-5: mixing harness + identity/ceiling checks + 25% mix sweep | Complete |
 | S4 | 2026-06-22 | Seed 2 full sweep + seed 0 GT weak labels regeneration + RESULTS_phase0 writeup | Complete |
 | S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 results + analysis + pre-registration | Complete |
+| S6 | 2026-06-22/23 | Phase 1 seeds 0+2 fraction sweep (8× H200) + 3-seed re-analysis, figures, RESULTS_phase1 | Complete |
 
 ---
 
@@ -379,8 +380,9 @@ were pulled. Instance was found still running with no active jobs; run dirs time
 - Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** + analyzed; pre-registration locked.
 - Seed-0 Phase 1: mixing + GT-only **complete**, integrated into phase1_results.csv; scored vs P1–P6.
 - seed-1 gpt2-large GT anomaly **adjudicated** (regenerated → reproduced 0.66198 bit-for-bit → real seed variance, kept). See NOTES_phase0.md.
-- Still pending: seed 2 full Phase 1 sweep (M3, **not yet started**), noise floor + plots (M5/M6), final 3-seed scoring of P1–P6.
-- Instance `42131402` (8×H200) is running a **gpt2-large variance verification** (seed=2, gt_fraction=0.1 runs) — NOT the seed-2 Phase 1 sweep. Left running at user request.
+- **NOTE: superseded by S6**, which completed the seed-0+2 Phase 1 sweep concurrently. Per S6: M3 (3-seed sweep), M5 (noise floor=0.014), M6 (figures), and RESULTS_phase1.md are all **done**. P1–P6 scored (P1 knee REFUTED — matches S5 finding).
+- Remaining: Phase 2 design (pre-register + oracle-allocation pilot); de-confound mixing-vs-GT-only (equal-rows test); optional more seeds for gpt2-large.
+- Instance `42131402` (8×H200) is running a **gpt2-large variance verification** — separate from the (now-complete) seed-2 sweep. Left running at user request.
 
 ### Time / Cost Summary
 | sid | Task | Wall time | GPU-hours | Notes |
