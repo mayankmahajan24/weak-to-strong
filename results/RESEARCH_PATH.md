@@ -181,6 +181,7 @@ small pre-registered Phase-2 B/C/D probe at {0.10,0.25} or write up the bounded,
 characterization (recommended) with a larger-model-gap proposal as the real next step.
 
 ## Artifact index
+- **Synthesis writeup (start here for the findings): [`FINDINGS.md`](FINDINGS.md).**
 - Narrative spine / decision log: this file.
 - Phase results: `phase0/RESULTS_phase0.md`, `phase1/RESULTS_phase1.md`, `phase1b/RESULTS_phase1b.md`;
   variance study `phase0/gpt2large_variance/SUMMARY.md`.
