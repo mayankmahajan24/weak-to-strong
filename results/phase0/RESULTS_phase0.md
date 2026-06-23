@@ -1,5 +1,7 @@
 # Phase 0 Results: Baseline Reproduction
 
+> Narrative spine / decision log: [`../RESEARCH_PATH.md`](../RESEARCH_PATH.md).
+
 ## Overview
 
 This document reports the results of reproducing the published weak-to-strong generalization (W2SG) baseline from the [OpenAI weak-to-strong repo](https://github.com/openai/weak-to-strong), restricted to the GPT-2 model family on BoolQ and SciQ.

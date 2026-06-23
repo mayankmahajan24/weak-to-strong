@@ -171,6 +171,7 @@ def main(
     gt_fraction: float = 0.0,
     gt_seed: int = 42,
     gt_only: bool = False,
+    mixing_strategy: str = "naive",
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,
@@ -264,7 +265,7 @@ def main(
         # Mix ground-truth labels into weak labels if requested
         if gt_fraction > 0.0:
             from weak_to_strong.label_mixing import apply_label_mixing
-            train1_ds = apply_label_mixing(train1_ds, gt_fraction, gt_seed)
+            train1_ds = apply_label_mixing(train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy)
             if gt_only:
                 train1_ds = train1_ds.filter(lambda ex: ex["label_source"] == "gt")
                 print(f"gt_only: filtered to {len(train1_ds)} GT-only rows")
@@ -276,6 +277,9 @@ def main(
             config["gt_seed"] = gt_seed
             if gt_only:
                 config["gt_only"] = True
+            # Only tag non-default strategies so naive runs keep Phase-1 folder names.
+            if mixing_strategy != "naive":
+                config["mixing_strategy"] = mixing_strategy
         config_name = get_config_foldername(config)
         config["weak_model"] = weak_model_config
 
@@ -325,6 +329,7 @@ def main(
         res_dict["gt_fraction_actual"] = gt_count / len(train1_ds)
         res_dict["gt_fraction_requested"] = gt_fraction
         res_dict["gt_seed"] = gt_seed
+        res_dict["mixing_strategy"] = mixing_strategy
     print("accuracy:", acc)
 
     with open(os.path.join(save_path, f"config.json"), "w") as f:

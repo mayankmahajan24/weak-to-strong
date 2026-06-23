@@ -1,5 +1,7 @@
 # Phase 1 Results — Supervision-Scaling Fraction Curve + Scale Interaction
 
+> Narrative spine / decision log: [`../RESEARCH_PATH.md`](../RESEARCH_PATH.md).
+
 **Dataset:** BoolQ · **Models:** GPT-2 family · **Seeds:** 0, 1, 2 · **Losses:** xent, logconf
 **Runs:** 504 canonical (3 seeds × [120 mixing + 48 GT-only]) + baselines.
 Consolidated in `phase1_results.csv` (582 rows; uniqueness-guarded — no stale/duplicate runs).
