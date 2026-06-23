@@ -4,6 +4,13 @@ dump
 *.swo
 *.pem
 .DS_Store
-results/
 full_results/
 .ipynb_checkpoints/
+
+# Track results/ (deliverables + slim run outputs), but never the large regenerable
+# model artifacts or the quarantined stale/residual runs.
+*.pkl
+pytorch_model*.bin
+*.safetensors
+results/data/_residual_quarantine/
+pytorch_model.bin.index.json
