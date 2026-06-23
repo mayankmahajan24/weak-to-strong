@@ -17,7 +17,7 @@ class LossFnBase:
 # Custom loss function
 class xent_loss(LossFnBase):
     def __call__(
-        self, logits: torch.Tensor, labels: torch.Tensor, step_frac: float
+        self, logits: torch.Tensor, labels: torch.Tensor, step_frac: float, **kwargs
     ) -> torch.Tensor:
         """
         This function calculates the cross entropy loss between logits and labels.
@@ -26,12 +26,46 @@ class xent_loss(LossFnBase):
         logits: The predicted values.
         labels: The actual values.
         step_frac: The fraction of total training steps completed.
+        **kwargs: ignored (accepts the per-row aux tensors gt_mask/sample_weight the
+            training loop now always passes, so the naive path is unaffected — Phase 2 A1).
 
         Returns:
         The mean of the cross entropy loss.
         """
         loss = torch.nn.functional.cross_entropy(logits, labels)
         return loss.mean()
+
+
+class WeightedXentLoss(LossFnBase):
+    """Per-row weighted cross-entropy (Phase 2 plumbing's reference consumer; used by M1
+    weighted-loss and M4 reliability-weighting).
+
+    Row weight = base 1.0, scaled by `gt_weight` on GT rows (via `gt_mask`), then multiplied
+    by an optional per-row `sample_weight`. Loss = Σ wᵢ·CEᵢ / Σ wᵢ.
+
+    INVARIANT 5: with `gt_weight == 1.0` and `sample_weight is None` (or all ones), this reduces
+    EXACTLY to `xent_loss` (`cross_entropy(logits, labels).mean()`).
+    """
+
+    def __init__(self, gt_weight: float = 1.0):
+        self.gt_weight = gt_weight
+
+    def __call__(
+        self,
+        logits: torch.Tensor,
+        labels: torch.Tensor,
+        step_frac: float,
+        gt_mask: torch.Tensor = None,
+        sample_weight: torch.Tensor = None,
+        **kwargs,
+    ) -> torch.Tensor:
+        ce = torch.nn.functional.cross_entropy(logits, labels, reduction="none")
+        w = torch.ones_like(ce)
+        if gt_mask is not None and self.gt_weight != 1.0:
+            w = w + (self.gt_weight - 1.0) * gt_mask.to(w.dtype)
+        if sample_weight is not None:
+            w = w * sample_weight.to(w.dtype)
+        return (w * ce).sum() / w.sum()
 
 
 class product_loss_fn(LossFnBase):
@@ -59,6 +93,7 @@ class product_loss_fn(LossFnBase):
         logits: torch.Tensor,
         labels: torch.Tensor,
         step_frac: float,
+        **kwargs,
     ) -> torch.Tensor:
         preds = torch.softmax(logits, dim=-1)
         target = torch.pow(preds, self.beta) * torch.pow(labels, self.alpha)
@@ -90,6 +125,7 @@ class logconf_loss_fn(LossFnBase):
         logits: torch.Tensor,
         labels: torch.Tensor,
         step_frac: float,
+        **kwargs,
     ) -> torch.Tensor:
         logits = logits.float()
         labels = labels.float()

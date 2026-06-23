@@ -103,6 +103,11 @@ def train_model(
             logger.logkv("eval_accuracy", eval_accs)
         all_logits = []
         all_labels = []
+        # Phase 2 A2: collect per-row provenance/weights alongside labels so combination
+        # methods can key off them. Defaults (no label_source -> weak; no column -> 1.0)
+        # make this a no-op for the naive/baseline/GT paths.
+        all_gt_mask = []
+        all_sample_weight = []
         for i in range(batch_size // minibatch_size):
             try:
                 mbatch = [next(it) for _ in range(minibatch_size)]
@@ -122,9 +127,21 @@ def train_model(
 
             all_logits.extend(logits.to(io_device))
             all_labels.extend(labels)
+            all_gt_mask.extend([ex.get("label_source") == "gt" for ex in mbatch])
+            all_sample_weight.extend([float(ex.get("sample_weight", 1.0)) for ex in mbatch])
         all_logits = torch.stack(all_logits)
         all_labels = torch.stack(all_labels)
-        loss = loss_fn(all_logits, all_labels, step_frac=step / nsteps)
+        gt_mask = torch.tensor(all_gt_mask, dtype=torch.bool, device=all_logits.device)
+        sample_weight = torch.tensor(
+            all_sample_weight, dtype=torch.float32, device=all_logits.device
+        )
+        loss = loss_fn(
+            all_logits,
+            all_labels,
+            step_frac=step / nsteps,
+            gt_mask=gt_mask,
+            sample_weight=sample_weight,
+        )
         loss_tot += loss.item()
         loss.backward()
         losses.append(loss_tot)

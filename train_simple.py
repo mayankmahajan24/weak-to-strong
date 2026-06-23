@@ -13,7 +13,8 @@ import weak_to_strong.logger as logger
 from weak_to_strong.common import get_tokenizer
 from weak_to_strong.datasets import (VALID_DATASETS, load_dataset,
                                      tokenize_dataset)
-from weak_to_strong.loss import logconf_loss_fn, product_loss_fn, xent_loss
+from weak_to_strong.loss import (logconf_loss_fn, product_loss_fn, xent_loss,
+                                  WeightedXentLoss)
 from weak_to_strong.train import ModelConfig, train_and_save_model
 
 # NOTE learning rates are not particularly tuned, work somewhat reasonably at train batch size 32
@@ -172,6 +173,10 @@ def main(
     gt_seed: int = 42,
     gt_only: bool = False,
     mixing_strategy: str = "naive",
+    # Phase 2 A3 — combination method (how to combine weak + GT). "naive" is the no-op
+    # default and leaves the loss/config/foldername byte-identical to pre-Phase-2.
+    combination_method: str = "naive",
+    gt_loss_weight: float = 1.0,
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,
@@ -280,6 +285,11 @@ def main(
             # Only tag non-default strategies so naive runs keep Phase-1 folder names.
             if mixing_strategy != "naive":
                 config["mixing_strategy"] = mixing_strategy
+            # Phase 2 A3 — tag combination method only when non-default (naive untouched).
+            if combination_method != "naive":
+                config["combination_method"] = combination_method
+                if gt_loss_weight != 1.0:
+                    config["gt_loss_weight"] = gt_loss_weight
         config_name = get_config_foldername(config)
         config["weak_model"] = weak_model_config
 
@@ -297,7 +307,20 @@ def main(
     if train2_ds:
         train2_ds = tokenize_dataset(train2_ds, tokenizer, max_ctx)
 
-    loss_fn = loss_dict[loss]
+    # Phase 2 A3 — select the loss from (loss, combination_method). "naive" returns the
+    # exact pre-Phase-2 loss object (byte-identical naive path). Other methods land in 2B.
+    if combination_method == "naive":
+        loss_fn = loss_dict[loss]
+    elif combination_method == "weighted":
+        loss_fn = WeightedXentLoss(gt_weight=gt_loss_weight)
+    elif combination_method == "reliability":
+        # M4: weights are precomputed into a `sample_weight` column; loss is weighted xent.
+        loss_fn = WeightedXentLoss(gt_weight=1.0)
+    else:
+        raise NotImplementedError(
+            f"combination_method='{combination_method}' is Phase 2B "
+            "(e.g. gt_anchored logconf, soft_gt, gt_early_stop)"
+        )
     print(f"Training model model, size {model_size}")
     test_results, weak_ds = train_and_save_model(
         model_config,
@@ -330,6 +353,7 @@ def main(
         res_dict["gt_fraction_requested"] = gt_fraction
         res_dict["gt_seed"] = gt_seed
         res_dict["mixing_strategy"] = mixing_strategy
+        res_dict["combination_method"] = combination_method
     print("accuracy:", acc)
 
     with open(os.path.join(save_path, f"config.json"), "w") as f:
