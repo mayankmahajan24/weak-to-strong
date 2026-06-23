@@ -143,11 +143,18 @@ foldernames, naive untouched. Suggested token: `cm={method}` (+ `glw=`, `sge=` a
 | M2 soft-GT (`soft_gt_eps`) | ✅ done | `tests/test_soft_gt.py` (7/7) |
 | M3 GT-anchored logconf (`GTAnchoredLogconfLoss`) | ✅ done | `test_losses.py` (regression + reconstruction) |
 | M4 reliability weighting (`reliability.py`) | ✅ done | `tests/test_reliability.py` (11/11) |
-| **M5 GT-as-early-stopping** | ⏳ **deferred to on-box** | needs a real training run (touches the shared loop; not locally unit-testable) — implement + smoke-test during pre-sweep setup |
+| M5 GT-as-early-stopping | ✅ implemented (gated) | `tests/test_select_step.py` (pure selector 6/6); **active path needs on-box smoke run** (loop only executes in a real training run) |
 
-Local suite: 13 + 11 + 7 (+ Phase-1b 17) checks pass; `py_compile` clean. The naive-reproduction
-GPU regression (~0.673) is the remaining pre-sweep gate. **The portfolio is runnable now with M1–M4
-(4 methods); M5 is optional 5th, added on-box if time permits.**
+M5 wiring: `train_model`/`train_and_save_model` take an optional `gt_val_ds`; when present, each
+eval step scores the held-out GT subset and the run returns the test results at the best-GT-val
+step (`_select_best_step`, ties→earliest). Strictly gated on `gt_val_ds is not None`, so naive/
+M1–M4 paths are byte-identical. `train_simple.py` builds the held-out GT-val set (true labels),
+trains on the weak remainder, and sets a ~6-eval cadence.
+
+Local suite: 13 + 7 + 11 + 6 (+ Phase-1b 17) = **54 checks pass**; `py_compile` clean. Remaining
+pre-sweep gates on the box: (1) naive-reproduction (~0.673 bit-for-bit) and (2) an M5 smoke run
+(confirm it trains on 0 GT rows, selects a checkpoint, yields a sane accuracy). **All 5 methods
+implemented; M5 enters the sweep only after its smoke run passes.**
 
 ## PHASE C — Pre-register, run, analyze
 

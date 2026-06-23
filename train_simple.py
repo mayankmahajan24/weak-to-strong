@@ -247,6 +247,7 @@ def main(
 
     # Split the training dataset in half
     train_dataset, test_ds = dataset["train"], dataset["test"]
+    gt_val_ds = None  # M5: held-out GT validation set (set in the transfer branch for gt_early_stop)
 
     if weak_labels_path is None:
         split_data = train_dataset.train_test_split(test_size=0.5, seed=seed)
@@ -267,23 +268,38 @@ def main(
                 raise RuntimeError(f"Sync command failed with return code {result.returncode}")
         train1_ds = load_from_disk(weak_labels_path)
         train2_ds = None
+        gt_val_ds = None  # M5: held-out GT validation set (built below for gt_early_stop)
 
         # Mix ground-truth labels into weak labels if requested
         if gt_fraction > 0.0:
-            from weak_to_strong.label_mixing import apply_label_mixing
-            # M4: compute reliability weights on the RAW weak labels BEFORE mixing overwrites
-            # the GT rows' weak predictions; the sample_weight column survives the mix.
-            if combination_method == "reliability":
-                from weak_to_strong.reliability import add_reliability_weights
-                train1_ds = add_reliability_weights(train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy)
-            # M2: label-smooth the GT-row targets when combination_method == "soft_gt".
-            _soft_eps = soft_gt_eps if combination_method == "soft_gt" else 0.0
-            train1_ds = apply_label_mixing(
-                train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy, soft_gt_eps=_soft_eps
-            )
-            if gt_only:
-                train1_ds = train1_ds.filter(lambda ex: ex["label_source"] == "gt")
-                print(f"gt_only: filtered to {len(train1_ds)} GT-only rows")
+            from weak_to_strong.label_mixing import apply_label_mixing, select_gt_indices
+            if combination_method == "gt_early_stop":
+                # M5: do NOT inject GT into training. Hold out the gt_seed-selected subset
+                # (with TRUE labels) as a clean validation set; train on the weak remainder.
+                _n = len(train1_ds)
+                _gt = set(select_gt_indices(
+                    _n, train1_ds["gt_label"], train1_ds["hard_label"], gt_fraction, gt_seed, mixing_strategy))
+                gt_val_ds = train1_ds.select(sorted(_gt)).map(
+                    lambda ex: {"soft_label": [1.0 - ex["gt_label"], float(ex["gt_label"])],
+                                "hard_label": ex["gt_label"], "label_source": "gt"})
+                train1_ds = train1_ds.select([i for i in range(_n) if i not in _gt]).map(
+                    lambda ex: {"label_source": "weak"})
+                print(f"gt_early_stop: train on {len(train1_ds)} weak rows, "
+                      f"hold out {len(gt_val_ds)} GT-val rows")
+            else:
+                # M4: compute reliability weights on the RAW weak labels BEFORE mixing overwrites
+                # the GT rows' weak predictions; the sample_weight column survives the mix.
+                if combination_method == "reliability":
+                    from weak_to_strong.reliability import add_reliability_weights
+                    train1_ds = add_reliability_weights(train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy)
+                # M2: label-smooth the GT-row targets when combination_method == "soft_gt".
+                _soft_eps = soft_gt_eps if combination_method == "soft_gt" else 0.0
+                train1_ds = apply_label_mixing(
+                    train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy, soft_gt_eps=_soft_eps
+                )
+                if gt_only:
+                    train1_ds = train1_ds.filter(lambda ex: ex["label_source"] == "gt")
+                    print(f"gt_only: filtered to {len(train1_ds)} GT-only rows")
 
         weak_model_config = json.load(open(weak_labels_path.replace("weak_labels", "config.json")))
         config["weak_model_size"] = weak_model_config["model_size"]
@@ -316,6 +332,13 @@ def main(
     tokenizer = get_tokenizer(model_config.name)
     train1_ds = tokenize_dataset(train1_ds, tokenizer, max_ctx)
     test_ds = tokenize_dataset(test_ds, tokenizer, max_ctx)
+    if gt_val_ds is not None:
+        gt_val_ds = tokenize_dataset(gt_val_ds, tokenizer, max_ctx)
+    # M5: GT-as-early-stopping needs intermediate evals; pick a ~6-eval cadence over training.
+    eval_every_eff = eval_every
+    if combination_method == "gt_early_stop":
+        _nsteps = max(1, len(train1_ds) * epochs // batch_size)
+        eval_every_eff = max(1, _nsteps // 6)
     if train2_ds:
         train2_ds = tokenize_dataset(train2_ds, tokenizer, max_ctx)
 
@@ -331,17 +354,17 @@ def main(
         loss_fn = xent_loss()
     elif combination_method == "gt_anchored":       # M3 (logconf with GT rows as hard anchors)
         loss_fn = GTAnchoredLogconfLoss()
+    elif combination_method == "gt_early_stop":      # M5 (train on weak; GT held out for selection)
+        loss_fn = xent_loss()
     else:
-        raise NotImplementedError(
-            f"combination_method='{combination_method}' is not implemented "
-            "(gt_early_stop = Phase 2B M5)"
-        )
+        raise NotImplementedError(f"combination_method='{combination_method}' is not recognized")
     print(f"Training model model, size {model_size}")
     test_results, weak_ds = train_and_save_model(
         model_config,
         train1_ds,
         test_ds,
         inference_ds=train2_ds,
+        gt_val_ds=gt_val_ds,
         batch_size=batch_size,
         save_path=save_path,
         loss_fn=loss_fn,
@@ -354,7 +377,7 @@ def main(
         linear_probe=linear_probe,
         lr_schedule=lr_schedule,
         optimizer_name=optim,
-        eval_every=eval_every,
+        eval_every=eval_every_eff,
     )
 
     if weak_ds is not None:

@@ -29,6 +29,12 @@ class ModelConfig:
     default_optimizer: str = "adam"
 
 
+def _select_best_step(val_acc_by_step):
+    """Phase 2 M5 — pick the checkpoint step with the highest GT-val accuracy; ties broken by
+    the EARLIEST step (least training / simplest model). Pure + unit-testable."""
+    return max(sorted(val_acc_by_step), key=lambda s: val_acc_by_step[s])
+
+
 def train_model(
     model: torch.nn.Module,
     ds: datasets.Dataset,
@@ -40,6 +46,7 @@ def train_model(
     eval_batch_size: int = 256,
     minibatch_size: int = 8,
     eval_ds: Optional[datasets.Dataset] = None,
+    gt_val_ds: Optional[datasets.Dataset] = None,
     gradient_checkpointing: bool = False,
     train_with_dropout: bool = False,
     epochs: int = 1,
@@ -82,6 +89,10 @@ def train_model(
     losses = []
     accuracies = []
     eval_acc_dict = {}
+    # Phase 2 M5 — GT-as-early-stopping (only active when gt_val_ds is provided; otherwise these
+    # stay empty and the return path below is identical to the original).
+    gt_val_acc_by_step = {}
+    test_results_by_step = {}
 
     # If the model is wrapped by DataParallel, it doesn't have a device. In this case,
     # we use GPU 0 as the output device. This sadly means that this device will store
@@ -92,6 +103,12 @@ def train_model(
         loss_tot = 0
         if eval_every and (step + 1) % eval_every == 0:
             eval_results = eval_model_acc(model, eval_ds, eval_batch_size)
+            if gt_val_ds is not None:
+                # M5: score the held-out GT subset and remember this checkpoint's test results
+                gt_val_results = eval_model_acc(model, gt_val_ds, eval_batch_size)
+                gt_val_acc_by_step[step] = float(np.mean([r["acc"] for r in gt_val_results]))
+                test_results_by_step[step] = eval_results
+                logger.logkv("gt_val_accuracy", gt_val_acc_by_step[step])
             if gradient_checkpointing:
                 (
                     model if hasattr(model, "gradient_checkpointing_enable") else model.module
@@ -172,6 +189,16 @@ def train_model(
             accuracies = []
         step += 1
         logger.dumpkvs()
+    # Phase 2 M5 — if a GT-val set was tracked, report the checkpoint that maximized GT-val
+    # accuracy (selection by GT-val, reported on the test set). Gated: with no gt_val_ds this
+    # block is skipped and the original final-eval path runs unchanged.
+    if gt_val_ds is not None and gt_val_acc_by_step:
+        best_step = _select_best_step(gt_val_acc_by_step)
+        print(
+            f"GT-val early-stopping: best step {best_step} "
+            f"(gt_val_acc={gt_val_acc_by_step[best_step]:.4f} of {len(gt_val_acc_by_step)} evals)"
+        )
+        return test_results_by_step[best_step]
     final_eval_results = None
     if eval_every:
         print("Final evaluation:")
@@ -186,6 +213,7 @@ def train_and_save_model(
     train_ds: datasets.Dataset,
     test_ds: datasets.Dataset,
     inference_ds: Optional[datasets.Dataset] = None,
+    gt_val_ds: Optional[datasets.Dataset] = None,
     *,
     batch_size: int,
     lr: float,
@@ -272,6 +300,7 @@ def train_and_save_model(
             lr=lr,
             epochs=epochs,
             eval_ds=test_ds,
+            gt_val_ds=gt_val_ds,
             gradient_checkpointing=gradient_checkpointing,
             loss_fn=loss_fn,
             eval_batch_size=eval_batch_size,
