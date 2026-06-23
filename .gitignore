@@ -14,3 +14,4 @@ pytorch_model*.bin
 *.safetensors
 results/data/_residual_quarantine/
 pytorch_model.bin.index.json
+cache-*.arrow
