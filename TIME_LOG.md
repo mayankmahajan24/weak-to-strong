@@ -379,8 +379,8 @@ were pulled. Instance was found still running with no active jobs; run dirs time
 - Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** + analyzed; pre-registration locked.
 - Seed-0 Phase 1: mixing + GT-only **complete**, integrated into phase1_results.csv; scored vs P1–P6.
 - seed-1 gpt2-large GT anomaly **adjudicated** (regenerated → reproduced 0.66198 bit-for-bit → real seed variance, kept). See NOTES_phase0.md.
-- Still pending: seed 2 sweep (M3, in progress on 42131402), noise floor + plots (M5/M6), final 3-seed scoring of P1–P6.
-- Instance `42131402` (seed-2 sweep) left **running** at user request.
+- Still pending: seed 2 full Phase 1 sweep (M3, **not yet started**), noise floor + plots (M5/M6), final 3-seed scoring of P1–P6.
+- Instance `42131402` (8×H200) is running a **gpt2-large variance verification** (seed=2, gt_fraction=0.1 runs) — NOT the seed-2 Phase 1 sweep. Left running at user request.
 
 ### Time / Cost Summary
 | sid | Task | Wall time | GPU-hours | Notes |
