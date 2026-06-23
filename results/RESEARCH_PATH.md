@@ -127,30 +127,35 @@ the effects and the **premises hold**. Four tests, each with a pre-registered ki
 
 - **Informed.** A+B+C give a sharp, honest, **cross-task** story: *which* labels matters (weak
   labels informative, both tasks), *where* you place GT does not (allocation null), *how much* is
-  gradual/back-loaded with no knee (both tasks). This **kills Phase-2 Axis A (allocation)** and —
-  since neither task is high-signal — argues against a broad Phase-2 bake-off. The defensible
-  contribution is the cross-task-replicated **characterization** + the allocation null + the
-  gpt2-large instability + the logconf null. Honest default: write up the bounded result and
-  propose a **larger model gap** as the real next step; any Phase 2 should be a small pre-registered
-  B/C/D probe ("interesting even if it fails"), not a sweep.
+  gradual/back-loaded with no knee (both tasks). This **kills Phase-2 Axis A (allocation)** —
+  uncertainty/disagreement/diversity all approximate the error-targeting the oracle bounded at
+  zero. So Phase 2 is **focused, not a broad bake-off**: a pre-registered *combination*-axis
+  portfolio (B/C/D) testing the one untested lever, *how* to combine weak + GT. The defensible
+  contribution either way is the cross-task-replicated **characterization** + the allocation null
+  + the gpt2-large instability + the logconf null; the **larger model gap** is the honest
+  future-work lever (out of scope per the brief), not this phase.
 
 ---
 
-## Forward roadmap (original plan, gated by Phase 1b)
+## Forward roadmap (decided after Phase 1b + reading the interview brief)
 
-- **Phase 2 — the idea-space portfolio** (where the "try many approaches" criterion is graded):
-  a grid of *Axis A — allocation* (random / high-uncertainty / **low-uncertainty = the
-  sanity-inverter** / disagreement / diversity), *Axis B — combination* (hard swap / soft GT /
-  confidence-weighted / weighted loss / curriculum), *Axis C — loss dynamics* (GT-anchored
-  logconf, scheduled confidence, GT-as-early-stopping), *Axis D — higher-creativity*
-  (teacher-reliability modeling, active-oversight loop, relabel-and-retrain, GT-guided filtering).
-  Our oracle/random_labels work is the Phase-1b *gate* in front of this. Present the grid itself
-  as the deliverable, with an explicit negative-results section.
-- **Phase 3 — mechanism + robustness + replication:** imitation analysis (does the winner fix
-  weak-*error* rows?), weak-quality interaction, noisy-oversight robustness, and second-dataset
-  (SciQ) replication of the headline.
-- **Phase 4 — synthesis:** ≤20-min talk on the three questions (how much / where / how), with
-  the seed-environment + noise-floor + negative-results slides as the rigor backbone.
+Phase 1b triaged the original idea-space portfolio: **Axis A (allocation) is dead** (oracle
+null), so we do **not** run allocation heuristics. The interview rubric's #1 criterion is breadth
+of *plausible* approaches with rigor, so Phase 2 is **on** — but focused on the one untested axis.
+
+- **Phase 2 — combination-method portfolio** (planned; *how* to combine weak + GT per row).
+  5 pre-registered methods — weighted loss, soft-GT, **GT-anchored logconf** (rescue the logconf
+  null), teacher-reliability weighting, GT-as-early-stopping — at {0.10, 0.25, 0.50}, 6 strict
+  pairs, 3 seeds (~300 runs, ~$170 on 8×H100). Success = beat-naive / left-shift / ceiling-raise
+  vs the 0.014 floor; report hits **and** misses. Plan: [`../plans/phase2.md`](../plans/phase2.md);
+  execution spec (code, tests, invariants): [`../plans/PHASE2_PROMPT.md`](../plans/PHASE2_PROMPT.md).
+- **Phase 3 — mechanism + robustness:** imitation analysis (does a winner fix weak-*error* rows?),
+  weak-quality interaction, noisy-oversight robustness. (SciQ headline replication already done in 1b-C.)
+- **Phase 4 — synthesis:** the ≤20-min talk on the three questions (how much / where / how), with
+  the pre-registration scorecard + noise-floor + negative-results slides as the rigor backbone.
+- **Out of scope (future work, not a deliverable):** the capability-gap scale-up to a ~100× family
+  is the scientifically correct next lever, but the brief fixes the universe to GPT-2 ("no models
+  other than the GPT-2 family exist") — so it lives in the talk as future work, not as compute spend.
 
 ## How we kept ourselves honest (the through-line for the talk)
 
@@ -174,11 +179,13 @@ the effects and the **premises hold**. Four tests, each with a pre-registered ki
 | 1 | ✅ | No knee (P1 refuted); mixing>GT-only (confounded); logconf null; scale inconclusive |
 | — | ✅ | gpt2-large GT ~27% unstable (S7) → exclusion principled, scale claim under-measured |
 | 1b | ✅ 0 PASS; A informative (both tasks); B allocation null; C testbed validated, findings replicate | Which labels matters; where doesn't; gradual no-knee curve — cross-task |
-| 2–4 | ⛔ likely descoped | Axis A killed; neither task high-signal → favor bounded write-up + scale-up proposal |
+| 2 | ▶ **planned + spec'd** (combination portfolio; pre-registration pending) | Tests the *how-to-combine* axis; Axis A dropped (oracle null) |
+| 3–4 | ⏳ pending | Mechanism analysis + the ≤20-min synthesis talk |
 
-**Immediate next:** Phase 1b is complete (0/A/B/C all run). The decision is whether to run a
-small pre-registered Phase-2 B/C/D probe at {0.10,0.25} or write up the bounded, cross-task
-characterization (recommended) with a larger-model-gap proposal as the real next step.
+**Immediate next:** implement Phase 2 per [`../plans/PHASE2_PROMPT.md`](../plans/PHASE2_PROMPT.md)
+— Phase A plumbing (loss `**kwargs` + per-row `gt_mask`/`sample_weight` threading + the
+`--combination_method` flag) with `tests/test_losses.py` and the naive-reproduction regression,
+then M1 + M3 first; commit the pre-registered predictions; run ~300 on 8×H100; then build the deck.
 
 ## Artifact index
 - **Synthesis writeup (start here for the findings): [`FINDINGS.md`](FINDINGS.md).**
@@ -186,6 +193,9 @@ characterization (recommended) with a larger-model-gap proposal as the real next
 - Phase results: `phase0/RESULTS_phase0.md`, `phase1/RESULTS_phase1.md`, `phase1b/RESULTS_phase1b.md`;
   variance study `phase0/gpt2large_variance/SUMMARY.md`.
 - Pre-registrations: `../NOTES_phase1.md` (P1–P6), `../NOTES_phase0.md` (code map + seed table + anomaly adjudication).
-- Plans: `../plans/w2sg_gt_mixing_plan.md` (master), `../plans/phase0.md`, `../plans/phase1.md`, `../plans/phase1b.md`.
+- Plans: `../plans/w2sg_gt_mixing_plan.md` (master), `../plans/phase0.md`, `../plans/phase1.md`,
+  `../plans/phase1b.md`, `../plans/phase2.md` (combination portfolio) + `../plans/PHASE2_PROMPT.md`
+  (execution spec: code/tests/invariants).
+- Interview brief (the rubric + scope constraints): `../docs/INTERVIEW_INSTRUCTIONS.pdf`.
 - Data + reproduce: `phase1/phase1_results.csv`, `phase1/consolidate_phase1.py`, `../plot_phase1*.py` (figures), `phase1b/*.py`.
-- Session / cost / lessons log: `../TIME_LOG.md` (S1–S7).
+- Session / cost / lessons log: `../TIME_LOG.md` (S1–S8).

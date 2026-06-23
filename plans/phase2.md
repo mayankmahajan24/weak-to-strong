@@ -96,7 +96,8 @@ Per method = 6 pairs × 3 fractions × 3 seeds = **54 runs**.
 | **Total** | **~300** |
 
 Per-run times = naive mixing (full-data): gpt2 ~80s … xl ~625s on H200. ≈34 GPU-hr ÷ 8 ≈
-**~5–6 h wall-clock, ~$150–180** on 8×H200. Remaining budget ≈ $1,485 of $2,000 → ample;
+**~5–6 h wall-clock, ~$150–180** on **8×H100 (preferred — same Hopper compute, ~30% cheaper;
+80 GB fits gpt2-xl) or 8×H200**. Remaining budget ≈ $1,485 of $2,000 → ample;
 scale to as many methods as implementable (~$30/method).
 
 ## Harness changes (more invasive than Phase 1b — flag in code, unit-test each)
@@ -117,7 +118,7 @@ bit-for-bit (default path unchanged).
 ## Execution
 
 GPU-pool driver (reuse `run_ab_driver.py` pattern): job list over (method, pair, fraction, seed),
-8 concurrent on 8×H200, write to `results/data/phase2_<method>/...`, clean `pytorch_model*.bin`
+8 concurrent on 8×H100 (or H200), write to `results/data/phase2_<method>/...`, clean `pytorch_model*.bin`
 + `results.pkl` per run, arm the dead-man failsafe, pull slim, destroy on completion. Verify
 N/N ok, 0 NaN (exclude any method that legitimately degrades-to-chance from the NaN gate, as we
 did for `random_labels`).

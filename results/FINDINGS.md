@@ -187,13 +187,18 @@ weak labels carry real signal, and don't bother optimizing *where* the GT goes �
 move the needle.** The headline-grabbing hypotheses (a frugal "knee," supervision value scaling
 with capability) are honest negatives here.
 
-The binding constraint is **model scale, not method.** The rigorous next step is not more
-strategies on GPT-2/BoolQ but to **re-run the fraction curve + the de-confound + the oracle on a
-family spanning a much larger capability gap** (e.g. Pythia/Qwen across ~100×), where the
-phenomena the original paper reports actually appear. Any GPT-2-scale Phase 2 (combination /
-loss-dynamics / reliability methods) should be a **small, pre-registered probe framed as
-"interesting even if it fails,"** not a broad sweep — because Component B already shows the
-allocation axis is dead and neither task offers the signal a sweep would need.
+The deepest read is that the binding constraint is **model scale, not method** — the
+scientifically correct lever is to re-run the core battery on a family spanning a much larger
+capability gap (~100×), where the phenomena the paper reports actually appear. **That is out of
+scope for this study** (the brief fixes the universe to the GPT-2 family), so it is the headline
+**future-work** proposal, not compute we spend here.
+
+In-scope, the next step (Phase 2) is a **focused, pre-registered combination-method portfolio** —
+the one axis Phase 1b left untested: *how* to combine weak + GT per row (weighted loss, soft-GT,
+GT-anchored logconf, teacher-reliability weighting, GT-as-early-stopping), at {0.10, 0.25, 0.50}.
+It is deliberately **not** a broad bake-off: Component B already killed the allocation axis, so we
+test combination only, report hits **and** misses, and expect most to be null (which is itself a
+result under the rubric). Plan: `../plans/phase2.md`; execution spec: `../plans/PHASE2_PROMPT.md`.
 
 ---
 

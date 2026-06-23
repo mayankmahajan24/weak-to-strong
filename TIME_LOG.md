@@ -13,7 +13,8 @@
 | S5 | 2026-06-22 | Recovery: capture seed-1 Phase 1 results + analysis + pre-registration | Complete |
 | S6 | 2026-06-22/23 | Phase 1 seeds 0+2 fraction sweep (8× H200) + 3-seed re-analysis, figures, RESULTS_phase1 | Complete |
 | S7 | 2026-06-23 | gpt2-large GT variance study (8 seeds, 8× H100): confirms ~27% instability, not an outlier | Complete |
-| S8 | 2026-06-23 | Phase 1b: Component 0 (power) + harness (oracle/random_labels) + A/B runs (8× H200) | Complete |
+| S8 | 2026-06-23 | Phase 1b: Component 0 (power) + harness (oracle/random_labels) + A/B + C runs (8× H200) | Complete |
+| S9 | 2026-06-23 | Synthesis (FINDINGS) + read interview brief + Phase 2 plan/exec-spec + doc reconciliation (local, no GPU) | Complete |
 
 ---
 
@@ -570,3 +571,18 @@ Inserted Phase 1b as a GATE before Phase 2 (don't tune strategies until the test
 | S8 | random_labels@low-fraction legitimately collapses to ~chance (90% noise) — exclude the control from any acc≈0.5 "degenerate run" QC gate, same as gt_only is excluded from the gt_fraction_actual gate |
 | S8 | SciQ runs ~2× faster than BoolQ (shorter sequences): gpt2-xl ~335s vs ~625s. Budget SciQ sweeps accordingly |
 | S8 | "Cleaner" (PGR) and "larger" (raw acc) can diverge: SciQ has higher baseline W2SG signal (positive PGR, less raw headroom). Report both; don't let a positive PGR imply a bigger absolute effect |
+
+---
+
+## S9 — 2026-06-23 — Synthesis + Phase 2 planning + doc reconciliation (local, no GPU)
+
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S9 | 2026-06-23 | — | Wrote results/FINDINGS.md (synthesis of Phase 0/1/1b around the 3 questions; pre-reg scorecard, threats, ~$515 total spend). Audited vs source RESULTS, added the Phase-0 baseline-reproduction + core-W2SG-phenomenon section |
+| S9 | 2026-06-23 | — | Copied + read the interview brief (docs/INTERVIEW_INSTRUCTIONS.pdf). Key recalibration: rubric #1 = breadth of plausible approaches + rigor; scale-up is OUT of scope ("only GPT-2 exists"); 25% plot + median PGR is the required deliverable; $2000 budget / 72h |
+| S9 | 2026-06-23 | — | Drafted plans/phase2.md (combination-method portfolio, Axis A dropped per oracle null) + plans/PHASE2_PROMPT.md (execution spec: invariants, per-method code/tests, run matrix) |
+| S9 | 2026-06-23 | — | Reconciled all docs (FINDINGS, RESEARCH_PATH, RESULTS_phase1b) to the decision: Phase 2 = focused combination portfolio (not descoped, not a broad bake-off); scale-up = future work. Committed + pushed |
+
+### Notes
+- No compute this session. Total project GPU spend remains ~$515 (S1–S8); Phase 2 будет ~$150–180 when run.
+- Decision recorded: run Phase 2 (combination portfolio) on 8×H100 (preferred) or H200, after Phase A plumbing + tests + pre-registration.

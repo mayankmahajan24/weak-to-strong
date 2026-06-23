@@ -167,12 +167,13 @@ gain, not bigger effects.
 | Does *where* you place GT matter? (B) | **no — oracle ≈ naive** | confident null (BoolQ) |
 | Is BoolQ the right task? (C) | SciQ cleaner-PGR but smaller raw; findings replicate | validated; no bigger effects |
 
-**Decision for Phase 2.** Allocation (Axis A) is dead, and neither task is a high-signal venue,
-so a large Phase-2 strategy bake-off is unlikely to surface effects above noise. The defensible,
-intellectually-honest contribution is the **cross-task-replicated characterization**: *how much*
-GT (gradual, back-loaded, no knee), *which* labels (weak supervision is genuinely informative,
-de-confounded), and *where* (allocation does not matter) — plus the gpt2-large instability and
-the logconf null. If Phase 2 is run, it should be a **small, pre-registered** probe of
-combination/loss/reliability (Axes B/C/D) at {0.10,0.25}, framed as "even if it fails," not a
-broad sweep — and the honest default is to **write up the bounded result and propose a larger
-model gap** as the real next step.
+**Decision for Phase 2.** Allocation (Axis A) is dead, so Phase 2 is **focused, not a broad
+bake-off**: a small, pre-registered **combination-method portfolio** (B/C/D — weighted loss,
+soft-GT, GT-anchored logconf, teacher-reliability weighting, GT-as-early-stopping) at
+{0.10, 0.25, 0.50}, framed as "interesting even if it fails," with most methods expected null.
+This tests the one untested lever (*how* to combine), and the rubric explicitly rewards breadth
+of plausible attempts with rigor. The defensible contribution regardless of outcome is the
+**cross-task-replicated characterization** (*how much* / *which* / *where*) + the gpt2-large
+instability + the logconf null. The **larger model gap** is the scientifically correct next
+lever but is **out of scope** (the brief fixes the universe to GPT-2) → future work in the talk.
+Plan: `../../plans/phase2.md`; execution spec: `../../plans/PHASE2_PROMPT.md`.
