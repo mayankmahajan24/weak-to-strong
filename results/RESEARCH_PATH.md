@@ -179,7 +179,7 @@ of *plausible* approaches with rigor, so Phase 2 is **on** — but focused on th
 | 1 | ✅ | No knee (P1 refuted); mixing>GT-only (confounded); logconf null; scale inconclusive |
 | — | ✅ | gpt2-large GT ~27% unstable (S7) → exclusion principled, scale claim under-measured |
 | 1b | ✅ 0 PASS; A informative (both tasks); B allocation null; C testbed validated, findings replicate | Which labels matters; where doesn't; gradual no-knee curve — cross-task |
-| 2 | ▶ **launch-ready**: M1–M5 implemented+tested, driver written, pre-reg committed (`../NOTES_phase2.md`); on-box gates pending | Tests *how to combine*; Axis A dropped (oracle null) |
+| 2 | ▶ **running** (8×H200): gates passed — naive bit-for-bit (0.69257), M5 smoke (0 GT, acc 0.65); 270-run combination sweep in progress | Tests *how to combine*; Axis A dropped (oracle null) |
 | 3–4 | ⏳ pending | Mechanism analysis + the ≤20-min synthesis talk |
 
 **Immediate next:** implement Phase 2 per [`../plans/PHASE2_PROMPT.md`](../plans/PHASE2_PROMPT.md)

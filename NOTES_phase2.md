@@ -42,7 +42,7 @@ conclusion that at GPT-2 scale, beyond label quantity and weak-label informative
 *where* nor *how* you combine moves the needle (→ scale is the binding constraint).
 
 ## Pre-sweep gates (must pass on the box before the full run)
-1. **Naive reproduction** — `gpt2-medium←gpt2 @0.25, seed 1, xent ≈ 0.673` bit-for-bit (the
+1. **Naive reproduction** — `gpt2-medium←gpt2 @0.25, seed 1, xent = 0.69257` bit-for-bit vs the canonical S6 run (the
    plumbing must not have perturbed the naive path).
 2. **M5 smoke** — one `gt_early_stop` run: 0 GT rows in training, a checkpoint is selected, sane acc.
 
@@ -54,4 +54,7 @@ proposal as future work.
 
 ## Deviations (append-only)
 
-_(none yet)_
+- **2026-06-23 (S11):** Corrected the *naive-reproduction gate reference* from the stale Phase-0
+  M5 figure (~0.673) to the canonical S6 value **0.69257** (`gpt2-medium←gpt2 @0.25 seed1 xent` in
+  `phase1_results.csv`). The gate then **passed bit-for-bit** (0.6925665341082899), confirming the
+  Phase-2 plumbing is inert on the naive path. No prediction changed — reference-value fix only.

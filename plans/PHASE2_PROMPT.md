@@ -13,7 +13,7 @@ pre-registered predictions in `plans/phase2.md` are committed.
   optimizer, the data split, or `eval_model_acc` semantics.
 - Regression anchor (naive path must stay byte-identical): a `naive` xent run of
   `gpt2-medium←gpt2, boolq, gt_fraction=0.25, seed=1` must reproduce the Phase-0/1 value
-  (≈ **0.673**) bit-for-bit; and `gt_fraction=0.0` ≡ baseline (the Phase-0 M3 identity check).
+  (= **0.69257**, the canonical S6 value — *not* the older Phase-0 0.673) bit-for-bit; and `gt_fraction=0.0` ≡ baseline.
 
 ---
 
@@ -152,7 +152,7 @@ M1–M4 paths are byte-identical. `train_simple.py` builds the held-out GT-val s
 trains on the weak remainder, and sets a ~6-eval cadence.
 
 Local suite: 13 + 7 + 11 + 6 (+ Phase-1b 17) = **54 checks pass**; `py_compile` clean. Remaining
-pre-sweep gates on the box: (1) naive-reproduction (~0.673 bit-for-bit) and (2) an M5 smoke run
+pre-sweep gates on the box: (1) naive-reproduction (= 0.69257 bit-for-bit) and (2) an M5 smoke run
 (confirm it trains on 0 GT rows, selects a checkpoint, yields a sane accuracy). **All 5 methods
 implemented; M5 enters the sweep only after its smoke run passes.**
 
@@ -172,7 +172,7 @@ implemented; M5 enters the sweep only after its smoke run passes.**
    acc≈0.5 NaN gate (as with `random_labels`).
 
 ## VERIFICATION GATES (before trusting results)
-- Naive regression passes (≈0.673 reproduction; `gt_fraction=0` identity).
+- Naive regression passes (= 0.69257 reproduction vs canonical S6; `gt_fraction=0` identity).
 - All unit tests green (`tests/test_losses.py`, extend `tests/test_label_mixing.py`).
 - `cm=` token present only on non-naive folders; no collision with Phase-1 dirs.
 - N/N runs ok, 0 unexpected NaN; `gt_fraction_actual ≈ requested` for training-on-GT methods
