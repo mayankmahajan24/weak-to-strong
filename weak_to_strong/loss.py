@@ -142,3 +142,49 @@ class logconf_loss_fn(LossFnBase):
         target = labels * (1 - coef) + strong_preds.detach() * coef
         loss = torch.nn.functional.cross_entropy(logits, target, reduction="none")
         return loss.mean()
+
+
+class GTAnchoredLogconfLoss(LossFnBase):
+    """Phase 2 M3 — logconf with GT rows held as hard anchors.
+
+    Standard logconf blends *every* row's target with the model's own hardened predictions
+    (`target = labels·(1-coef) + strong_preds·coef`), so even ground-truth rows are diluted to
+    ~50% self-prediction. Here the auxiliary coefficient is zeroed on GT rows (via `gt_mask`),
+    so GT rows keep their hard labels while weak rows get the standard treatment. Tests whether
+    protecting the clean labels rescues the Phase-1 logconf null.
+
+    With `gt_mask` all-False this is IDENTICAL to `logconf_loss_fn` (regression invariant).
+    """
+
+    def __init__(self, aux_coef: float = 0.5, warmup_frac: float = 0.1):
+        self.aux_coef = aux_coef
+        self.warmup_frac = warmup_frac
+
+    def __call__(
+        self,
+        logits: torch.Tensor,
+        labels: torch.Tensor,
+        step_frac: float,
+        gt_mask: torch.Tensor = None,
+        **kwargs,
+    ) -> torch.Tensor:
+        logits = logits.float()
+        labels = labels.float()
+        coef = 1.0 if step_frac > self.warmup_frac else step_frac
+        coef = coef * self.aux_coef
+        preds = torch.softmax(logits, dim=-1)
+        mean_weak = torch.mean(labels, dim=0)
+        assert mean_weak.shape == (2,)
+        threshold = torch.quantile(preds[:, 0], mean_weak[1])
+        strong_preds = torch.cat(
+            [(preds[:, 0] >= threshold)[:, None], (preds[:, 0] < threshold)[:, None]],
+            dim=1,
+        )
+        # Per-row coefficient: 0 on GT rows (hard anchor), `coef` on weak rows.
+        coef_row = torch.full((logits.shape[0],), float(coef), device=logits.device, dtype=logits.dtype)
+        if gt_mask is not None:
+            coef_row = coef_row * (~gt_mask).to(coef_row.dtype)
+        coef_row = coef_row[:, None]
+        target = labels * (1 - coef_row) + strong_preds.detach() * coef_row
+        loss = torch.nn.functional.cross_entropy(logits, target, reduction="none")
+        return loss.mean()

@@ -13,7 +13,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from weak_to_strong.loss import (  # noqa: E402
-    xent_loss, logconf_loss_fn, product_loss_fn, WeightedXentLoss)
+    xent_loss, logconf_loss_fn, product_loss_fn, WeightedXentLoss, GTAnchoredLogconfLoss)
 
 PASS = 0
 
@@ -67,5 +67,31 @@ check("WX sample_weight matches closed form",
 check("WX gt_weight>1 increases weight on GT rows",
       WeightedXentLoss(8.0)(logits, labels, sf, gt_mask=gt_mask).item()
       != WeightedXentLoss(1.0)(logits, labels, sf, gt_mask=gt_mask).item())
+
+# --- M3: GTAnchoredLogconfLoss ---
+# (a) gt_mask all-False == stock logconf_loss_fn (regression invariant)
+none_mask = torch.zeros(N, dtype=torch.bool)
+check("M3 all-weak == logconf_loss_fn",
+      torch.allclose(GTAnchoredLogconfLoss()(logits, labels, sf, gt_mask=none_mask),
+                     logconf_loss_fn()(logits, labels, sf), atol=1e-6))
+check("M3 (no gt_mask) == logconf_loss_fn",
+      torch.allclose(GTAnchoredLogconfLoss()(logits, labels, sf),
+                     logconf_loss_fn()(logits, labels, sf), atol=1e-6))
+# (b) gt_mask all-True ⇒ pure CE on the (hard) labels (coef→0, no self-prediction blend)
+all_mask = torch.ones(N, dtype=torch.bool)
+check("M3 all-GT == cross_entropy(logits, labels)",
+      torch.allclose(GTAnchoredLogconfLoss()(logits, labels, sf, gt_mask=all_mask),
+                     torch.nn.functional.cross_entropy(logits, labels), atol=1e-6))
+# (c) mixed mask: matches a manual reconstruction (GT rows → hard labels, weak rows → blend)
+_l = logits.float(); _lab = labels.float()
+_coef = 0.5  # step_frac 0.5 > warmup 0.1 -> coef = 1.0 * aux_coef(0.5)
+_preds = torch.softmax(_l, dim=-1)
+_thr = torch.quantile(_preds[:, 0], torch.mean(_lab, dim=0)[1])
+_sp = torch.cat([(_preds[:, 0] >= _thr)[:, None], (_preds[:, 0] < _thr)[:, None]], dim=1).float()
+_cr = (_coef * (~gt_mask).float())[:, None]
+_target = _lab * (1 - _cr) + _sp * _cr
+_expected = torch.nn.functional.cross_entropy(_l, _target, reduction="none").mean()
+check("M3 mixed-mask matches manual reconstruction",
+      torch.allclose(GTAnchoredLogconfLoss()(logits, labels, sf, gt_mask=gt_mask), _expected, atol=1e-6))
 
 print(f"\nALL {PASS} CHECKS PASSED")

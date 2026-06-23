@@ -14,7 +14,7 @@ from weak_to_strong.common import get_tokenizer
 from weak_to_strong.datasets import (VALID_DATASETS, load_dataset,
                                      tokenize_dataset)
 from weak_to_strong.loss import (logconf_loss_fn, product_loss_fn, xent_loss,
-                                  WeightedXentLoss)
+                                  WeightedXentLoss, GTAnchoredLogconfLoss)
 from weak_to_strong.train import ModelConfig, train_and_save_model
 
 # NOTE learning rates are not particularly tuned, work somewhat reasonably at train batch size 32
@@ -177,6 +177,7 @@ def main(
     # default and leaves the loss/config/foldername byte-identical to pre-Phase-2.
     combination_method: str = "naive",
     gt_loss_weight: float = 1.0,
+    soft_gt_eps: float = 0.0,
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,
@@ -270,7 +271,16 @@ def main(
         # Mix ground-truth labels into weak labels if requested
         if gt_fraction > 0.0:
             from weak_to_strong.label_mixing import apply_label_mixing
-            train1_ds = apply_label_mixing(train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy)
+            # M4: compute reliability weights on the RAW weak labels BEFORE mixing overwrites
+            # the GT rows' weak predictions; the sample_weight column survives the mix.
+            if combination_method == "reliability":
+                from weak_to_strong.reliability import add_reliability_weights
+                train1_ds = add_reliability_weights(train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy)
+            # M2: label-smooth the GT-row targets when combination_method == "soft_gt".
+            _soft_eps = soft_gt_eps if combination_method == "soft_gt" else 0.0
+            train1_ds = apply_label_mixing(
+                train1_ds, gt_fraction, gt_seed, strategy=mixing_strategy, soft_gt_eps=_soft_eps
+            )
             if gt_only:
                 train1_ds = train1_ds.filter(lambda ex: ex["label_source"] == "gt")
                 print(f"gt_only: filtered to {len(train1_ds)} GT-only rows")
@@ -290,6 +300,8 @@ def main(
                 config["combination_method"] = combination_method
                 if gt_loss_weight != 1.0:
                     config["gt_loss_weight"] = gt_loss_weight
+                if soft_gt_eps != 0.0:
+                    config["soft_gt_eps"] = soft_gt_eps
         config_name = get_config_foldername(config)
         config["weak_model"] = weak_model_config
 
@@ -311,15 +323,18 @@ def main(
     # exact pre-Phase-2 loss object (byte-identical naive path). Other methods land in 2B.
     if combination_method == "naive":
         loss_fn = loss_dict[loss]
-    elif combination_method == "weighted":
+    elif combination_method == "weighted":          # M1
         loss_fn = WeightedXentLoss(gt_weight=gt_loss_weight)
-    elif combination_method == "reliability":
-        # M4: weights are precomputed into a `sample_weight` column; loss is weighted xent.
+    elif combination_method == "reliability":       # M4 (weights in the sample_weight column)
         loss_fn = WeightedXentLoss(gt_weight=1.0)
+    elif combination_method == "soft_gt":           # M2 (label transform; standard xent loss)
+        loss_fn = xent_loss()
+    elif combination_method == "gt_anchored":       # M3 (logconf with GT rows as hard anchors)
+        loss_fn = GTAnchoredLogconfLoss()
     else:
         raise NotImplementedError(
-            f"combination_method='{combination_method}' is Phase 2B "
-            "(e.g. gt_anchored logconf, soft_gt, gt_early_stop)"
+            f"combination_method='{combination_method}' is not implemented "
+            "(gt_early_stop = Phase 2B M5)"
         )
     print(f"Training model model, size {model_size}")
     test_results, weak_ds = train_and_save_model(

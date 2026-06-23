@@ -50,7 +50,7 @@ def select_gt_indices(n, gt_labels, hard_labels, gt_fraction, gt_seed, strategy=
     raise AssertionError(strategy)  # unreachable
 
 
-def apply_label_mixing(ds, gt_fraction, gt_seed, strategy="naive"):
+def apply_label_mixing(ds, gt_fraction, gt_seed, strategy="naive", soft_gt_eps=0.0):
     """
     Mix ground-truth labels into a weak-label dataset.
 
@@ -59,10 +59,15 @@ def apply_label_mixing(ds, gt_fraction, gt_seed, strategy="naive"):
     label; for other strategies non-GT rows keep their weak labels. Every row gets a
     `label_source` field ("gt", "weak", or "random") for provenance.
 
+    Phase 2 M2 — `soft_gt_eps > 0` label-smooths the GT-row targets: the GT class gets
+    probability `1 - eps` instead of 1.0 (so soft_label = [eps, 1-eps] for gt==1). hard_label
+    is unchanged. `soft_gt_eps == 0.0` reproduces the one-hot GT target exactly (no-op).
+
     Returns a new dataset (does not mutate the input).
     """
     assert strategy in STRATEGIES, f"Unknown mixing strategy: {strategy}"
     assert 0.0 <= gt_fraction <= 1.0
+    assert 0.0 <= soft_gt_eps < 0.5
 
     if gt_fraction == 0.0:
         return ds.map(lambda ex: {"label_source": "weak"})
@@ -84,7 +89,10 @@ def apply_label_mixing(ds, gt_fraction, gt_seed, strategy="naive"):
     def _mix(ex, idx):
         if idx in gt_indices:
             gt = ex["gt_label"]
-            return {"soft_label": [1.0 - gt, float(gt)], "hard_label": gt, "label_source": "gt"}
+            # prob assigned to the GT class (label-smoothed by soft_gt_eps; one-hot when eps=0)
+            p_gt = 1.0 - soft_gt_eps
+            p1 = p_gt if gt == 1 else soft_gt_eps
+            return {"soft_label": [1.0 - p1, p1], "hard_label": gt, "label_source": "gt"}
         if strategy == "random_labels":
             r = rand_label[idx]
             return {"soft_label": [1.0 - r, float(r)], "hard_label": r, "label_source": "random"}
