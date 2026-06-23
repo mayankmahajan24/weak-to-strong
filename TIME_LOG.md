@@ -368,6 +368,13 @@ were pulled. Instance was found still running with no active jobs; run dirs time
 | S5 | 2026-06-23 | ~01:32 | GT run complete: accuracy=0.6619761394921995 — **bit-identical** to original. Verified fresh run (294 steps). weak_labels: hard labels identical (0/4714 mismatch), soft ≤0.007 diff |
 | S5 | 2026-06-23 | ~01:35 | Adjudication: anomaly is real/reproducible seed variance, not corruption. Keep as-is, validity rule excludes seed-1 large-as-student pairs. No downstream reruns. Pulled slim results; destroyed H100 (42160540) + confirmed A100 gone |
 
+### Deeper analysis + methodology decisions (local)
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S5 | 2026-06-23 | ~02:00 | Per-pair re-examination of the "knee": median Δacc-vs-baseline + #pairs-improved. P1 (knee at 0.25) looking **refuted**, not just shaky — seed0 shows ~0 gain at 0.25 (5/10 pairs), effect only consistent at 0.50 (9/10), large only at 1.0. Curvature convex/accelerating (opposite of predicted concave/diminishing-returns). The PGR "knee" was a small-denominator amplification + seed-1 artifact |
+| S5 | 2026-06-23 | ~02:05 | Decision: keep seed 1 in the {0,1,2} set. Dropping a reproducible-but-unlucky seed = outcome-dependent selection; validity rule already handles it. Recommend a with/without-seed1-large sensitivity check in the writeup |
+| S5 | 2026-06-23 | ~02:10 | Audited results.pkl need: holds per-example TEST predictions only. Not required for any planned work (metrics from results_summary.json; Phase 2 allocation needs weak_labels, preserved for all 3 seeds). Regenerable exactly for accuracy/hard-labels (code+config+weak_labels preserved), ~0.007-approximate for soft_labels under env change |
+
 ### Status after S5
 - Seed-1 Phase 1: mixing (M2) + GT-only controls (M4) **complete** + analyzed; pre-registration locked.
 - Seed-0 Phase 1: mixing + GT-only **complete**, integrated into phase1_results.csv; scored vs P1–P6.
