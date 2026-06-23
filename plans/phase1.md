@@ -315,7 +315,7 @@ Local Python script that:
 | File | Action |
 |------|--------|
 | `run_phase1.sh` | **New** — batch runner for fraction sweep |
-| `plot_phase1.py` | **New** — generates the three Phase 1 plots |
+| `scripts/phase1/plot_phase1.py` | **New** — generates the three Phase 1 plots |
 | `results/phase1/RESULTS_phase1.md` | **New** — results writeup |
 | `NOTES_phase1.md` | **New** — pre-registered predictions + methodology |
 | `TIME_LOG.md` | Add S4 session entries |

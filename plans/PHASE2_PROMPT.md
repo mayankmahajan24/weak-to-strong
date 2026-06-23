@@ -162,7 +162,7 @@ implemented; M5 enters the sweep only after its smoke run passes.**
    before any sweep — `git rev-parse HEAD` is the pre-registration anchor.
 2. **Run matrix:** per method 6 strict pairs × {0.10, 0.25, 0.50} × 3 seeds = 54;
    5 methods + ~30 HP-pilot runs ≈ **300 runs**. Naive baseline reused from Phase 1 (no re-run).
-3. **Driver:** clone `results/phase1b/run_ab_driver.py` → `run_c2_driver.py`. Job =
+3. **Driver:** clone `scripts/phase1b/run_ab_driver.py` → `run_c2_driver.py`. Job =
    (method, pair, frac, seed); 8 concurrent on **8×H100 (preferred) or 8×H200**; outputs to
    `results/data/phase2_<method>/{fdir}/seed{N}`; clean `pytorch_model*.bin` + `results.pkl`
    per run; arm the 3h dead-man; pull slim; **destroy on completion + verify via API.**
@@ -173,7 +173,7 @@ implemented; M5 enters the sweep only after its smoke run passes.**
 
 ## VERIFICATION GATES (before trusting results)
 - Naive regression passes (≈0.673 reproduction; `gt_fraction=0` identity).
-- All unit tests green (`tests/test_losses.py`, extend `results/phase1b/test_label_mixing.py`).
+- All unit tests green (`tests/test_losses.py`, extend `tests/test_label_mixing.py`).
 - `cm=` token present only on non-naive folders; no collision with Phase-1 dirs.
 - N/N runs ok, 0 unexpected NaN; `gt_fraction_actual ≈ requested` for training-on-GT methods
   (M5 exempt — it trains on 0 GT by design).

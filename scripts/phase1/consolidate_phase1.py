@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]  # repo root
 DATA = ROOT / "results" / "data"
-OUT = Path(__file__).resolve().parent / "phase1_results.csv"
+OUT = ROOT / "results" / "phase1" / "phase1_results.csv"
 
 # (glob root, condition label, is_gt_only)
 # Seeds to include. gt_seed must equal seed (Phase 1 plan).

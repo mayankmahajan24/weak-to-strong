@@ -12,7 +12,7 @@ The synthetic part runs on plain Python (no deps).
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from weak_to_strong.label_mixing import select_gt_indices  # noqa: E402
 
 PASS = 0

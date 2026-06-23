@@ -11,7 +11,7 @@ import csv
 import statistics as st
 from pathlib import Path
 
-CSV = Path(__file__).resolve().parent / "phase1_seed1_results.csv"
+CSV = Path(__file__).resolve().parents[2] / "results" / "phase1" / "phase1_seed1_results.csv"
 ORDER = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 RANK = {m: i for i, m in enumerate(ORDER)}
 IDENTITY_NOISE = 0.0018  # Phase 0 M3: gt_fraction=0.0 vs baseline, same hardware

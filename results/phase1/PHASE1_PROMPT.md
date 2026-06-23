@@ -160,7 +160,7 @@ Each leaf run dir is named by `get_config_foldername()` and contains exactly:
 
 - **Noise floor (M5):** per-pair baseline (`gt_fraction=0.0`) accuracy spread across the 3
   seeds — "what zero effect looks like."
-- **Consolidate:** extend `results/phase1/consolidate_phase1.py` to all seeds → one CSV.
+- **Consolidate:** extend `scripts/phase1/consolidate_phase1.py` to all seeds → one CSV.
 - **Plots (M6):** `phase1_fraction_curve.png`, `phase1_scale_interaction.png`,
   `phase1_accuracy_grid.png`. Write `results/phase1/RESULTS_phase1.md` (noise-floor table,
   fraction-curve table, scale-interaction read, decision gate for Phase 2).

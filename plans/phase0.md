@@ -1,5 +1,8 @@
 # Phase 0: Baseline + GT-mixing infrastructure
 
+> _Repo note (S9 reorg): the `run_*.sh` runners referenced here now live in `scripts/phase0/`; `plot_smoke_test.py` was retired (superseded by `scripts/phase1/plot_phase1.py`). Historical text below is unchanged._
+
+
 ## Context
 
 This is a fork of openai/weak-to-strong. We're extending it to study how mixing a small fraction of ground-truth (GT) labels with weak-teacher labels affects weak-to-strong generalization (W2SG). The full research program will compare many label-mixing strategies. This first step reproduces the published baseline and builds the seams that later strategies plug into. Do not over-build: implement the naive mix as the one and only strategy now, but structure the code so adding a strategy later is a localized change.

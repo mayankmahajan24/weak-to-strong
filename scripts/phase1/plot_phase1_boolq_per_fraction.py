@@ -22,7 +22,7 @@ import seaborn as sns
 
 sns.set_style("whitegrid")
 
-ROOT = os.path.dirname(__file__)
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA = os.path.join(ROOT, "results", "data")
 OUT = os.path.join(ROOT, "results", "plots")
 os.makedirs(OUT, exist_ok=True)

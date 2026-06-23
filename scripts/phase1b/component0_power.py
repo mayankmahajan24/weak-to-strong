@@ -22,7 +22,7 @@ import statistics as st
 from collections import defaultdict
 from pathlib import Path
 
-CSV = Path(__file__).resolve().parents[1] / "phase1" / "phase1_results.csv"
+CSV = Path(__file__).resolve().parents[2] / "results" / "phase1" / "phase1_results.csv"
 ORDER = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 RANK = {m: i for i, m in enumerate(ORDER)}
 EXCLUDE = {(1, "gpt2-large")}          # pre-stated failed-ceiling filter (carried from Phase 1)

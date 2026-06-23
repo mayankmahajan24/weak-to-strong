@@ -4,7 +4,7 @@
 bottom and you can reconstruct the whole study: the question, the operating rules, then for
 each phase *what we did → what we saw → how it changed what we did next*. Detailed numbers
 live in the per-phase `RESULTS_*.md` (linked); pre-registrations in `NOTES_*.md`; the full
-timestamped/cost record in [`../TIME_LOG.md`](../TIME_LOG.md) (sessions S1–S7). This file is
+timestamped/cost record in [`../TIME_LOG.md`](../TIME_LOG.md) (sessions S1–S9). This file is
 deliberately honest about predictions that were wrong and choices we revised — that trail is
 the scientific contribution as much as the numbers.
 
@@ -197,5 +197,6 @@ then M1 + M3 first; commit the pre-registered predictions; run ~300 on 8×H100; 
   `../plans/phase1b.md`, `../plans/phase2.md` (combination portfolio) + `../plans/PHASE2_PROMPT.md`
   (execution spec: code/tests/invariants).
 - Interview brief (the rubric + scope constraints): `../docs/INTERVIEW_INSTRUCTIONS.pdf`.
-- Data + reproduce: `phase1/phase1_results.csv`, `phase1/consolidate_phase1.py`, `../plot_phase1*.py` (figures), `phase1b/*.py`.
+- Code (by phase): `../scripts/phase1/` (consolidate/analyze/compare/robustness/plot), `../scripts/phase1b/` (power/analyze/drivers), `../scripts/phase0/` (baseline runners), `../tests/`.
+- Data + outputs: `phase1/phase1_results.csv`, `phase*/RESULTS_*.md`, `plots/`, `data/`.
 - Session / cost / lessons log: `../TIME_LOG.md` (S1–S8).

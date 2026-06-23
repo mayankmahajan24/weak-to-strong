@@ -23,7 +23,7 @@ deterministic under fixed seed), so it is a real bad-optimization outcome for th
 
 I apply a **pre-stated, outcome-independent filter**: *drop any GT ceiling that fails to
 exceed the next-smaller model's GT accuracy.* Under this rule seed-1 `gpt2-large` is excluded
-as both weak teacher and strong student (`EXCLUDE = {(1, "gpt2-large")}` in `plot_phase1.py`).
+as both weak teacher and strong student (`EXCLUDE = {(1, "gpt2-large")}` in `scripts/phase1/plot_phase1.py`).
 
 **Follow-up variance study (8 fresh seeds) confirms this is instability, not an outlier.**
 Re-running `gpt2-large` GT on BoolQ across seeds 11–18 (`results/phase0/gpt2large_variance/`)
@@ -235,9 +235,9 @@ data-starvation effect of Result 2, now in PGR units.
 ## Reproduce
 
 ```
-python3 results/phase1/consolidate_phase1.py   # -> phase1_results.csv (uniqueness-guarded)
-python3 plot_phase1.py                          # Figures 1–3 (+ by-seed); EXCLUDE applied
-python3 plot_phase1_boolq_per_fraction.py       # Figure 4
+python3 scripts/phase1/consolidate_phase1.py   # -> phase1_results.csv (uniqueness-guarded)
+python3 scripts/phase1/plot_phase1.py                          # Figures 1–3 (+ by-seed); EXCLUDE applied
+python3 scripts/phase1/plot_phase1_boolq_per_fraction.py       # Figure 4
 ```
 The exclusion rule and the noise floor are defined in code; remove `EXCLUDE` to see the
 unfiltered (seed-1-`gpt2-large`-included) version.

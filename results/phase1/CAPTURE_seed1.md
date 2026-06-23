@@ -25,7 +25,7 @@ Phase 1 session (those dirs retain their local `results.pkl`).
 Columns: condition, ds_name, loss, strong_model, weak_model, gt_fraction_requested,
 gt_fraction_actual, gt_seed, seed, lr, accuracy, run_dir.
 
-Regenerate with: `python3 results/phase1/consolidate_phase1.py`
+Regenerate with: `python3 scripts/phase1/consolidate_phase1.py`
 (filters to BoolQ, seed=1, gt_seed=1 — drops old Phase 0 gt_seed=42 artifacts).
 
 ## Quick read (xent mixing, median over 10 pairs)

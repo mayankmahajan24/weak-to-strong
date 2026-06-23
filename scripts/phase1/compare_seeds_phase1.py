@@ -11,7 +11,7 @@ import csv
 import statistics as st
 from pathlib import Path
 
-CSV = Path(__file__).resolve().parent / "phase1_results.csv"
+CSV = Path(__file__).resolve().parents[2] / "results" / "phase1" / "phase1_results.csv"
 ORDER = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 RANK = {m: i for i, m in enumerate(ORDER)}
 FRACS = [0.0, 0.01, 0.05, 0.10, 0.25, 0.50, 1.0]

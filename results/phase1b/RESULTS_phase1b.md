@@ -24,7 +24,7 @@ Phase 2, if pursued, should pivot to combination/loss/reliability axes (B/C/D), 
 
 ## Component 0 — Power / minimum-detectable-effect (local, no GPU) ✅ PASS
 
-`results/phase1b/component0_power.py`. Estimates the noise of the paired per-(pair,seed)
+`scripts/phase1b/component0_power.py`. Estimates the noise of the paired per-(pair,seed)
 contrast (`cond − naive` at the same pair/seed/fraction) that Components A/B will use, then
 the MDE at 80% power.
 
@@ -62,13 +62,13 @@ Phase-1 `naive` runs stay byte-identical):
 - `random_labels` — GT on the same rows as naive, non-GT rows get Bernoulli(0.5) labels
   (Component A; row/step count held equal to mixing).
 
-Unit-tested in `results/phase1b/test_label_mixing.py` — **17/17 pass** (synthetic edge cases
+Unit-tested in `tests/test_label_mixing.py` — **17/17 pass** (synthetic edge cases
 + a real preserved weak_labels arrow). Pre-run fact from the real data (gpt2→ BoolQ, seed 0):
 weak error rate **0.346**; **oracle@10% achieves 100% error-coverage vs naive's ~33%** — the
 allocation lever is large; Component B will test whether it converts to accuracy.
 
 Runs executed on 8×H200 (instance 42235643, destroyed after pull): **60/60 ok, 0 failed,
-0 NaN/degenerate**. Analysis: `results/phase1b/analyze_ab.py`.
+0 NaN/degenerate**. Analysis: `scripts/phase1b/analyze_ab.py`.
 
 ## Component A — Weak-label informativeness (de-confound) ✅ INFORMATIVE
 
@@ -121,7 +121,7 @@ to weak-error location is not directly bounded, but it is the weaker motivation.
 144 SciQ xent runs on 8×H200 (instance 42244966, destroyed after pull): mixing curve
 (10 pairs × {0.10,0.25,0.50,1.0} × 3 seeds = 120) + random_labels control (24). 144/144 ok.
 SciQ GT ceilings are healthy (gpt2-large is *not* anomalous on SciQ; one minor seed-1 xl←large
-inversion handled by the generic validity rule). Analysis: `results/phase1b/analyze_c.py`.
+inversion handled by the generic validity rule). Analysis: `scripts/phase1b/analyze_c.py`.
 
 **C.1 — Fraction curve, SciQ vs BoolQ (xent):**
 
