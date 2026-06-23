@@ -179,7 +179,7 @@ of *plausible* approaches with rigor, so Phase 2 is **on** — but focused on th
 | 1 | ✅ | No knee (P1 refuted); mixing>GT-only (confounded); logconf null; scale inconclusive |
 | — | ✅ | gpt2-large GT ~27% unstable (S7) → exclusion principled, scale claim under-measured |
 | 1b | ✅ 0 PASS; A informative (both tasks); B allocation null; C testbed validated, findings replicate | Which labels matters; where doesn't; gradual no-knee curve — cross-task |
-| 2 | ▶ **planned + spec'd** (combination portfolio; pre-registration pending) | Tests the *how-to-combine* axis; Axis A dropped (oracle null) |
+| 2 | ▶ **launch-ready**: M1–M5 implemented+tested, driver written, pre-reg committed (`../NOTES_phase2.md`); on-box gates pending | Tests *how to combine*; Axis A dropped (oracle null) |
 | 3–4 | ⏳ pending | Mechanism analysis + the ≤20-min synthesis talk |
 
 **Immediate next:** implement Phase 2 per [`../plans/PHASE2_PROMPT.md`](../plans/PHASE2_PROMPT.md)
@@ -192,7 +192,7 @@ then M1 + M3 first; commit the pre-registered predictions; run ~300 on 8×H100; 
 - Narrative spine / decision log: this file.
 - Phase results: `phase0/RESULTS_phase0.md`, `phase1/RESULTS_phase1.md`, `phase1b/RESULTS_phase1b.md`;
   variance study `phase0/gpt2large_variance/SUMMARY.md`.
-- Pre-registrations: `../NOTES_phase1.md` (P1–P6), `../NOTES_phase0.md` (code map + seed table + anomaly adjudication).
+- Pre-registrations: `../NOTES_phase1.md` (P1–P6), `../NOTES_phase2.md` (M1–M5), `../NOTES_phase0.md` (code map + seed table + anomaly adjudication).
 - Plans: `../plans/w2sg_gt_mixing_plan.md` (master), `../plans/phase0.md`, `../plans/phase1.md`,
   `../plans/phase1b.md`, `../plans/phase2.md` (combination portfolio) + `../plans/PHASE2_PROMPT.md`
   (execution spec: code/tests/invariants).

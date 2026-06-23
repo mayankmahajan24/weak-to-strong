@@ -158,11 +158,11 @@ implemented; M5 enters the sweep only after its smoke run passes.**
 
 ## PHASE C — Pre-register, run, analyze
 
-1. **Commit predictions** (the M1–M5 directional calls + the honest "most null" prior) to git
-   before any sweep — `git rev-parse HEAD` is the pre-registration anchor.
+1. **Pre-registration committed** ✅ → `NOTES_phase2.md` (anchor `f3acd25`): frozen methods,
+   per-method directional predictions, the "most null" prior, and the three success readouts.
 2. **Run matrix:** per method 6 strict pairs × {0.10, 0.25, 0.50} × 3 seeds = 54;
    5 methods + ~30 HP-pilot runs ≈ **300 runs**. Naive baseline reused from Phase 1 (no re-run).
-3. **Driver:** clone `scripts/phase1b/run_ab_driver.py` → `run_c2_driver.py`. Job =
+3. **Driver written** ✅ → `scripts/phase2/run_portfolio_driver.py` (270 jobs; `--only/--pairs/--fracs/--seeds` for smoke/pilot subsets). Job =
    (method, pair, frac, seed); 8 concurrent on **8×H100 (preferred) or 8×H200**; outputs to
    `results/data/phase2_<method>/{fdir}/seed{N}`; clean `pytorch_model*.bin` + `results.pkl`
    per run; arm the 3h dead-man; pull slim; **destroy on completion + verify via API.**
