@@ -132,6 +132,23 @@ foldernames, naive untouched. Suggested token: `cm={method}` (+ `glw=`, `sge=` a
 
 ---
 
+## IMPLEMENTATION STATUS (as of S9/S10)
+
+| Item | Status | Test |
+|---|---|---|
+| A1 loss `**kwargs` | ✅ done | `tests/test_losses.py` (A1 ignore-invariants) |
+| A2 loop threads `gt_mask`/`sample_weight` | ✅ done | covered via loss tests + py_compile |
+| A3 `--combination_method` dispatch + tagging | ✅ done | naive byte-identical by construction |
+| M1 weighted loss (`WeightedXentLoss`) | ✅ done | `test_losses.py` (Inv5, closed forms) |
+| M2 soft-GT (`soft_gt_eps`) | ✅ done | `tests/test_soft_gt.py` (7/7) |
+| M3 GT-anchored logconf (`GTAnchoredLogconfLoss`) | ✅ done | `test_losses.py` (regression + reconstruction) |
+| M4 reliability weighting (`reliability.py`) | ✅ done | `tests/test_reliability.py` (11/11) |
+| **M5 GT-as-early-stopping** | ⏳ **deferred to on-box** | needs a real training run (touches the shared loop; not locally unit-testable) — implement + smoke-test during pre-sweep setup |
+
+Local suite: 13 + 11 + 7 (+ Phase-1b 17) checks pass; `py_compile` clean. The naive-reproduction
+GPU regression (~0.673) is the remaining pre-sweep gate. **The portfolio is runnable now with M1–M4
+(4 methods); M5 is optional 5th, added on-box if time permits.**
+
 ## PHASE C — Pre-register, run, analyze
 
 1. **Commit predictions** (the M1–M5 directional calls + the honest "most null" prior) to git
