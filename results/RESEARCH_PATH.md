@@ -4,7 +4,7 @@
 bottom and you can reconstruct the whole study: the question, the operating rules, then for
 each phase *what we did → what we saw → how it changed what we did next*. Detailed numbers
 live in the per-phase `RESULTS_*.md` (linked); pre-registrations in `NOTES_*.md`; the full
-timestamped/cost record in [`../TIME_LOG.md`](../TIME_LOG.md) (sessions S1–S9). This file is
+timestamped/cost record in [`../TIME_LOG.md`](../TIME_LOG.md) (sessions S1–S11). This file is
 deliberately honest about predictions that were wrong and choices we revised — that trail is
 the scientific contribution as much as the numbers.
 
