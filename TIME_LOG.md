@@ -404,3 +404,48 @@ Instance 42131402 (8× H200, seed-2 sweep) billing accrues separately while left
 | S5 | Don't manually slot a job onto an instance running an active multi-GPU sweep — the sweep's orchestrator grabs idle GPUs and double-books, causing OOM. Provision a dedicated box (1× H100 SXM ~$2/hr, <$2 for a single run) for isolated one-offs |
 | S5 | gpt2-large BoolQ at mbs=16/mc=1024 OOMs on 80GB; mbs=4 fits (~64GB). minibatch only chunks memory — effective batch_size=32 via grad accumulation, so results are identical |
 | S5 | Training is effectively deterministic under fixed seed: seed-1 gpt2-large GT reproduced bit-for-bit (0.6619761394921995) across A100→H100, mbs, and datasets 4.x→5.0.0. Re-running a suspected-bad run is a valid, cheap way to distinguish transient failure from real seed variance |
+
+---
+
+## S6 — 2026-06-22 — Phase 1 Seeds 0 + 2 Fraction Sweep (8x H200)
+
+Ran the full Phase 1 fraction sweep for seeds 0 and 2 (seed 1 already complete locally),
+completing the 3-seed supervision-scaling curve. Also wrote the LLM-ready Phase 1 prompt
+(`results/phase1/PHASE1_PROMPT.md`) with the per-(seed,fraction,condition) data-location map.
+
+### Run matrix (per seed: 6 fractions × (20 mixing + 8 gt_only) = 168; ×2 seeds = 336)
+Fractions {0.01, 0.05, 0.10, 0.25, 0.50, 1.0}, boolq, xent+logconf, gt_seed=seed.
+Weak_labels (boolq xent, 4 models/seed) already existed locally — no GT regeneration needed
+(plan's "deleted" note was stale). Reused existing 8× H200 instance (id 42131402).
+
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S6 | 2026-06-22 | 22:31 | Cleared stale seed-1 data on instance; staged seed0/seed2 weak_labels to /dev/shm |
+| S6 | 2026-06-22 | 22:34 | Launched 336-run sweep via GPU-pool driver (8 concurrent, outputs to /dev/shm, pkl/bin cleaned per-run) |
+| S6 | 2026-06-22 | ~00:19 | Seed 0 complete (168/168); pulled + verified slim results locally |
+| S6 | 2026-06-22 | 00:47 | Caught disk-cleanup gap: gpt2-xl saves SHARDED weights (pytorch_model-0000N-of-*.bin) that the exact-name cleaner missed → 407 GB accrued. Purged to 763 MB, added supplemental sharded-pattern cleaner |
+| S6 | 2026-06-22 | 02:21 | Sweep complete: 336/336 ok, 0 failed (~3h48m). 240 mixing + 96 gt_only |
+| S6 | 2026-06-22 | 02:22 | Pulled + verified seed 2 (0 NaN, 0 fidelity violations). Instance destroyed (billing stopped) |
+| S6 | 2026-06-22 | ~02:25 | Consolidated all 3 seeds → results/phase1/phase1_results.csv (582 rows) |
+
+### Headline result — 3-seed xent PGR vs gt_fraction (mixing, weak≠strong pairs, n=13/frac)
+| gf | 0.0 | 0.01 | 0.05 | 0.10 | 0.25 | 0.50 | 1.0 |
+|----|-----|------|------|------|------|------|-----|
+| median PGR | -0.24 | -0.21 | -0.11 | -0.21 | **+0.25** | +0.27 | +1.03 |
+| median acc | 0.656 | 0.667 | 0.670 | 0.671 | 0.693 | 0.693 | 0.746 |
+
+- **No sharp knee** (corrected after scrutiny): gradual threshold-then-convex rise. ≤0.10 flat/within-noise; crossover to positive PGR is *not* seed-robust at 0.25 (seed 0 still −0.18); first all-seed-positive fraction is 0.50; only 1.0 clearly above noise. Raw accuracy is convex (back-loaded benefit) — refutes pre-reg prediction #1 (concave/front-loaded).
+- **logconf flat/null** until full GT (median PGR bounces ~0 for fractions 0.01–0.50; n=2 valid pairs after denominator-stability filter — logconf compresses model spread, so ceiling−floor denominators are tiny/negative for most pairs). Supports dropping logconf at the Phase 2 gate.
+
+### Time / Cost Summary
+| sid | Instance | $/hr | Duration | Cost |
+|---|---|---|---|---|
+| S6 | Vast 8× H200 (reused, id 42131402) | $26.70/hr | ~3.9h sweep | ~$104 |
+
+### Lessons Learned
+| sid | Lesson |
+|---|---|
+| S6 | gpt2-xl save_pretrained(safe_serialization=False) writes SHARDED weights (pytorch_model-00001-of-00002.bin), NOT pytorch_model.bin. A cleaner matching only the exact name silently misses them → multi-100GB accrual. Match `pytorch_model-*.bin` too. Watch disk *trend*, not just absolute free space |
+| S6 | gt_only at gt_fraction=1.0 trains on the full transfer split (nothing filtered), so those xl runs are as slow as full-data mixing (~625s), not fast like low-fraction gt_only — they gate sweep completion |
+| S6 | gt_only `gt_fraction_actual` is 1.0 by construction (dataset filtered to GT rows), so it will "violate" a naive actual≈requested check — exclude gt_only from that gate |
+| S6 | Resilience pattern for long remote sweeps: on-instance finalizer snapshots slim results to persistent disk at ALL DONE (survives /dev/shm RAM loss + local internet drops); kill stays gated on a verified local copy. Pull completed seeds incrementally rather than waiting for the whole run |

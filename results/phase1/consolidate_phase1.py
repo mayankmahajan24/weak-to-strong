@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Consolidate Phase 1 seed-1 run results into a single CSV.
+"""Consolidate Phase 1 run results (seeds 0, 1, 2) into a single CSV.
 
 Walks the per-run directories (each holding config.json + results_summary.json),
 extracts the key numbers needed for plotting / PGR / further phases, and writes a
@@ -19,8 +19,8 @@ DATA = ROOT / "results" / "data"
 OUT = Path(__file__).resolve().parent / "phase1_results.csv"
 
 # (glob root, condition label, is_gt_only)
-# Seeds to include. Add 2 once seed-2 lands. gt_seed must equal seed (Phase 1 plan).
-SEEDS = [0, 1]
+# Seeds to include. gt_seed must equal seed (Phase 1 plan).
+SEEDS = [0, 1, 2]
 
 SOURCES = [
     (DATA / "naive_mixing", "mixing", False),
@@ -77,6 +77,18 @@ for src, condition, _ in SOURCES:
             "accuracy": summ.get("accuracy"),
             "run_dir": str(run_dir.relative_to(ROOT)),
         })
+
+# Hard uniqueness guard: every logical run must be unique. Catches stale/residual
+# duplicates leaking in (e.g. old gt_seed=42 dirs) instead of silently averaging them.
+_seen = {}
+for r in rows:
+    k = (r["condition"], r["seed"], r["loss"], r["strong_model"], r["weak_model"],
+         str(r["gt_fraction_requested"]))
+    if k in _seen:
+        raise SystemExit(
+            f"DUPLICATE logical run {k}:\n  {_seen[k]}\n  {r['run_dir']}\n"
+            "Residual/stale data in tree — quarantine it before consolidating.")
+    _seen[k] = r["run_dir"]
 
 rows.sort(key=lambda r: (r["condition"], str(r["gt_fraction_requested"]), r["loss"],
                          str(r["strong_model"]), str(r["weak_model"])))
