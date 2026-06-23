@@ -37,8 +37,28 @@ GT budgets, and supervision value scaling with model size) **did not survive**.
 - **Metrics:** raw test accuracy (primary, stable); PGR `(transfer − weak)/(strong_GT − weak)`
   (secondary, caveated — small adjacent-pair denominators inflate it). Aggregated median over
   pairs then seeds; every effect read against a **noise floor = 0.014** (3-seed per-pair range).
-- **Baseline W2SG signal is weak at this scale:** BoolQ xent median PGR ≈ **−0.31**, SciQ ≈
-  **+0.17** (Phase 0). This near-zero floor is the backdrop for every intervention below.
+---
+
+## Phase 0 — Baseline reproduction (the foundation)
+
+**We reproduced the published W2SG baseline on the GPT-2 family and validated the harness —
+this is what licenses every claim below.**
+
+- **Reproduction.** GT ceilings (gpt2 ~0.66 → gpt2-xl ~0.75) and the weak→strong transfer
+  matrices are qualitatively consistent with the repo's published reference on both tasks. The
+  mixing harness was validated by an **identity check** (`gt_fraction=0` ≡ baseline to within
+  0.0018 FP noise) and a **ceiling check** (`gt_fraction=1.0` = +0.088), so the GT-mixing seam is
+  inert when off and effective when on.
+- **The core W2SG phenomenon (the backdrop).** Transfer accuracy **tracks weak-teacher quality,
+  not strong-model capacity**: on BoolQ with gpt2 as teacher, transfer is flat at ~0.64–0.65
+  across *every* strong size — the strong model fails to exceed its teacher. Generalization
+  recovery is **near zero at this scale**.
+- **Baseline median PGR:** SciQ **+0.17**, BoolQ **−0.31** (logconf −0.32 / −1.37). Vs the
+  published full-sweep reference (+0.33 / +0.05): same signs within the GPT-2 sub-range, lower
+  magnitude — expected, since the GPT-2 family spans ~12× vs the reference's ~115×. **logconf is
+  counterproductive**, matching the paper's finding that it only helps at larger capacity gaps.
+- This near-zero floor is the backdrop for every intervention below — and the first hint that
+  **scale, not method, is the binding constraint.**
 
 ---
 
