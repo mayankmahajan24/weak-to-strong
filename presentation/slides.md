@@ -40,6 +40,23 @@ Open on the result, no background. The thesis sentence stands in for the intro.
 
 ---
 
+## Scope & setup
+
+- **Setting:** weak-to-strong generalization — a strong *student* is trained on a weak *teacher's* labels.
+- **Extension:** a *supervision budget* — mix a fraction of ground-truth ("strong") labels into the weak labels, and sweep that fraction.
+- **Models:** **GPT-2 family only** — gpt2 / medium / large / xl, with within-family student–teacher pairs.
+- **Tasks:** **BoolQ** (required) + **SciQ** (cross-task check).
+- **Readout:** median **PGR** across the model sweep (raw accuracy primary; PGR secondary).
+
+<span class="small">3 seeds · paired per-(pair,seed) contrasts · pre-registered · gpt2-large (seed 1) excluded by rule</span>
+
+<!--
+Scope card, not background — one glance. The interviewer knows W2SG; this just fixes the
+experimental frame (family, tasks, the budget extension) before the results.
+-->
+
+---
+
 ## GPT-2 sweep at 25% ground truth
 
 ![bg right:50% fit](../results/plots/sweep_acc_boolq_gf025.png)
