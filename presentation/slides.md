@@ -38,7 +38,7 @@ style: |
 
 **On GPT-2 / BoolQ, mixing a ground-truth budget into the weak labels helps only modestly — and *where* and *how* it is spent show little effect.**
 
-A consistent account: the student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective lever is *volume*, not placement or combination.
+The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective lever is *volume*, not placement or combination.
 
 <span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · pre-registered</span>
 
