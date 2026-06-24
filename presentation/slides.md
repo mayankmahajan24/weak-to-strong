@@ -177,12 +177,36 @@ the allocation and combination nulls are expected rather than surprising.
 - **Exclusion:** gpt2-large GT is bimodal (an 8-seed run collapses below gpt2-medium 27% of the time) → excluded by a fixed rule, applied uniformly.
 - **De-confounding:** a random-label control rules out training-set size — weak labels carry information (random < gt_only < mixing).
 - **Cross-task:** the fraction curve, allocation null, and de-confound all replicate on **SciQ**.
+- **Robustness:** a 5-seed baseline pass reproduces the 3-seed conclusions — nothing flips.
 
 <!--
 MDE is the load-bearing number — it's what lets me call these nulls rather than underpowered. The
 exclusion is decided by gpt2-large's optimisation behaviour, not by any result, and applied
 everywhere. The de-confound matters because at low fractions GT-only trains on far fewer rows, so
 the random-label control is needed to attribute the mixing gain to information, not data volume.
+-->
+
+---
+
+## Pre-registration scorecard — hits and misses
+
+**Phase 1** (P1–P6, git-anchored before seeds 0/2 existed)
+
+| | Prediction | Outcome |
+|---|---|---|
+| P1 | knee at ~25% | ✗ refuted — back-loaded, no knee (retracted) |
+| P2 | ≤10% GT inert | ✓ within noise |
+| P3 | mixing > GT-only | ✓ (confound named → resolved in 1b) |
+| P4 | logconf null | ✓ inert at every budget |
+| P5 | scale interaction (gap → more GT) | — underpowered at GPT-2 scale |
+| P6 | 0.25–0.50 plateau | ✓ flat in that range |
+
+**Phase 2** (M1–M5, registered before the portfolio ran): M2 ✓ null, M4 ✓ null (as flagged uncertain), **M3 ◑** (strongest bet — rescues logconf, still < xent), M1/M5 ✗ negative.
+
+<!--
+The point of pre-registration here: later seeds and the whole Phase-2 portfolio were out-of-sample
+tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we report as
+not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.
 -->
 
 ---
@@ -214,8 +238,8 @@ that's explanatory rather than a test; the rest are measurements with a stated e
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
 - One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
 - The main constraint here appears to be **scale**, not allocation or combination.
-  - Direct test (out of scope under GPT-2-only): widen the student–teacher gap and re-run the sweep.
-  - Falsifiable prediction: if recovery becomes **concave** at larger gaps, placement and combination should start to matter.
+  - Within GPT-2, the scale-interaction test was **underpowered** (gpt2-large's GT is unstable) — inconclusive, not negative.
+  - Direct test (out of scope under GPT-2-only): widen the student–teacher gap and re-run the sweep — if recovery turns **concave** at larger gaps, placement and combination should start to matter.
 
 <!--
 The scale test is the next experiment — it's the direct way to falsify the volume-bound account, and
