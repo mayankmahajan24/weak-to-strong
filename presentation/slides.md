@@ -234,12 +234,12 @@ interesting variable is the capability gap, not the supervision strategy.
 
 ## Next steps
 
-1. **Vary the capability gap.** Volume-bound recovery predicts a GT label's value is gap-invariant. Re-measure recovery under wider student–teacher gaps (early-checkpoint / label-noised teachers; larger families if scope allowed) — a shift from linear to **concave** would mean targeted GT generalizes, reopening *where* and *how*.
-2. **Test whether teacher errors are structured.** Probe the student's hidden states for teacher-correctness from held-out GT. Low AUC ⇒ the wrong rows are diffuse, not separable for the budget to exploit — the mechanism under the allocation null. Near-free.
-3. **Schedule the budget over training.** The mixture is held stationary; ordering is unexamined. Compare GT-first / annealed / interleaved at matched budget — refinement-scheduling work suggests order can outweigh the loss objective under weak supervision.
-4. **Iterate the weak-to-strong loop.** Re-derive the teacher from the budget-trained student, repeat at fixed total GT — does a one-pass-null budget compound across rounds (single-round elicitation vs label information)?
+1. **Vary the capability gap.** Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to **concave**, targeted GT starts to generalize — and *where* / *how* would matter again.
+2. **Are the teacher's mistakes structured?** Train a small probe to predict, from the student's features, where the teacher is wrong. If it can't, the errors are scattered with no pattern to target — which is why allocation doesn't help. Cheap; reuses saved predictions.
+3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first / annealed / interleaved — recent work suggests the schedule can matter more than the loss.
+4. **Iterate the loop.** Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?
 
-<span class="small">Ordered by bearing on the volume-bound account: (1) discriminates it · (2) tests its premise · (3–4) probe axes the budget framing leaves open.</span>
+<span class="small">Ordered by relevance to the mechanism: (1) tests it directly · (2) explains it · (3–4) open new axes.</span>
 
 <!--
 (1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and

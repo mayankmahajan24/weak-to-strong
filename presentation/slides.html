@@ -788,12 +788,12 @@ section.tight li { margin-bottom: 2px; }
 ;" data-marpit-pagination-total="17" data-size="16:9">
 <h2 id="next-steps">Next steps</h2>
 <ol>
-<li><strong>Vary the capability gap.</strong> Volume-bound recovery predicts a GT label's value is gap-invariant. Re-measure recovery under wider student–teacher gaps (early-checkpoint / label-noised teachers; larger families if scope allowed) — a shift from linear to <strong>concave</strong> would mean targeted GT generalizes, reopening <em>where</em> and <em>how</em>.</li>
-<li><strong>Test whether teacher errors are structured.</strong> Probe the student's hidden states for teacher-correctness from held-out GT. Low AUC ⇒ the wrong rows are diffuse, not separable for the budget to exploit — the mechanism under the allocation null. Near-free.</li>
-<li><strong>Schedule the budget over training.</strong> The mixture is held stationary; ordering is unexamined. Compare GT-first / annealed / interleaved at matched budget — refinement-scheduling work suggests order can outweigh the loss objective under weak supervision.</li>
-<li><strong>Iterate the weak-to-strong loop.</strong> Re-derive the teacher from the budget-trained student, repeat at fixed total GT — does a one-pass-null budget compound across rounds (single-round elicitation vs label information)?</li>
+<li><strong>Vary the capability gap.</strong> Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to <strong>concave</strong>, targeted GT starts to generalize — and <em>where</em> / <em>how</em> would matter again.</li>
+<li><strong>Are the teacher's mistakes structured?</strong> Train a small probe to predict, from the student's features, where the teacher is wrong. If it can't, the errors are scattered with no pattern to target — which is why allocation doesn't help. Cheap; reuses saved predictions.</li>
+<li><strong>Schedule the budget over training.</strong> We mixed GT and weak labels in a fixed ratio throughout, never varying the <em>timing</em>. Compare GT-first / annealed / interleaved — recent work suggests the schedule can matter more than the loss.</li>
+<li><strong>Iterate the loop.</strong> Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?</li>
 </ol>
-<p><span class="small">Ordered by bearing on the volume-bound account: (1) discriminates it · (2) tests its premise · (3–4) probe axes the budget framing leaves open.</span></p>
+<p><span class="small">Ordered by relevance to the mechanism: (1) tests it directly · (2) explains it · (3–4) open new axes.</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-class="lead" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap');
