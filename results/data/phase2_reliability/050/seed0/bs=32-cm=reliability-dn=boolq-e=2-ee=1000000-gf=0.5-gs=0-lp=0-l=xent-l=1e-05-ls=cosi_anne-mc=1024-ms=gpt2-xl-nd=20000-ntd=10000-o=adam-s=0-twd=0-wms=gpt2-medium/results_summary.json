@@ -1,0 +1,8 @@
+{
+  "accuracy": 0.69593147751606,
+  "gt_fraction_actual": 0.5,
+  "gt_fraction_requested": 0.5,
+  "gt_seed": 0,
+  "mixing_strategy": "naive",
+  "combination_method": "reliability"
+}

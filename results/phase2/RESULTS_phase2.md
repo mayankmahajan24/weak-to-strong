@@ -1,8 +1,7 @@
 # Phase 2 — Combination-method portfolio (RESULTS)
 
-> **STATUS: PRELIMINARY (skeleton).** Numbers below are from the partial sweep (M1–M3 final at
-> 54/54; M4 reliability near-final; **M5 gt_early_stop still running**). Finalize by re-pulling at
-> ALL DONE and re-running `scripts/phase2/analyze_phase2.py` + `scripts/phase2/plot_phase2.py`.
+> **STATUS: FINAL** — 270/270 runs, 0 failures (S11). Analysis `scripts/phase2/analyze_phase2.py`,
+> overlay `scripts/phase2/plot_phase2.py` → `../plots/phase2_overlay.png`.
 > Pre-registration: [`../../NOTES_phase2.md`](../../NOTES_phase2.md) (anchor f3acd25, predictions frozen).
 
 ## Setup
@@ -15,17 +14,18 @@
 - **Methods:** M1 weighted (λ=4) · M2 soft_gt (ε=0.1) · M3 gt_anchored (logconf, GT rows un-blended) ·
   M4 reliability (weight weak rows by P(correct|conf)) · M5 gt_early_stop (GT = checkpoint-selection val).
 
-## Results — median Δacc(method − naive) over valid (pair, seed)   _(PRELIMINARY)_
+## Results — median Δacc(method − naive) over valid (pair, seed)
 
 | method | Δ@0.10 | Δ@0.25 | Δ@0.50 | verdict |
 |---|---|---|---|---|
-| **gt_anchored** (vs logconf) | +0.004 | +0.011 | **+0.040** (15/15) | **clears floor @0.50** |
+| **gt_anchored** (vs logconf) | +0.004 | +0.011 | **+0.040** (15/15) | **clears floor @0.50** (only positive) |
 | soft_gt (vs xent) | +0.000 | −0.002 | +0.003 | within noise (null) |
 | reliability (vs xent) | −0.003 | −0.004 | −0.006 | within noise (null) |
-| weighted (vs xent) | −0.012 | −0.036 | −0.018 | **negative everywhere** |
-| gt_early_stop (vs xent) | _pending_ | _pending_ | _pending_ | ⏳ |
+| weighted (vs xent) | −0.012 | −0.036 | −0.018 | negative everywhere |
+| gt_early_stop (vs xent) | −0.005 | −0.036 | **−0.054** (0/15) | **negative, worsening with budget** |
 
 Overlay figure: `../plots/phase2_overlay.png` (method curves vs naive xent/logconf references).
+**No method beats naive xent mixing.**
 
 ## Pre-registration scorecard (M1–M5)   _(PRELIMINARY)_
 
@@ -35,7 +35,13 @@ Overlay figure: `../plots/phase2_overlay.png` (method curves vs naive xent/logco
 | M2 | soft_gt | "≈ neutral / within noise" | neutral (±0.003) | ✅ HIT |
 | M3 | gt_anchored | "STRONG: rescue logconf toward xent-like" | beats naive-logconf, monotone, clears floor @0.50 | ✅ HIT (mechanism) |
 | M4 | reliability | "+ iff weak errors feature-predictable (uncertain)" | null/slightly negative — premise didn't pay | ◐ consistent |
-| M5 | gt_early_stop | "small + (sample-efficiency)" | _pending_ | ⏳ |
+| M5 | gt_early_stop | "small + (sample-efficiency)" | **negative, worsening with budget** (−0.054 @0.50) | ❌ MISS (informative) |
+
+**Scorecard:** 2 clean hits (M2 neutral, M3 mechanism), M4 consistent-null, 2 informative misses
+(M1 GT-upweighting hurts; M5 spending GT on validation wastes its training value). The M5 miss is
+itself a result: **naive mixing *trains* on the GT budget; M5 only *selects* with it — and the gap
+grows with budget (−0.005 → −0.054 from 0.10 → 0.50)**, so the training-value of GT strictly beats
+its selection-value here.
 
 ## The headline + the honest caveat
 **The one method pre-registered as the strong bet (M3) is the one that clears the floor**, exactly as
@@ -48,11 +54,18 @@ logconf pathology (clean GT rows shouldn't be diluted by the model's own predict
 *understanding* result — but the repaired logconf is still a worse method than plain xent. **No method
 beats naive xent mixing.**
 
-## Net (so far)
-Portfolio is **"mostly null, one mechanism confirmed"** — matching the honest "most null" prior. No
-*how-to-combine* method beats naive xent; the only positive is M3 rescuing the logconf failure mode
-(below the xent baseline). Combined with Phase-1b's allocation null, this says: **at GPT-2 scale,
-beyond label quantity, neither where nor how you spend GT moves the needle past naive mixing.**
+## Net
+Portfolio is **"mostly null/negative, one mechanism confirmed"** — matching the honest "most null"
+prior. No *how-to-combine* method beats naive xent; the only positive is M3 rescuing the logconf
+failure mode (still below the xent baseline). Combined with Phase-1b's allocation null, this says:
+**at GPT-2 scale, beyond label quantity, neither where nor how you spend GT moves the needle past
+naive mixing.**
+
+**Why (mechanism, [`MECHANISM.md`](MECHANISM.md)):** the Tier-1 imitation experiment shows the
+strong student *imitates* the teacher's errors (70–81% at f=0) and GT recovers them only **diffusely
+— ~linear in budget, not concave.** Correction is volume-bound, so *where* (allocation) and *how*
+(combination) you spend GT can't help past naive — only *how much* matters, exactly the three nulls
+we measured. The portfolio null isn't five separate disappointments; it's one mechanism.
 
 ## Threats / caveats
 - 3-seed cells near a 0.014 floor; no multiple-comparisons correction across 5 methods × 3 fractions.
