@@ -35,7 +35,7 @@ os.makedirs(OUT, exist_ok=True)
 SEEDS = [0, 1, 2]
 MODELS = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]
 MODEL_IDX = {m: i for i, m in enumerate(MODELS)}
-FRACTIONS = [0.0, 0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
+FRACTIONS = [0.0, 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0]
 LOSSES = ["xent", "logconf"]
 
 LOSS_COLOR = {"xent": "#1f77b4", "logconf": "#d62728"}

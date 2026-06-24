@@ -41,7 +41,7 @@ for r in rows:
 gtonly = {(r["loss"], r["frac"], r["strong_model"]): r["accuracy"]
           for r in rows if r["condition"] == "gt_only"}
 
-FRACS = [0.0, 0.01, 0.05, 0.10, 0.25, 0.50, 1.0]
+FRACS = [0.0, 0.01, 0.05, 0.10, 0.25, 0.50, 1.0]  # seed-1 recovery csv (no 0.75); 3-seed 0.75 lives in phase1_results.csv
 vpairs = [(s, w) for s in ORDER for w in ORDER if valid("xent", s, w)]
 
 print("=" * 70)

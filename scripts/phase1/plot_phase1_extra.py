@@ -35,7 +35,7 @@ for r in csv.DictReader((ROOT / "results/phase1/phase1_results.csv").open()):
         elif w != sg:                            # frac0 weak→strong transfer = the f=0 point
             mixing[(loss, w, sg, 0.0, s)] = acc
 def med(v): return st.median(v) if v else None
-FRACS = [0.0, 0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
+FRACS = [0.0, 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0]
 
 # ===== PGR vs fraction =====
 fig, ax = plt.subplots(figsize=(8, 5))

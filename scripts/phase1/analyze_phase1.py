@@ -64,7 +64,7 @@ for r in rows:
     if r["condition"] == "baseline" and r["weak_model"] not in ("", None):
         acc[("mixing", r["loss"], 0.0, r["strong_model"], r["weak_model"])] = r["accuracy"]
 
-FRACS = [0.0, 0.01, 0.05, 0.10, 0.25, 0.50, 1.0]
+FRACS = [0.0, 0.01, 0.05, 0.10, 0.25, 0.50, 1.0]  # seed-1 recovery csv (no 0.75); 3-seed 0.75 lives in phase1_results.csv
 
 def median_pgr_mixing(loss, frac):
     vals = []

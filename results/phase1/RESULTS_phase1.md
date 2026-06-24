@@ -63,6 +63,7 @@ see Milestone 5):
 | 0.10 | +0.0028 | 64% | within noise |
 | 0.25 | +0.0239 | 79% | ~1.7× noise |
 | 0.50 | +0.0300 | 100% | ~2× noise, unanimous |
+| 0.75 | +0.0613 | 100% | ~4× noise, unanimous |
 | 1.00 | +0.0746 | 100% | large, unanimous |
 
 **Read.** The response is monotonic but **back-loaded**: marginal return per unit GT is *not*
@@ -71,13 +72,19 @@ accuracy GT mixing **never hurts** — it does nothing, then helps. Practically:
 **if you can only afford ≤10% GT, naive mixing buys you nothing.** You need a real budget
 (≥25–50%) for a reliable gain.
 
+The added **0.75** point pins down where the curve flattens: the climb is concentrated in
+**0.50→0.75 (+0.031)**, while the final quarter **0.75→1.00 adds only +0.013 (≈ the noise floor)**.
+So the benefit **largely saturates by ~75% GT** — past three-quarters of the budget, extra GT
+buys essentially nothing. (At the per-cell level 0.75 and 1.00 are near-tied: 5/15 pairs even
+have 0.75 ≥ 1.00, consistent with that last step being within noise.)
+
 ## Result 2 — Mixing vs GT-only (the strongest effect, with a confound)
 
 Accuracy of mixing minus GT-only at the *same* strong model and budget (xent, excluded):
 
-| gt_fraction | 0.01 | 0.05 | 0.10 | 0.25 | 0.50 | 1.00 |
-|---|---|---|---|---|---|---|
-| median(mix − GT-only) | +0.047 | +0.048 | +0.053 | +0.070 | +0.047 | −0.000 |
+| gt_fraction | 0.01 | 0.05 | 0.10 | 0.25 | 0.50 | 0.75 | 1.00 |
+|---|---|---|---|---|---|---|---|
+| median(mix − GT-only) | +0.047 | +0.048 | +0.053 | +0.070 | +0.047 | +0.047 | −0.000 |
 
 Mixing beats GT-only by 5–7 accuracy points everywhere below full GT, collapsing to zero at
 1.0 (where both train on identical all-GT data). This is the cleanest, most seed-consistent
@@ -97,10 +104,10 @@ valuable."
 
 Δaccuracy of logconf mixing vs the logconf pure-weak baseline (excluded):
 
-| gt_fraction | 0.01 | 0.05 | 0.10 | 0.25 | 0.50 | 1.00 |
-|---|---|---|---|---|---|---|
-| median Δacc | +0.004 | +0.001 | −0.002 | −0.001 | −0.005 | −0.0003 |
-| % positive | 67% | 60% | 47% | 47% | 27% | 47% |
+| gt_fraction | 0.01 | 0.05 | 0.10 | 0.25 | 0.50 | 0.75 | 1.00 |
+|---|---|---|---|---|---|---|---|
+| median Δacc | +0.004 | +0.001 | −0.002 | −0.001 | −0.005 | −0.006 | −0.0003 |
+| % positive | 67% | 60% | 47% | 47% | 27% | 26% | 47% |
 
 Even at **100% GT**, logconf transfer does not improve over its weak baseline. Mechanistic
 explanation (`weak_to_strong/loss.py:106`): the auxiliary confidence term replaces ~half the
@@ -204,7 +211,10 @@ Two-stage aggregate (per-seed median over pairs, then median across seeds), excl
 
 Consistent with the raw-accuracy story (xent rises and crosses zero between 0.10 and 0.25;
 logconf stays deeply negative). The large negative GT-only PGRs at low fractions are the
-data-starvation effect of Result 2, now in PGR units.
+data-starvation effect of Result 2, now in PGR units. *(The later-added 0.75 point is omitted
+from this table — its 4-column GT-only/logconf PGRs use a denominator-sensitive pipeline not
+re-run here; xent-mixing PGR at 0.75 ≈ **+0.90**, between 0.50's +0.26 and 1.00's +1.10, matching
+the near-saturation seen in raw accuracy.)*
 
 ## Threats to validity
 
@@ -223,7 +233,9 @@ data-starvation effect of Result 2, now in PGR units.
 1. **Budget for strategy tests: gt_fraction ∈ {0.10, 0.25}.** Not because of a knee — because
    that is the low-budget regime where naive mixing is weak/within-noise, so a smarter
    allocation or combination has the most room to beat it. The curve does **not** saturate above
-   0.25 (it rises to 1.0), so high-budget tests would mostly re-measure the naive ceiling.
+   0.25 (it keeps rising through 0.50→0.75), so high-budget tests would mostly re-measure the
+   naive ceiling. (The later-added 0.75 point shows the rise **does** largely flatten by ~0.75:
+   0.75→1.00 is within noise — so the live regime for beating naive is ≤0.75, and most sharply ≤0.25.)
 2. **Drop logconf from Phase 2** (and run xent-only) — inert at every budget across all seeds,
    including 100% GT. Halves compute. Carry the null as a result; optionally keep one
    logconf-repair cell (Axis C) as a deliberate probe.
