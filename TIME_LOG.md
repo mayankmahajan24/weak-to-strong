@@ -17,6 +17,7 @@
 | S9 | 2026-06-23 | Synthesis (FINDINGS) + read interview brief + Phase 2 plan/exec-spec + doc reconciliation (local, no GPU) | Complete |
 | S10 | 2026-06-23 | Phase 2 implementation (M1–M5 + plumbing, 54 unit tests) + repo reorg (scripts/ by phase) + driver + NOTES_phase2 pre-reg (local, no GPU) | Complete |
 | S11 | 2026-06-23 | Phase 2 portfolio run (8× H200): gates passed (naive bit-for-bit, M5 smoke), 270-run combination sweep | In progress |
+| S12 | 2026-06-23 | Seed 3+4 phase-0 baseline gen (2nd 8× H200, concurrent w/ S11): GT ceilings + weak_labels + frac=0 transfers, boolq+sciq, 0 fail → enables 5-seed extension | Complete |
 
 ---
 
@@ -610,3 +611,11 @@ No compute this session. Total project GPU spend still ~$515 (S1–S8) entering 
 | S11 | 2026-06-23 | ~20:30 | Provisioned 8× H200; rsync code + 9 boolq-xent weak_labels (gpt2/medium/large × 3 seeds) + driver; pinned deps; imports OK; dead-man armed (4h) |
 | S11 | 2026-06-23 | ~20:45 | **Gate 1 (naive-repro) PASS:** gpt2-medium←gpt2 @0.25 seed1 = 0.6925665341082899, **bit-for-bit** vs canonical S6 (plumbing inert; the prior 0.673 reference was a stale Phase-0 figure). **Gate 2 (M5 smoke) PASS:** gt_early_stop trains on 0 GT rows (gt_fraction_actual=0.0), selects a checkpoint, sane acc 0.650 |
 | S11 | 2026-06-23 | ~20:55 | Launched full 270-run portfolio (5 methods × 6 strict pairs × {0.10,0.25,0.50} × 3 seeds). _[run in progress — update on completion]_ |
+
+## S12 — 2026-06-23 — Seed 3+4 baseline generation (2nd 8× H200, instance 42283409, concurrent with S11)
+
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S12 | 2026-06-23 | — | Provisioned 2nd 8× H200 ($26.04/hr) to generate seeds 3,4 in parallel with the Phase-2 sweep. Two-phase driver: 16 GT runs (4 models × boolq+sciq × 2 seeds → weak_labels + ceilings), then 80 frac=0 transfers (10 pairs × 2 ds × 2 losses × 2 seeds) |
+| S12 | 2026-06-23 | — | ALL DONE: GT 16/16, transfers 80/80, **0 failures**. Pulled slim (data-*.arrow + config + summary; stripped HF cache arrows), ~32M/seed → `results/data/baseline/seed{3,4}/` alongside 0/1/2. Sanity OK (GT xl 0.750 / large 0.709 / medium 0.645 / gpt2 0.678) |
+| S12 | 2026-06-23 | — | Destroyed **only 42283409** (verified 42270079 Phase-2 box still running). Enables extending any Phase-1/2 claim to 5 seeds on both tasks (e.g. Phase-2 winner confirmation) |
