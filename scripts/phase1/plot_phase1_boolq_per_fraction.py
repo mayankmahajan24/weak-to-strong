@@ -18,6 +18,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import plot_style; plot_style.setup()
 import seaborn as sns
 
 sns.set_style("whitegrid")

@@ -15,6 +15,7 @@ import glob, json, statistics as st
 from pathlib import Path
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import plot_style; plot_style.setup()
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -334,6 +334,8 @@ All runs used the same codebase (transformers 4.57.6, torch 2.12.1) across diffe
 
 
 ## Figures (`../plots/`, seeds 0,1,2)
+- `sweep_acc_boolq.png`, `sweep_acc_sciq.png` — **canonical openai/weak-to-strong sweep** (paper-style): x = strong model (with its GT accuracy), one line per weak teacher, xent solid / logconf dashed, ground-truth line, seed bands, PGR inset. GPT-2 family (the paper's larger models are out of scope).
+- `sweep_pgr_boolq.png`, `sweep_pgr_sciq.png` — same structure with **PGR on the y-axis** (the paper reports both accuracy and PGR views); y clipped to drop small-denominator PGR outliers.
 - `phase0_w2sg_boolq.png`, `phase0_w2sg_sciq.png` — **canonical W2SG**: student vs teacher accuracy per pair, with the imitation diagonal (y=x) and strong GT-ceiling band. xent points hug the diagonal (W2SG ≈ absent); logconf sits *below* it (harmful).
 - `phase0_ceilings.png` — GT ceiling vs model size (log), both tasks, seed min/max bars — shows the capability ladder and the mid-family (medium/large) optimization instability.
 - `phase0_pgr_by_pair_boolq.png`, `phase0_pgr_by_pair_sciq.png` — PGR per strict pair, xent vs logconf.
