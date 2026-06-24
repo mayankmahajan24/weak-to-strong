@@ -34,14 +34,17 @@ style: |
 
 # A small supervision budget barely improves weak-to-strong generalization
 
-**On GPT-2 / BoolQ, mixing in a ground-truth budget helps only modestly — and *where* and *how* it's spent show little effect.**
+**On GPT-2 / BoolQ, mixing a ground-truth budget into the weak labels helps only modestly — and *where* and *how* it is spent show little effect.**
 
-A consistent picture emerges from the data: the student largely imitates the teacher's errors, and ground truth appears to repair mainly what it directly supervises — pointing to *volume* as the main lever.
+A consistent account: the student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective lever is *volume*, not placement or combination.
 
 <span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · pre-registered</span>
 
 <!--
-Open on the result, no background. The thesis sentence stands in for the intro.
+We take the W2SG setup and add a ground-truth budget — a fraction of strong labels mixed into the
+weak teacher's labels — and ask three things: how much budget is needed, where to place it, and how
+to combine it with the weak labels. The headline is on the slide; the rest is the evidence for each
+and a mechanism that ties them together.
 -->
 
 ---
@@ -57,8 +60,9 @@ Open on the result, no background. The thesis sentence stands in for the intro.
 <span class="small">3 seeds · paired per-(pair,seed) contrasts · pre-registered · gpt2-large (seed 1) excluded by rule</span>
 
 <!--
-Scope card, not background — one glance. The interviewer knows W2SG; this just fixes the
-experimental frame (family, tasks, the budget extension) before the results.
+Within-family pairs give six strict weak-below-strong pairs per seed. BoolQ is the required task,
+SciQ the independent check. Raw accuracy is primary and PGR secondary, because PGR denominators are
+small and unstable for closely-matched pairs.
 -->
 
 ---
@@ -67,139 +71,156 @@ experimental frame (family, tasks, the budget extension) before the results.
 
 ![bg right:50% fit](../results/plots/sweep_acc_boolq_gf025.png)
 
-- GPT-2 family, BoolQ, **25% ground truth mixed into the weak labels** — paper-format sweep.
-- **Median PGR (xent) = +0.30** across the sweep; logconf deeply negative (−1.3), so it's dropped.
-- 25% GT moves the median from **−0.27 (0% GT) → +0.30**: real, but modest.
-- Rest of the talk: *how* modest, where/how it does or doesn't help, and why.
+- GPT-2 family, BoolQ, **25% ground truth mixed into the weak labels** — standard sweep format.
+- **Median PGR (xent) = +0.30** across the sweep; logconf is deeply negative (−1.3) and is dropped.
+- The 0% baseline is **−0.27**; 25% GT moves the median to **+0.30** — a small positive.
 
 <!--
-This is the standardized readout. Lead with what it shows. logconf is already out of the picture.
+Each coloured line is a weak teacher; the x-axis is the student labelled with its own ground-truth
+accuracy; solid is cross-entropy, dashed is the confidence loss. The inset is median PGR over the
+six strict pairs — the standardised number requested. logconf sits below xent at every student,
+which is why it's dropped from here on.
 -->
 
 ---
 
-## How *much*? — no cheap knee; saturates by ~75%
+## How *much*? — back-loaded, and saturating by ~75%
 
 ![bg right:50% fit](../results/plots/phase1_fraction_curve.png)
 
-- **≤10% GT sits within the noise floor (0.014)** — a small budget adds little above the pure-weak baseline.
-- The response is **back-loaded**. Median xent PGR:
-  −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
-- The 0.75 point shows it **saturates by ~75%** — the 0.75→1.0 step is within noise.
-- A pre-registered "concave knee at 25%" prediction was **refuted** (retracted after the multi-seed view).
+- Up to **10% GT**, the gain over the 0% baseline stays within the **0.014 noise floor**.
+- Median xent PGR is **back-loaded**: −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
+- The 0.75 point: the **0.50→0.75 step is the largest**, and **0.75→1.0 is within noise** — the gain is essentially complete by ~75%.
+- A pre-registered concave-knee-at-25% prediction was **refuted**, and retracted after the multi-seed data.
 
 <!--
-The brief's own suggestion was start-high-then-decrease to test sample efficiency. The answer is
-that efficiency is poor: you need a real budget, and most of it pays off late.
+The brief suggested starting at a high fraction and lowering it to probe sample efficiency. Doing
+that, efficiency is poor here: nothing distinguishable from weak-only below 10%, first robust
+positive at 25%, and most of the movement between 50% and 75%. Accuracy is monotone; PGR is noisier
+because of the denominator.
 -->
 
 ---
 
-## *Where* it's spent — little effect (allocation null)
+## *Where* it's spent — within noise (allocation null)
 
 ![bg right:50% fit](../results/plots/phase1b_B_allocation.png)
 
-- A **perfect error-targeting oracle** places GT exactly on the teacher-wrong rows — an upper bound on any allocation heuristic.
-- oracle − naive (random placement) = **+0.0006 / −0.0049** at 0.10 / 0.25 — inside the MDE (0.0071).
-- Since even this oracle ties random placement, allocation heuristics have **little room to help here.**
+- An **oracle** uses held-out GT to place the budget exactly on the **teacher-wrong rows** — an upper bound on any allocation rule.
+- Paired against random placement at matched budget: oracle − random = **+0.0006** (0.10), **−0.0049** (0.25) — both within the MDE.
+- If the best possible placement ties random, allocation heuristics have **little to gain** on this testbed.
 
 <!--
-The oracle is the strongest possible allocation strategy. A tie with random rules out the whole
-class. This also replicates on SciQ.
+The oracle is a ceiling, not a deployable method — it needs the labels it's allocating. Per-(pair,
+seed) paired contrast at matched budget; the difference is within noise and changes sign between
+fractions, and it replicates on SciQ. So before building an allocation method, the ceiling already
+says there's nothing to capture here.
 -->
 
 ---
 
-## *How* it's combined — little effect (combination null)
+## *How* it's combined — within noise (combination null)
 
 ![bg right:50% fit](../results/plots/phase2_delta_bars.png)
 
-- A pre-registered portfolio of **5 methods**: GT up-weighting, soft-GT, GT-anchored logconf, reliability-weighting, GT-early-stop.
-- **None** left-shifts the curve or raises the ceiling — median Δ vs naive mixing ≈ 0.
-- Only **gt-anchored** clears the floor (+0.040 @0.50), and it only *rescues* logconf — still below plain xent (0.642 vs 0.697).
+- Five methods vs naive mixing at matched budget: GT up-weighting, soft-GT targets, GT-anchored logconf, reliability-weighted weak labels, GT-based early stopping.
+- Median Δ vs naive ≈ **0** across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.
+- **gt-anchored** is the only method above the floor (+0.040 at 0.50), but it recovers logconf toward xent **without exceeding plain xent** (0.642 vs 0.697).
 
 <!--
-A pre-registered portfolio that comes back null is a clean result. gt_anchored was the registered
-"most likely positive"; it's the one partial hit, and even it loses to the simplest baseline.
+Each method is a different hypothesis about how to use the GT rows. gt-anchored exempts GT rows from
+the confidence blend, so it was the registered most-likely-positive; it does what it's designed to —
+fixes logconf — but doesn't beat the simplest baseline. The other four are within noise or slightly
+negative.
 -->
 
 ---
 
-## Why: the student imitates the teacher's **errors**
+## Mechanism: the student reproduces the teacher's **errors**
 
 ![bg right:50% fit](../results/plots/mechanism.png)
 
-- Mechanism probe (gpt2 → gpt2-xl), on per-example predictions.
-- At 0% GT, the student copies the teacher's **wrong** answer **81% (BoolQ) / 70% (SciQ)** of the time.
-- The failures look **largely inherited rather than independent** — the rows needing correction are mostly the teacher-wrong ones.
+- Probe: gpt2 → gpt2-xl, joining teacher and student **per-example** test predictions.
+- On teacher-wrong rows at 0% GT, the student reproduces the teacher's wrong answer **81% (BoolQ) / 70% (SciQ)** of the time.
+- Errors are **largely inherited rather than independent** — so the rows needing correction are identifiable in principle.
 
 <!--
-Sets up the payoff: the student isn't making fresh mistakes, so targeting teacher-wrong rows
-*should* help — which makes the next slide the surprising part.
+If the student were making its own independent mistakes, targeting teacher-wrong rows would be
+pointless. It isn't — the failures are mostly inherited. So in principle the budget could be aimed
+at exactly the wrong rows, which is what the oracle did. The next slide is why that still doesn't
+help.
 -->
 
 ---
 
-## Why (hypothesis): recovery looks **diffuse** → volume may be the main lever
+## Mechanism: recovery is ~linear in budget (volume-bound)
 
 ![bg right:50% fit](../results/plots/mechanism_recovery.png)
 
-- GT repairs teacher-wrong rows **~linearly in budget** (42% / 55% of the gap at 50%) — rather than concave/targeted.
-- A GT label's value appears **roughly independent of which row it lands on.**
-- This is **consistent with all three results**: if recovery is volume-bound, *where* (allocation) and *how* (combination) have little leverage — leaving *how much* as the main lever.
+- Recovery of teacher-wrong rows is **~linear in budget** — 42% / 55% of the 0→100% gap recovered at 50%, tracking *y = x* rather than a concave curve.
+- A GT label's marginal value appears **roughly independent of which row it lands on**.
+- Under volume-bound recovery, placement (*where*) and re-weighting (*how*) have **little leverage** — consistent with both nulls.
 
 <!--
-The three separate negatives reduce to one property of the system. This is the central point.
+This is the link between the mechanism and the two nulls. Concave recovery would mean a little
+targeted GT goes a long way, and then placement would matter. We see roughly linear recovery
+instead — a GT label is worth about the same wherever it goes — which is the condition under which
+the allocation and combination nulls are expected rather than surprising.
 -->
 
 ---
 
-## Are the nulls real? — power and controls
+## Power and controls
 
-- **Power:** paired per-(pair,seed) contrasts give **MDE = 0.0071**, below the 0.02 effect of interest — a null here is informative.
-- **Pre-registration:** git-anchored predictions, hits *and* misses reported; the "knee" prediction was retracted.
-- **Exclusion:** an 8-seed study found gpt2-large GT collapses **27%** of the time → excluded by rule, not by outcome.
-- **De-confounding:** a random-label control shows weak labels are genuinely informative (mixing > GT-only isn't just row count).
-- **Cross-task:** the findings replicate on **SciQ**.
+- **Power:** the paired per-(pair,seed) design gives **MDE = 0.0071**, below the 0.02 we'd treat as meaningful — so within-noise results are genuine nulls, not underpowered.
+- **Pre-registration:** predictions git-anchored before the confirmatory seeds, and scored — including the refuted knee.
+- **Exclusion:** gpt2-large GT is bimodal (an 8-seed run collapses below gpt2-medium 27% of the time) → excluded by a fixed rule, applied uniformly.
+- **De-confounding:** a random-label control rules out training-set size — weak labels carry information (random < gt_only < mixing).
+- **Cross-task:** the fraction curve, allocation null, and de-confound all replicate on **SciQ**.
 
 <!--
-The rigor half of the rubric. The MDE point is what licenses calling these "nulls" rather than
-"couldn't tell."
+MDE is the load-bearing number — it's what lets me call these nulls rather than underpowered. The
+exclusion is decided by gpt2-large's optimisation behaviour, not by any result, and applied
+everywhere. The de-confound matters because at low fractions GT-only trains on far fewer rows, so
+the random-label control is needed to attribute the mixing gain to information, not data volume.
 -->
 
 ---
 
 ## Experiments across the three axes
 
-| Axis | Tried | Outcome |
+| Axis | Experiment | Outcome |
 |---|---|---|
 | How much | 8-point fraction sweep, 0 → 1 | back-loaded, saturates ~0.75 |
-| Where | error-targeting oracle + random control | null — no signal on allocation |
-| How | 5 combination / loss methods | null — 1 floor-clearer, still < xent |
+| Where | error-targeting oracle + random control | null — within MDE |
+| How | 5 combination / loss methods | null — 1 above floor, still < xent |
 | Loss | xent vs logconf | logconf inert → dropped |
 | Tasks | BoolQ + SciQ | replicates on both |
-| Mechanism | imitation-vs-correction probe | consistent with the nulls |
-| Robustness | 8-seed variance, seeds 3–4 reserve | exclusion principled |
+| Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
+| Robustness | 8-seed variance, seeds 3–4 reserve | exclusion by fixed rule |
 
-<span class="small">Most results are negative; together they point toward a common mechanism rather than leaving loose ends.</span>
+<span class="small">Coverage spans the three axes plus loss, task, and robustness checks; the negatives are concordant with the volume-bound account.</span>
 
 <!--
-Coverage across the axes. Frame the negatives as triangulation toward the mechanism.
+Each row is a separate pre-registered or controlled experiment. The mechanism probe is the only one
+that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
 -->
 
 ---
 
-## Takeaways & the experiment that would change this
+## Takeaways, and the experiment that would change them
 
 - Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.
-- A **three-question decomposition** — *how much / where / how* — with a powered null on each.
-- A single **hypothesis** (imitation + volume-bound recovery) is consistent with all three.
-- **The data point to scale — rather than allocation or combination — as the main constraint here.**
-  - The test that could change this: **larger student–teacher capacity gaps** (out of scope here — GPT-2 only).
-  - Prediction: if recovery becomes **concave** at scale, *where* and *how* begin to matter.
+- Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
+- One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
+- The main constraint here appears to be **scale**, not allocation or combination.
+  - Direct test (out of scope under GPT-2-only): widen the student–teacher gap and re-run the sweep.
+  - Falsifiable prediction: if recovery becomes **concave** at larger gaps, placement and combination should start to matter.
 
 <!--
-Close on the synthesis and a concrete, falsifiable next experiment that respects the GPT-2 scope.
+The scale test is the next experiment — it's the direct way to falsify the volume-bound account, and
+it's out of scope only because of the GPT-2 restriction. If recovery stays linear at larger gaps the
+negative is general; if it turns concave, the allocation and combination axes reopen.
 -->
 
 ---
@@ -213,13 +234,13 @@ Close on the synthesis and a concrete, falsifiable next experiment that respects
 
 ---
 
-## Appendix — frac=0 reproduction (the testbed)
+## Appendix — frac=0 reproduction
 
 ![bg right:52% fit](../results/plots/sweep_pgr_boolq.png)
 
-- Canonical W2SG sweep, GPT-2 family, BoolQ, **0% GT** — PGR axis.
-- Median xent PGR **−0.27**: BoolQ is low-signal at zero strong supervision (several pairs sub-imitation).
-- The baseline the 25%-GT plot is measured against.
+- Standard W2SG sweep, GPT-2 family, BoolQ, **0% GT**, PGR axis.
+- Median xent PGR **−0.27**; several pairs fall below the imitation line — BoolQ is low-signal at 0% GT.
+- This is the baseline the 25%-GT sweep is measured against.
 
 ---
 
@@ -227,8 +248,8 @@ Close on the synthesis and a concrete, falsifiable next experiment that respects
 
 ![bg right:52% fit](../results/plots/phase0_transfer_heatmap.png)
 
-- Holding the teacher fixed, scaling the student up adds **~+0.003**; improving the teacher adds **~+0.04** (~10× here).
-- Suggests the student's extra capacity is largely spent on imitation — the static counterpart of the mechanism.
+- With the teacher fixed, scaling the student adds **~+0.003**; with the student fixed, a better teacher adds **~+0.04**.
+- Transfer tracks the teacher far more than student capacity — the static counterpart of the imitation result.
 
 ---
 
@@ -237,13 +258,13 @@ Close on the synthesis and a concrete, falsifiable next experiment that respects
 ![bg right:52% fit](../results/plots/phase2_overlay.png)
 
 - All five methods track naive mixing across {0.10, 0.25, 0.50}.
-- gt-anchored (logconf) is the only floor-clearer; it rescues logconf but stays under xent.
+- gt-anchored (logconf) is the only method above the floor; it recovers logconf but stays under xent.
 
 ---
 
-## Appendix — weak labels are informative (de-confound)
+## Appendix — weak labels carry information (de-confound)
 
 ![bg right:52% fit](../results/plots/phase1b_A_deconfound.png)
 
 - Ordering: **random < gt_only < naive mixing** (15/15 BoolQ, 18/18 SciQ pairs).
-- Replacing weak labels with noise *hurts* → mixing's gain reflects weak-label information, not just training-set size.
+- Replacing weak labels with noise reduces accuracy → the mixing gain reflects weak-label information, not just added rows.
