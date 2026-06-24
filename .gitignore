@@ -7,6 +7,9 @@ dump
 full_results/
 .ipynb_checkpoints/
 
+# Personal time-tracking log — kept local, not part of the public deliverable.
+TIME_LOG.md
+
 # Track results/ (deliverables + slim run outputs), but never the large regenerable
 # model artifacts or the quarantined stale/residual runs.
 *.pkl
