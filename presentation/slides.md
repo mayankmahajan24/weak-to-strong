@@ -75,7 +75,7 @@ small and unstable for closely-matched pairs.
 
 - GPT-2 family, BoolQ, **25% ground truth mixed into the weak labels** — standard sweep format.
 - **Median PGR (xent) = +0.30** across the sweep; logconf (dashed) sits well below xent.
-- The 0% baseline is **−0.27**; 25% GT moves the median to **+0.30** — a small positive.
+- The 0% baseline is **−0.27**, making the +0.30 a **small** positive shift.
 
 <!--
 Each coloured line is a weak teacher; the x-axis is the student labelled with its own ground-truth
@@ -92,7 +92,7 @@ which is why it's dropped from here on.
 
 - Up to **10% GT**, the gain over the 0% baseline stays within the **0.014 noise floor**.
 - Median xent PGR is **back-loaded**: −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
-- The 0.75 point: the **0.50→0.75 step is the largest**, and **0.75→1.0 is within noise** — the gain is essentially complete by ~75%.
+- The 0.75 point: the **0.50→0.75 step is the largest**, and **0.75→1.0 is within noise**.
 - A pre-registered concave-knee-at-25% prediction was **refuted**, and retracted after the multi-seed data.
 
 <!--
@@ -109,7 +109,7 @@ because of the denominator.
 ![bg right:50% fit](../results/plots/phase1b_B_allocation.png)
 
 - An **oracle** uses held-out GT to place the budget exactly on the **teacher-wrong rows** — an upper bound on any allocation rule.
-- Paired against random placement at matched budget: oracle − random = **+0.0006** (0.10), **−0.0049** (0.25) — both within the **MDE (0.0071)**, so a genuine null, not underpowered.
+- Paired against random placement at matched budget: oracle − random = **+0.0006** (0.10), **−0.0049** (0.25) — both below the **MDE (0.0071)** we could detect.
 - If the best possible placement ties random, allocation heuristics have **little to gain** on this testbed.
 
 <!--
@@ -144,7 +144,7 @@ negative.
 
 - Probe: gpt2 → gpt2-xl, joining teacher and student **per-example** test predictions.
 - On teacher-wrong rows at 0% GT, the student reproduces the teacher's wrong answer **81% (BoolQ) / 70% (SciQ)** of the time.
-- Errors are **largely inherited rather than independent** — so the rows needing correction are identifiable in principle.
+- Errors are **largely inherited, not independent** — the student adopts the teacher's specific wrong answers.
 
 <!--
 If the student were making its own independent mistakes, targeting teacher-wrong rows would be
@@ -161,7 +161,7 @@ help.
 
 - Recovery of teacher-wrong rows is **~linear in budget** — 42% / 55% of the 0→100% gap recovered at 50%, tracking *y = x* rather than a concave curve.
 - A GT label's marginal value appears **roughly independent of which row it lands on**.
-- Under volume-bound recovery, placement (*where*) and re-weighting (*how*) have **little leverage** — consistent with both nulls.
+- This is the condition that produces both nulls: when recovery is volume-bound, placement (*where*) and re-weighting (*how*) have **little leverage**.
 
 <!--
 This is the link between the mechanism and the two nulls. Concave recovery would mean a little
@@ -207,7 +207,7 @@ not-testable rather than refuted, because gpt2-large's instability removes the p
 | Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
 | Robustness | 8-seed variance; 5-seed baseline pass | exclusion by rule; 3-seed conclusions hold |
 
-<span class="small">Coverage spans the three axes plus loss, task, and robustness checks; the negatives are concordant with the volume-bound account.</span>
+<span class="small">Coverage spans the three axes, plus loss, task, and robustness checks.</span>
 
 <!--
 Each row is a separate pre-registered or controlled experiment. The mechanism probe is the only one
@@ -221,7 +221,7 @@ that's explanatory rather than a test; the rest are measurements with a stated e
 - Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
 - One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
-- So the binding constraint here looks like **scale**, not allocation or combination — which sets the next experiments.
+- So the binding constraint here looks like **scale**, not allocation or combination.
 
 <!--
 The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
@@ -235,7 +235,7 @@ interesting variable is the capability gap, not the supervision strategy.
 ## Next steps
 
 1. **Vary the capability gap.** Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to **concave**, targeted GT starts to generalize — and *where* / *how* would matter again.
-2. **Are the teacher's mistakes structured?** Train a small probe to predict, from the student's features, where the teacher is wrong. If it can't, the errors are scattered with no pattern to target — which is why allocation doesn't help. Cheap; reuses saved predictions.
+2. **Are the teacher's mistakes structured?** Train a **cheap** probe — reusing the saved predictions — to find, from the student's features, where the teacher is wrong. If it can't, the errors are scattered, with no pattern for allocation to exploit.
 3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first / annealed / interleaved — recent work suggests the schedule can matter more than the loss.
 4. **Iterate the loop.** Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?
 
