@@ -72,7 +72,7 @@ small and unstable for closely-matched pairs.
 ![bg right:50% fit](../results/plots/sweep_acc_boolq_gf025.png)
 
 - GPT-2 family, BoolQ, **25% ground truth mixed into the weak labels** — standard sweep format.
-- **Median PGR (xent) = +0.30** across the sweep; logconf (dashed) sits well below xent — inert, so we use xent.
+- **Median PGR (xent) = +0.30** across the sweep; logconf (dashed) sits well below xent.
 - The 0% baseline is **−0.27**; 25% GT moves the median to **+0.30** — a small positive.
 
 <!--
