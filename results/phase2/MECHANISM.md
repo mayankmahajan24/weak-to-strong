@@ -99,3 +99,8 @@ error from the rest of the (weak-labeled) data. That is a plausible mechanism fo
 error-targeting allocation tied random*: the benefit of GT is diffuse/regularizing, not
 per-example correction. (A full test needs the student's per-example predictions, which we'd keep
 on a future run — see the deferred mechanism analysis.)
+
+
+## Figures (`../plots/`)
+- `mechanism.png` — student accuracy on teacher-WRONG vs teacher-right rows, and the imitation rate, vs GT fraction (gpt2→gpt2-xl, both tasks).
+- `mechanism_recovery.png` — fraction of teacher-wrong errors recovered vs GT budget against the linear (diffuse) reference: recovery is ~linear → volume-bound, not concave/generalizing.

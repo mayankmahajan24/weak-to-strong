@@ -177,3 +177,9 @@ of plausible attempts with rigor. The defensible contribution regardless of outc
 instability + the logconf null. The **larger model gap** is the scientifically correct next
 lever but is **out of scope** (the brief fixes the universe to GPT-2) → future work in the talk.
 Plan: `../../plans/phase2.md`; execution spec: `../../plans/PHASE2_PROMPT.md`.
+
+
+## Figures (`../plots/`)
+- `phase1b_A_deconfound.png` — **weak labels are informative**: random_labels < gt_only < naive mixing (BoolQ + SciQ); replacing weak labels with noise *hurts*.
+- `phase1b_B_allocation.png` — **allocation NULL**: per-(pair,seed) Δ(oracle−naive) scattered around 0 within the noise floor (coin-flip sign), and oracle ≈ naive median acc — a perfect error-targeting oracle ties random.
+- `phase1b_C_sciq_vs_boolq.png` — **replication**: PGR (SciQ positive from 0.10, BoolQ starts negative) and Δacc (both gradual/no-knee; SciQ smaller raw) vs fraction.

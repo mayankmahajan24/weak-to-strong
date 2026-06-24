@@ -27,7 +27,7 @@
 Overlay figure: `../plots/phase2_overlay.png` (method curves vs naive xent/logconf references).
 **No method beats naive xent mixing.**
 
-## Pre-registration scorecard (M1–M5)   _(PRELIMINARY)_
+## Pre-registration scorecard (M1–M5)
 
 | # | method | prediction (NOTES_phase2) | outcome | hit? |
 |---|---|---|---|---|
@@ -77,4 +77,10 @@ we measured. The portfolio null isn't five separate disappointments; it's one me
 ## Decision → next
 - **Promote M3 to 5 seeds** (`run_portfolio_driver.py --only=gt_anchored --seeds=3,4`) and **replicate on
   SciQ** (`--ds=sciq --only=gt_anchored`) — confirm the logconf-rescue mechanism cross-seed + cross-task.
-- Everything else: report as honest negatives. _(Finalize this doc once M5 lands.)_
+- Everything else: report as honest negatives.
+
+
+## Figures (`../plots/`, BoolQ, seeds 0,1,2)
+- `phase2_overlay.png` — each method's median-accuracy curve vs the naive xent/logconf references.
+- `phase2_delta_bars.png` — median Δ(method−naive) per method × fraction vs the noise-floor band: only gt_anchored clears it; none beat naive xent.
+- `phase2_per_pair_heatmap.png` — Δacc per method × pair @0.50 (blue=helps, red=hurts).

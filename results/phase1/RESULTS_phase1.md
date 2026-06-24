@@ -232,12 +232,18 @@ data-starvation effect of Result 2, now in PGR units.
 4. **Add an equal-total-rows GT-only vs mixing cell** to de-confound Result 2 — currently the
    strongest effect, currently confounded.
 
+**Additional figures (`plot_phase1_extra.py`):**
+- `../plots/phase1_pgr_vs_fraction.png` — PGR vs fraction (xent vs logconf): gradual/back-loaded, logconf negative.
+- `../plots/phase1_knee_diagnostic.png` — **paired** Δacc vs a linear reference: ≤0.10 within noise, value at 0.25+, on/below the line → back-loaded, **not a frugal knee** (matches +0.003/+0.024/+0.030/+0.075).
+- `../plots/phase1_mixing_vs_gtonly.png` — mixing − gt_only gap (the data-quantity confound → de-confounded in Phase 1b · A).
+
 ## Reproduce
 
 ```
 python3 scripts/phase1/consolidate_phase1.py   # -> phase1_results.csv (uniqueness-guarded)
 python3 scripts/phase1/plot_phase1.py                          # Figures 1–3 (+ by-seed); EXCLUDE applied
 python3 scripts/phase1/plot_phase1_boolq_per_fraction.py       # Figure 4
+python3 scripts/phase1/plot_phase1_extra.py                    # PGR / no-knee / mixing-vs-gtonly
 ```
 The exclusion rule and the noise floor are defined in code; remove `EXCLUDE` to see the
 unfiltered (seed-1-`gpt2-large`-included) version.

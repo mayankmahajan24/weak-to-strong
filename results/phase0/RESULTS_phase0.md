@@ -331,3 +331,11 @@ All runs used the same codebase (transformers 4.57.6, torch 2.12.1) across diffe
 - **PGR computation:** We follow the original paper's convention of reporting **median** PGR rather than mean. Median is more robust to the high-variance pairs where the GT gap is small (denominator near zero). PGR is computed only for pairs where the weak model is strictly weaker than the strong model (excluding self-supervision and pairs where weak GT > strong GT).
 
 - **Transfer protocol:** The weak model trains on half the data and generates soft-label predictions (logits, not hard labels) on the other half. The strong model trains exclusively on these soft labels. This 50/50 split means each model trains on ~5K examples (from 10K after the 20K→10K test holdout), which contributes to the variance observed.
+
+
+## Figures (`../plots/`, seeds 0,1,2)
+- `phase0_w2sg_boolq.png`, `phase0_w2sg_sciq.png` — **canonical W2SG**: student vs teacher accuracy per pair, with the imitation diagonal (y=x) and strong GT-ceiling band. xent points hug the diagonal (W2SG ≈ absent); logconf sits *below* it (harmful).
+- `phase0_ceilings.png` — GT ceiling vs model size (log), both tasks, seed min/max bars — shows the capability ladder and the mid-family (medium/large) optimization instability.
+- `phase0_pgr_by_pair_boolq.png`, `phase0_pgr_by_pair_sciq.png` — PGR per strict pair, xent vs logconf.
+- `phase0_transfer_heatmap.png` — full weak×strong transfer-accuracy matrix (diag = GT ceiling), both tasks.
+- `phase0_xent_vs_logconf.png` — median PGR, xent vs logconf — logconf inert/harmful.
