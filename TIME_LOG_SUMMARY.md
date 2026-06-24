@@ -1,17 +1,16 @@
 # Time Summary — Ground-Truth Mixing in Weak-to-Strong Generalization
 
-**~25 hours of hands-on work, compressed into 3 days (June 21–23, 2026).**
+**~25 hours of hands-on work.**
 
-This is the executive view of [`TIME_LOG.md`](TIME_LOG.md) (the full timestamped record, sessions
-S1–S13). The detailed log tracks *session wall-time* (~45–50h), much of which was GPU sweeps running
-in the background; the hands-on engineering + analysis time below is the active subset (~25h).
+This is the executive view of [`TIME_LOG.md`](TIME_LOG.md) (the full record, sessions S1–S13). The
+detailed log tracks *session wall-time* (~45–50h), much of which was GPU sweeps running in the
+background; the hands-on engineering + analysis time below is the active subset (~25h).
 
 ## At a glance
 | | |
 |---|---|
 | **Hands-on time** | **~25 hours** |
 | Session wall-time (incl. background compute) | ~45–50 hours |
-| Calendar span | 3 days (Jun 21–23, 2026) |
 | GPU runs | ~1,000+ training runs (GPT-2 family) |
 | Compute spend | ~$1.3k (Vast.ai, 8×H200 / H100 / A100 / B200) |
 | Result | Full 3-question result set + mechanism, pre-registered, 0-failure final sweeps |
@@ -53,5 +52,5 @@ to the ~$1.3k actual is provisioning, idle/setup time, and aborted instances not
 - A **reproducible repo**: per-phase scripts, 54 unit tests, drivers, and writeups from which the
   whole study rebuilds.
 
-*Efficiency note: ~25 hands-on hours over 3 days for a pre-registered, mechanism-backed,
-two-task result set — most of the wall-clock was unattended GPU sweeps, not active work.*
+*Efficiency note: ~25 hands-on hours for a pre-registered, mechanism-backed, two-task result set —
+most of the wall-clock was unattended GPU sweeps, not active work.*
