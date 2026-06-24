@@ -123,9 +123,9 @@ says there's nothing to capture here.
 
 ![bg right:50% fit](../results/plots/phase2_delta_bars.png)
 
-- Five methods vs naive mixing at matched budget: GT up-weighting, soft-GT targets, GT-anchored logconf, reliability-weighted weak labels, GT-based early stopping.
+- Five methods vs naive mixing at matched budget: **M1** GT up-weighting · **M2** soft-GT targets · **M3** GT-anchored logconf · **M4** reliability-weighted weak labels · **M5** GT-based early stopping.
 - Median Δ vs naive ≈ **0** across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.
-- **gt-anchored** is the only method above the floor (+0.040 at 0.50), but it recovers logconf toward xent **without exceeding plain xent** (0.642 vs 0.697).
+- **M3 (gt-anchored)** is the only method above the floor (+0.040 at 0.50), but it recovers logconf toward xent **without exceeding plain xent** (0.642 vs 0.697).
 
 <!--
 Each method is a different hypothesis about how to use the GT rows. gt-anchored exempts GT rows from
@@ -214,19 +214,35 @@ that's explanatory rather than a test; the rest are measurements with a stated e
 
 ---
 
-## Takeaways, and the experiment that would change them
+## Takeaways
 
 - Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
 - One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
-- The main constraint here appears to be **scale**, not allocation or combination.
-  - Within GPT-2, the scale-interaction test was **underpowered** (gpt2-large's GT is unstable) — inconclusive, not negative.
-  - Direct test (out of scope under GPT-2-only): widen the student–teacher gap and re-run the sweep — if recovery turns **concave** at larger gaps, placement and combination should start to matter.
+- So the binding constraint here looks like **scale**, not allocation or combination — which sets the next experiments.
 
 <!--
-The scale test is the next experiment — it's the direct way to falsify the volume-bound account, and
-it's out of scope only because of the GPT-2 restriction. If recovery stays linear at larger gaps the
-negative is general; if it turns concave, the allocation and combination axes reopen.
+The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
+interesting variable is the capability gap, not the supervision strategy.
+-->
+
+---
+
+## Next steps — highest-leverage experiments
+
+1. **Scale the capability gap — the decisive test.** Widen the student–teacher gap (handicapped teachers within GPT-2; larger families beyond it). Volume-bound recovery predicts it stays ~linear; if it turns **concave**, the *where* and *how* axes reopen. Directly falsifies the central claim.
+2. **Is teacher error targetable? — closes the allocation null.** Probe whether "teacher-wrong" is predictable from the student's representations. If error is unstructured, that *is* why targeting can't help. Near-zero compute.
+3. **The untested axis — *when*.** Schedule the budget (GT-first / anneal / interleave) instead of mixing it statically; iterative-label-refinement results suggest order can matter under weak supervision.
+4. **Compounding via iterative weak-to-strong.** Spend the same budget across self-training rounds — does a one-shot-null budget accumulate?
+
+<span class="small">Ordered by leverage: #1 falsifies the central claim · #2 closes the mechanism · #3–4 probe untested axes.</span>
+
+<!--
+#1 maps to the misfit/disagreement theory of W2SG gain — gain should grow with the gap, and that's
+exactly where targeting could start to matter. #2 is the cheapest and gives mechanistic closure on
+the allocation null. #3 is motivated by "iterative label refinement matters more than preference
+optimisation under weak supervision"; #4 by bootstrapping. All but #1 fit comfortably in budget;
+#2 is near-free.
 -->
 
 ---
