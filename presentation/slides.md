@@ -107,7 +107,7 @@ because of the denominator.
 ![bg right:50% fit](../results/plots/phase1b_B_allocation.png)
 
 - An **oracle** uses held-out GT to place the budget exactly on the **teacher-wrong rows** — an upper bound on any allocation rule.
-- Paired against random placement at matched budget: oracle − random = **+0.0006** (0.10), **−0.0049** (0.25) — both within the MDE.
+- Paired against random placement at matched budget: oracle − random = **+0.0006** (0.10), **−0.0049** (0.25) — both within the **MDE (0.0071)**, so a genuine null, not underpowered.
 - If the best possible placement ties random, allocation heuristics have **little to gain** on this testbed.
 
 <!--
@@ -170,24 +170,6 @@ the allocation and combination nulls are expected rather than surprising.
 
 ---
 
-## Power and controls
-
-- **Power:** the paired per-(pair,seed) design gives **MDE = 0.0071**, below the 0.02 we'd treat as meaningful — so within-noise results are genuine nulls, not underpowered.
-- **Pre-registration:** predictions git-anchored before the confirmatory seeds, and scored — including the refuted knee.
-- **Exclusion:** gpt2-large GT is bimodal (an 8-seed run collapses below gpt2-medium 27% of the time) → excluded by a fixed rule, applied uniformly.
-- **De-confounding:** a random-label control rules out training-set size — weak labels carry information (random < gt_only < mixing).
-- **Cross-task:** the fraction curve, allocation null, and de-confound all replicate on **SciQ**.
-- **Robustness:** a 5-seed baseline pass reproduces the 3-seed conclusions — nothing flips.
-
-<!--
-MDE is the load-bearing number — it's what lets me call these nulls rather than underpowered. The
-exclusion is decided by gpt2-large's optimisation behaviour, not by any result, and applied
-everywhere. The de-confound matters because at low fractions GT-only trains on far fewer rows, so
-the random-label control is needed to attribute the mixing gain to information, not data volume.
--->
-
----
-
 ## Pre-registration scorecard — hits and misses
 
 **Phase 1** (P1–P6, git-anchored before seeds 0/2 existed)
@@ -221,7 +203,7 @@ not-testable rather than refuted, because gpt2-large's instability removes the p
 | Loss | xent vs logconf | logconf inert → dropped |
 | Tasks | BoolQ + SciQ | replicates on both |
 | Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
-| Robustness | 8-seed variance, seeds 3–4 reserve | exclusion by fixed rule |
+| Robustness | 8-seed variance; 5-seed baseline pass | exclusion by rule; 3-seed conclusions hold |
 
 <span class="small">Coverage spans the three axes plus loss, task, and robustness checks; the negatives are concordant with the volume-bound account.</span>
 
