@@ -16,8 +16,9 @@
 | S8 | 2026-06-23 | Phase 1b: Component 0 (power) + harness (oracle/random_labels) + A/B + C runs (8× H200) | Complete |
 | S9 | 2026-06-23 | Synthesis (FINDINGS) + read interview brief + Phase 2 plan/exec-spec + doc reconciliation (local, no GPU) | Complete |
 | S10 | 2026-06-23 | Phase 2 implementation (M1–M5 + plumbing, 54 unit tests) + repo reorg (scripts/ by phase) + driver + NOTES_phase2 pre-reg (local, no GPU) | Complete |
-| S11 | 2026-06-23 | Phase 2 portfolio run (8× H200): gates passed (naive bit-for-bit, M5 smoke), 270-run combination sweep | In progress |
+| S11 | 2026-06-23 | Phase 2 portfolio run (8× H200): 270/270, 0 fail. Portfolio null/negative; M3 gt_anchored only floor-clearer (rescues logconf, below xent) | Complete |
 | S12 | 2026-06-23 | Seed 3+4 phase-0 baseline gen (2nd 8× H200, concurrent w/ S11): GT ceilings + weak_labels + frac=0 transfers, boolq+sciq, 0 fail → enables 5-seed extension | Complete |
+| S13 | 2026-06-23 | Tier-1 mechanism experiment (3rd 8× H200): imitation vs correction. Student imitates teacher errors (70–81%); GT recovery diffuse/~linear → explains allocation-null | Complete |
 
 ---
 
@@ -619,3 +620,11 @@ No compute this session. Total project GPU spend still ~$515 (S1–S8) entering 
 | S12 | 2026-06-23 | — | Provisioned 2nd 8× H200 ($26.04/hr) to generate seeds 3,4 in parallel with the Phase-2 sweep. Two-phase driver: 16 GT runs (4 models × boolq+sciq × 2 seeds → weak_labels + ceilings), then 80 frac=0 transfers (10 pairs × 2 ds × 2 losses × 2 seeds) |
 | S12 | 2026-06-23 | — | ALL DONE: GT 16/16, transfers 80/80, **0 failures**. Pulled slim (data-*.arrow + config + summary; stripped HF cache arrows), ~32M/seed → `results/data/baseline/seed{3,4}/` alongside 0/1/2. Sanity OK (GT xl 0.750 / large 0.709 / medium 0.645 / gpt2 0.678) |
 | S12 | 2026-06-23 | — | Destroyed **only 42283409** (verified 42270079 Phase-2 box still running). Enables extending any Phase-1/2 claim to 5 seeds on both tasks (e.g. Phase-2 winner confirmation) |
+
+## S13 — 2026-06-23 — Tier-1 mechanism experiment (3rd 8× H200, instance 42296918)
+
+| sid | Date | Time (UTC) | Event |
+|---|---|---|---|
+| S13 | 2026-06-23 | — | Provisioned 3rd 8× H200 ($26.66/hr) for the mechanism experiment (highest-value spend per the budget review). gpt2→gpt2-xl mixing at frac {0,0.1,0.25,0.5,1.0} × boolq+sciq × 2 seeds, **keeping results.pkl** (per-example test preds) + gpt2 teacher test preds. 24 runs, 0 fail |
+| S13 | 2026-06-23 | — | Analysis (`analyze_mechanism.py`): at f=0 student imitates teacher's wrong answer **81% boolq / 70% sciq**; GT recovers teacher-wrong rows only **diffusely (42%/55% of f=0→1 gap at f=0.5, ~linear not concave)** → mechanistically explains the Phase-1b allocation-null. Pulled `mechanism_summary.csv` + `plots/mechanism.png`; destroyed box |
+| S13 | 2026-06-23 | — | **All 3 instances destroyed; 0 running.** Approx box costs this arc: Phase-2 ~$115, baseline ~$27, mechanism ~$20 |

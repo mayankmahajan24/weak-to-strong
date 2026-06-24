@@ -13,16 +13,21 @@ labels, and ask three questions: **how much** is needed, **where** to spend it, 
 combine it. On the GPT-2 family (BoolQ primary, SciQ replication), 3 seeds, raw-accuracy-first
 with a measured noise floor and pre-registered predictions:
 
-> **The value of scarce supervision at this scale comes from *quantity* and from the
-> *informativeness of the weak labels themselves* — not from *where* you place the GT.**
-> GT mixing helps cross-entropy transfer, but the gain is **gradual and back-loaded (no knee)**;
-> **weak labels are genuinely informative** (a clean control rules out a mere data-quantity
-> effect); and a **perfect error-targeting oracle does no better than random allocation**.
-> Effects are modest and consistent across two tasks; the confidence-loss variant is inert.
+> **The value of scarce supervision at this scale comes only from *how much* you spend — not from
+> *where* you place it (allocation) or *how* you combine it (method).** GT mixing helps
+> cross-entropy transfer, but the gain is **gradual and back-loaded (no knee)**; **weak labels are
+> genuinely informative** (a clean control rules out a mere data-quantity effect); a **perfect
+> error-targeting oracle ties random allocation**; and **no combination method beats naive xent
+> mixing.** Effects are modest and consistent across two tasks; the confidence loss is inert.
+>
+> **Why (mechanism):** the strong student *imitates* the teacher's errors (70–81% at zero GT), and
+> GT recovers them only **diffusely — ~linear in budget, not concave.** Correction is volume-bound,
+> so neither targeting nor reweighting can help past naive — **the three nulls are one mechanism.**
 
-This is a deliberately honest result set: of five pre-registered Phase-1 predictions, **one was
-refuted, one unsupported, three held**; the single most exciting hypothesis (a "knee" at small
-GT budgets, and supervision value scaling with model size) **did not survive**.
+This is a deliberately honest result set: across Phases 1–2, the most exciting hypotheses (a "knee"
+at small budgets, supervision value scaling with model size, and a winning combination method) **did
+not survive** — but a $25 mechanism experiment turns the central negative ("where and how don't
+matter") into an *explained* result rather than a bare null.
 
 ---
 
@@ -131,6 +136,25 @@ data-quantity artifact — and the confidence loss (logconf) cannot use GT at al
   all-GT targets are ~50% self-prediction — the GT signal is structurally diluted. (P2 held;
   logconf dropped from later phases.)
 
+**Finding (Phase 2): no *combination method* beats naive xent mixing — and a mechanism experiment
+explains why.** A pre-registered 270-run portfolio (5 methods, BoolQ) vs loss-matched naive:
+
+  | method (M#) | result vs naive | prediction |
+  |---|---|---|
+  | M3 gt_anchored | **only floor-clearer** (+0.040 @0.50, 15/15) — *rescues* logconf, but stays **below xent** (0.642 vs 0.697) | ✅ HIT (mechanism) |
+  | M2 soft_gt | neutral | ✅ HIT |
+  | M4 reliability | null/slightly negative (confidence calibrated but shallow) | ◐ consistent |
+  | M1 weighted | negative (GT-upweighting hurts) | ❌ MISS |
+  | M5 gt_early_stop | negative, worse with budget (−0.054 @0.50) — GT spent on *selection* wastes its *training* value | ❌ MISS |
+
+  **Mechanism (Tier-1 experiment, [`phase2/MECHANISM.md`](phase2/MECHANISM.md)):** with pure weak
+  supervision the strong student **imitates the teacher's wrong answer 70–81% of the time**; adding
+  GT recovers those errors only **diffusely — ~linear in budget, not concave** (42%/55% of the
+  f=0→1 gap recovered at half budget). Correction is **volume-bound**: a little GT does not teach
+  the student to broadly override an unreliable teacher. This *mechanistically explains* both the
+  allocation-null (targeting can't help) and the combination-null (no reweighting changes the
+  volume-bound dynamic). **The three nulls are one mechanism.**
+
 ---
 
 ## Secondary findings
@@ -181,24 +205,24 @@ Predictions committed to git **before** the confirming seeds/runs existed:
 
 ## Bottom line & next step
 
-At GPT-2 scale, with a near-zero baseline, the actionable picture is clear and cross-task:
-**spend GT to get more of it (the curve is gradual, so small budgets buy little), trust that
-weak labels carry real signal, and don't bother optimizing *where* the GT goes — it doesn't
-move the needle.** The headline-grabbing hypotheses (a frugal "knee," supervision value scaling
-with capability) are honest negatives here.
+At GPT-2 scale, with a near-zero baseline, the actionable picture is clear, cross-task, and now
+complete across all three questions: **spend GT to get more of it (the curve is gradual, so small
+budgets buy little), trust that weak labels carry real signal, and don't bother optimizing *where*
+the GT goes or *how* you combine it — neither beats naive mixing.** The headline-grabbing hypotheses
+(a frugal "knee," supervision value scaling with capability, a winning combination method) are all
+honest negatives here.
 
-The deepest read is that the binding constraint is **model scale, not method** — the
-scientifically correct lever is to re-run the core battery on a family spanning a much larger
-capability gap (~100×), where the phenomena the paper reports actually appear. **That is out of
-scope for this study** (the brief fixes the universe to the GPT-2 family), so it is the headline
-**future-work** proposal, not compute we spend here.
+**And we know *why*:** the Tier-1 mechanism experiment shows the strong student imitates the
+teacher's errors and GT corrects them only diffusely (~linear in budget). Correction is
+volume-bound, so allocation and combination *can't* help — only quantity can. The central negative
+is explained, not just observed.
 
-In-scope, the next step (Phase 2) is a **focused, pre-registered combination-method portfolio** —
-the one axis Phase 1b left untested: *how* to combine weak + GT per row (weighted loss, soft-GT,
-GT-anchored logconf, teacher-reliability weighting, GT-as-early-stopping), at {0.10, 0.25, 0.50}.
-It is deliberately **not** a broad bake-off: Component B already killed the allocation axis, so we
-test combination only, report hits **and** misses, and expect most to be null (which is itself a
-result under the rubric). Plan: `../plans/phase2.md`; execution spec: `../plans/PHASE2_PROMPT.md`.
+The deepest read is that the binding constraint is **model scale, not method** — the scientifically
+correct lever is to re-run the core battery on a family spanning a much larger capability gap
+(~100×), where the phenomena the paper reports actually appear. **That is out of scope here** (the
+brief fixes the universe to the GPT-2 family), so it is the headline **future-work** proposal. The
+remaining in-scope step is the **≤20-minute synthesis talk**, built around the honest three-question
+negative and the mechanism that explains it.
 
 ---
 

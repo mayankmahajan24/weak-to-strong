@@ -179,13 +179,31 @@ of *plausible* approaches with rigor, so Phase 2 is **on** — but focused on th
 | 1 | ✅ | No knee (P1 refuted); mixing>GT-only (confounded); logconf null; scale inconclusive |
 | — | ✅ | gpt2-large GT ~27% unstable (S7) → exclusion principled, scale claim under-measured |
 | 1b | ✅ 0 PASS; A informative (both tasks); B allocation null; C testbed validated, findings replicate | Which labels matters; where doesn't; gradual no-knee curve — cross-task |
-| 2 | ▶ **running** (8×H200): gates passed — naive bit-for-bit (0.69257), M5 smoke (0 GT, acc 0.65); 270-run combination sweep in progress | Tests *how to combine*; Axis A dropped (oracle null) |
-| 3–4 | ⏳ pending | Mechanism analysis + the ≤20-min synthesis talk |
+| 2 | ✅ 270/270 (8×H200), 0 fail. Portfolio **null/negative**; **M3 gt_anchored** only floor-clearer (rescues logconf, below xent). M1 hurts, M5 hurts (worse w/ budget), M2/M4 null | *How* to combine doesn't beat naive xent either ([`phase2/RESULTS_phase2.md`](phase2/RESULTS_phase2.md)) |
+| — | ✅ **Mechanism (Tier-1, S13):** student imitates teacher errors (70–81% @f=0); GT recovery **diffuse/~linear** → *explains* the allocation-null | Correction is volume-bound → only *how-much* matters ([`phase2/MECHANISM.md`](phase2/MECHANISM.md)) |
+| 3–4 | ⏳ pending | The ≤20-min synthesis talk |
 
-**Immediate next:** implement Phase 2 per [`../plans/PHASE2_PROMPT.md`](../plans/PHASE2_PROMPT.md)
-— Phase A plumbing (loss `**kwargs` + per-row `gt_mask`/`sample_weight` threading + the
-`--combination_method` flag) with `tests/test_losses.py` and the naive-reproduction regression,
-then M1 + M3 first; commit the pre-registered predictions; run ~300 on 8×H100; then build the deck.
+## Phase 2 — How to combine? Combination portfolio + the mechanism
+*(detail: [`phase2/RESULTS_phase2.md`](phase2/RESULTS_phase2.md), [`phase2/MECHANISM.md`](phase2/MECHANISM.md);
+pre-reg [`../NOTES_phase2.md`](../NOTES_phase2.md); sessions S10–S13)*
+
+- **Did.** Pre-registered M1–M5 (anchor f3acd25) then ran the 270-run portfolio (5 methods × 6 strict
+  pairs × {0.10,0.25,0.50} × 3 seeds), BoolQ, vs loss-matched naive. Then spent the budget-review's
+  top pick on a **mechanism experiment** (gpt2→gpt2-xl, fractions, keeping per-example test preds).
+- **Saw.** **No method beats naive xent.** Only **M3 gt_anchored** clears the floor (+0.040 @0.50,
+  15/15) — it *rescues* the logconf failure mode (clean GT rows shouldn't be diluted by self-preds),
+  confirming a mechanism, but stays **below** xent (0.642 vs 0.697). M1 (weighted) and M5
+  (gt_early_stop) are negative — M5 worse with budget (spending GT on *selection* wastes its
+  *training* value). M2/M4 null. **Scorecard: 2 hits (M2,M3), M4 consistent, 2 informative misses.**
+- **Mechanism (the payoff).** At f=0 the strong student **imitates** the teacher's wrong answer
+  70–81% of the time; GT recovers those errors only **diffusely — ~linear in budget, not concave**
+  (42%/55% of the f=0→1 gap at f=0.5). Correction is *volume-bound*, which **mechanistically explains
+  the Phase-1b allocation-null** (targeting can't help if a little GT doesn't teach broad override)
+  and the combination null. The three nulls are one mechanism.
+- **Informed.** Closes the three-question arc: **only *how much* GT matters** at this scale — not
+  *where* (allocation) or *how* (combination). The binding constraint is scale/imitation, not method.
+
+**Immediate next:** build the ≤20-min deck around the honest negative + the mechanism that explains it.
 
 ## Artifact index
 - **Synthesis writeup (start here for the findings): [`FINDINGS.md`](FINDINGS.md).**
