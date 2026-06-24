@@ -1,16 +1,16 @@
 # Time Summary — Ground-Truth Mixing in Weak-to-Strong Generalization
 
-**~27 hours of hands-on work.**
+**~28.5 hours of hands-on work.**
 
 This is the executive view of my time spent on this project. Total *wall-clock time* was
 ~45–50h, much of which was GPU sweeps running in the background; the hands-on engineering +
-analysis time below is the active subset (approximately 27h). It counts work that didn't make the
+analysis time below is the active subset (approximately 28.5h). It counts work that didn't make the
 final result set as well as work that did.
 
 ## At a glance
 | | |
 |---|---|
-| **Hands-on time** | **~27 hours** |
+| **Hands-on time** | **~28.5 hours** |
 | Wall-clock time (incl. background compute) | ~45–50 hours |
 | GPU runs | ~1,000+ training runs (GPT-2 family) |
 | Compute spend | ~$1.3k (Vast.ai, 8×H200 / H100 / A100 / B200) |
@@ -23,6 +23,7 @@ final result set as well as work that did.
 ## Where the time went (by phase)
 | Phase | Hands-on | What was produced |
 |---|---|---|
+| **Background — paper study** | ~1.5h | Read the original OpenAI Weak-to-Strong Generalization paper (problem framing, PGR metric, baseline sweep methodology) to ground the extension |
 | **0 — Infrastructure + baseline** | ~13h | Reproduced the W2SG baseline across the full GPT-2 family (BoolQ+SciQ, xent+logconf, 3 seeds); built + validated the GT-mixing harness (identity/ceiling checks). Includes scoping work that didn't make the cut: an initial multi-dataset sweep (amazon_polarity / anthropic_hh / cosmos_qa) before restricting to BoolQ+SciQ; cross-instance reproducibility re-runs of the baseline (Lambda → B200 → A100) to fix a single canonical environment; and GPU/OOM shakeout |
 | **1 — How much? (fraction curve)** | ~3h | Pre-registered P1–P6; ran the full fraction sweep; found *no knee* (P1 refuted), logconf null; retracted a single-seed "knee" headline |
 | **— Variance study** | ~0.5h | 8-seed gpt2-large study → confirmed ~27% optimization instability (exclusion principled) |
@@ -32,7 +33,7 @@ final result set as well as work that did.
 | **2 — Portfolio run** | ~1.5h | 270-run combination sweep (0 fail); portfolio null/negative, M3 only floor-clearer |
 | **— Robustness reserve** | ~0.5h | Generated seeds 3,4 baseline (5-seed extension capability) |
 | **— Mechanism experiment** | ~0.75h | Imitation-vs-correction: explained *why* allocation + combination are null |
-| | **~27h** | |
+| | **~28.5h** | |
 
 ## What was explored but didn't make the final cut (still counted in the hours):
 
@@ -69,7 +70,7 @@ final result set as well as work that did.
 above sum to ~$680; the difference to the ~$1.3k actual is provisioning, idle/setup time, and
 aborted instances not captured per-run.*
 
-## What ~27 hours produced
+## What ~28.5 hours produced
 - **A complete, honest three-question result set** (how much / where / how) with a **mechanism** that
   explains the central negative, all cross-task (BoolQ + SciQ).
 - **Pre-registration discipline** (git-anchored predictions; hits *and* misses reported) and a
@@ -78,5 +79,5 @@ aborted instances not captured per-run.*
 - A **reproducible repo**: per-phase scripts, 54 unit tests, drivers, and writeups from which the
   whole study rebuilds.
 
-*Efficiency note: ~27 hands-on hours for a pre-registered, mechanism-backed, two-task result set —
+*Efficiency note: ~28.5 hands-on hours for a pre-registered, mechanism-backed, two-task result set —
 most of the wall-clock was unattended GPU sweeps, not active work.*
