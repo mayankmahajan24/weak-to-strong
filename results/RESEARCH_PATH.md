@@ -199,4 +199,11 @@ then M1 + M3 first; commit the pre-registered predictions; run ~300 on 8×H100; 
 - Interview brief (the rubric + scope constraints): `../docs/INTERVIEW_INSTRUCTIONS.pdf`.
 - Code (by phase): `../scripts/phase1/` (consolidate/analyze/compare/robustness/plot), `../scripts/phase1b/` (power/analyze/drivers), `../scripts/phase0/` (baseline runners), `../tests/`.
 - Data + outputs: `phase1/phase1_results.csv`, `phase*/RESULTS_*.md`, `plots/`, `data/`.
-- Session / cost / lessons log: `../TIME_LOG.md` (S1–S8).
+- **Robustness reserve (seeds 3,4).** All reported results are **3-seed** (seeds 0,1,2) — what we
+  pre-registered and saw in sequence; this is canonical and is *not* retconned to 5 seeds. Seeds 3,4
+  (S12, `baseline/seed{3,4}/`, analysis `../scripts/phase0/analyze_5seed_baseline.py`) are held as a
+  reserve for confirming a Phase-2 winner at 5 seeds and for optional robustness checks. A 5-seed
+  robustness pass on the phase-0 baseline **confirms the 3-seed conclusions** (nothing flips; the lone
+  positive, SciQ-xent PGR, shrinks +0.19→+0.11 toward null; mid-family ceiling instability widens —
+  new gpt2-medium/SciQ/s4 collapse). Used on top of the story, never to rewrite it.
+- Session / cost / lessons log: `../TIME_LOG.md` (S1–S12).
