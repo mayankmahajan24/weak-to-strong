@@ -27,6 +27,8 @@ style: |
   section.lead h1 { font-size: 44px; line-height: 1.18; }
   footer { color: #b0aea5; font-size: 14px; }
   .small { font-size: 19px; color: #6b6a63; }
+  section.tight { font-size: 22px; }
+  section.tight li { margin-bottom: 2px; }
 ---
 
 <!-- _class: lead -->
@@ -228,21 +230,22 @@ interesting variable is the capability gap, not the supervision strategy.
 
 ---
 
-## Next steps — highest-leverage experiments
+<!-- _class: tight -->
 
-1. **Scale the capability gap — the decisive test.** Widen the student–teacher gap (handicapped teachers within GPT-2; larger families beyond it). Volume-bound recovery predicts it stays ~linear; if it turns **concave**, the *where* and *how* axes reopen. Directly falsifies the central claim.
-2. **Is teacher error targetable? — closes the allocation null.** Probe whether "teacher-wrong" is predictable from the student's representations. If error is unstructured, that *is* why targeting can't help. Near-zero compute.
-3. **The untested axis — *when*.** Schedule the budget (GT-first / anneal / interleave) instead of mixing it statically; iterative-label-refinement results suggest order can matter under weak supervision.
-4. **Compounding via iterative weak-to-strong.** Spend the same budget across self-training rounds — does a one-shot-null budget accumulate?
+## Next steps
 
-<span class="small">Ordered by leverage: #1 falsifies the central claim · #2 closes the mechanism · #3–4 probe untested axes.</span>
+1. **Vary the capability gap.** Volume-bound recovery predicts a GT label's value is gap-invariant. Re-measure recovery under wider student–teacher gaps (early-checkpoint / label-noised teachers; larger families if scope allowed) — a shift from linear to **concave** would mean targeted GT generalizes, reopening *where* and *how*.
+2. **Test whether teacher errors are structured.** Probe the student's hidden states for teacher-correctness from held-out GT. Low AUC ⇒ the wrong rows are diffuse, not separable for the budget to exploit — the mechanism under the allocation null. Near-free.
+3. **Schedule the budget over training.** The mixture is held stationary; ordering is unexamined. Compare GT-first / annealed / interleaved at matched budget — refinement-scheduling work suggests order can outweigh the loss objective under weak supervision.
+4. **Iterate the weak-to-strong loop.** Re-derive the teacher from the budget-trained student, repeat at fixed total GT — does a one-pass-null budget compound across rounds (single-round elicitation vs label information)?
+
+<span class="small">Ordered by bearing on the volume-bound account: (1) discriminates it · (2) tests its premise · (3–4) probe axes the budget framing leaves open.</span>
 
 <!--
-#1 maps to the misfit/disagreement theory of W2SG gain — gain should grow with the gap, and that's
-exactly where targeting could start to matter. #2 is the cheapest and gives mechanistic closure on
-the allocation null. #3 is motivated by "iterative label refinement matters more than preference
-optimisation under weak supervision"; #4 by bootstrapping. All but #1 fit comfortably in budget;
-#2 is near-free.
+(1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and
+that's where targeting could begin to pay. (2) is near-free and gives the mechanism behind the
+allocation null directly. (3) follows iterative-label-refinement results under weak supervision; (4)
+is the bootstrapping question. All but (1) fit comfortably in budget.
 -->
 
 ---
