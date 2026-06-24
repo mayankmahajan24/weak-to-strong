@@ -5,22 +5,28 @@ paginate: true
 size: 16:9
 math: katex
 style: |
+  /* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
   section {
-    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Lora", Georgia, serif;
     font-size: 25px;
-    color: #1b1b1b;
+    color: #141413;
+    background: #faf9f5;
     padding: 48px 56px;
   }
-  h1 { font-size: 44px; color: #111; }
-  h2 { font-size: 33px; color: #111; border-bottom: 2px solid #E69F00; padding-bottom: 6px; }
-  strong { color: #b35900; }
-  em { color: #444; }
-  table { font-size: 21px; }
-  th { background: #f2f2f2; }
-  section.lead h1 { font-size: 44px; line-height: 1.18; }
+  h1 { font-family: "Poppins", Arial, sans-serif; font-weight: 700; font-size: 44px; color: #141413; }
+  h2 { font-family: "Poppins", Arial, sans-serif; font-weight: 600; font-size: 33px; color: #141413;
+       border-bottom: 3px solid #d97757; padding-bottom: 6px; }
+  strong { color: #d97757; font-weight: 600; }
+  em { color: #6b6a63; }
+  table { font-size: 21px; border-collapse: collapse; }
+  th { background: #e8e6dc; color: #141413; }
+  td, th { border: 1px solid #b0aea5; padding: 4px 10px; }
+  a { color: #6a9bcc; }
   section.lead { justify-content: center; }
-  footer { color: #999; font-size: 14px; }
-  .small { font-size: 19px; color: #555; }
+  section.lead h1 { font-size: 44px; line-height: 1.18; }
+  footer { color: #b0aea5; font-size: 14px; }
+  .small { font-size: 19px; color: #6b6a63; }
 ---
 
 <!-- _class: lead -->
