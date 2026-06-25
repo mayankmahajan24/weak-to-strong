@@ -17,6 +17,12 @@ style: |
   h1 { font-family: "Poppins", Arial, sans-serif; font-weight: 700; font-size: 44px; color: #141413; }
   h2 { font-family: "Poppins", Arial, sans-serif; font-weight: 600; font-size: 33px; color: #141413;
        border-bottom: 3px solid #d97757; padding-bottom: 6px; }
+  /* inset background images (bg right/left) so they aren't flush with the slide border */
+  [data-marpit-advanced-background-container] figure {
+    background-origin: content-box;
+    background-position: center;
+    padding: 26px 34px;
+  }
   strong { color: #d97757; font-weight: 600; }
   em { color: #6b6a63; }
   table { font-size: 21px; border-collapse: collapse; }
@@ -172,18 +178,18 @@ the allocation and combination nulls are expected rather than surprising.
 
 ---
 
-## Read it out instead of supervising?
+## Extract the answer instead of supervising?
 
 ![bg right:58% fit](figs/elicitation_scaling.png)
 
-- The other lever is **elicitation** — read truth from the frozen model's activations, spending GT only to *orient* it, not to teach.
+- The other lever is **elicitation** — extract the answer from the frozen model's activations, spending GT only to *orient* the probe, not to teach.
 - **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.
 - The small-gap end of the regime where elicitation **dominates at a large gap** (Anthropic's automated-W2S, PGR ~0.97).
 
 <!--
-Frozen readout: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
+Frozen extraction: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
 even with full supervision; the SciQ full-supervised probe rises 0.59 -> 0.67 (gpt2 -> xl). This is the
-finding the Takeaways slide then draws its elicitation conclusion from. Caveat if pushed: linear readout
+finding the Takeaways slide then draws its elicitation conclusion from. Caveat if pushed: linear probe
 only — a nonlinear / ensemble elicitor (à la their CCS + evolution-strategy) might surface more.
 -->
 
@@ -222,7 +228,7 @@ report as not-testable rather than refuted, because gpt2-large's instability rem
 | Loss | xent vs logconf | logconf inert → dropped |
 | Tasks | BoolQ + SciQ | replicates on both |
 | Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
-| Elicitation | spend GT to *orient* a frozen readout (probe + CCS) | weak at GPT-2; scales with model size (SciQ) |
+| Elicitation | spend GT to *orient* a frozen-model extraction (probe + CCS) | weak at GPT-2; scales with model size (SciQ) |
 | Robustness | 8-seed variance; 5-seed baseline pass | exclusion by rule; 3-seed conclusions hold |
 
 <span class="small">Coverage spans the three axes, plus loss, task, robustness, and elicitation checks.</span>
@@ -230,7 +236,7 @@ report as not-testable rather than refuted, because gpt2-large's instability rem
 <!--
 Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
 that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
-Elicitation row: instead of supervising, read truth out of the frozen strong model (k-shot linear probe;
+Elicitation row: instead of supervising, extract the answer from the frozen strong model (k-shot linear probe;
 CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
 SciQ it rises with model size (0.59 -> 0.67, gpt2 -> xl). That's the small-gap end of Anthropic's
 automated-W2S result (elicitation reaches PGR ~0.97 at a large 4B gap): elicitable knowledge grows with the
@@ -245,7 +251,7 @@ gap, so at GPT-2 scale volume stays the only lever — the same volume-bound sto
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
 - One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
 - So the binding constraint here looks like **scale**, not allocation or combination.
-- And the lever that scales is **elicitation, not supervision**: reading truth out of the frozen model is weak at GPT-2 but grows with model size — the small-gap end of where elicitation dominates at larger gaps (Anthropic's automated-W2S result). For superhuman models, *elicit* what they know rather than *supervise* it.
+- And the lever that scales is **elicitation, not supervision**: extracting the answer from the frozen model is weak at GPT-2 but grows with model size — the small-gap end of where elicitation dominates at larger gaps (Anthropic's automated-W2S result). For superhuman models, *elicit* what they know rather than *supervise* it.
 
 <!--
 The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
