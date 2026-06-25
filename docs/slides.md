@@ -205,13 +205,19 @@ not-testable rather than refuted, because gpt2-large's instability removes the p
 | Loss | xent vs logconf | logconf inert → dropped |
 | Tasks | BoolQ + SciQ | replicates on both |
 | Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
+| Elicitation | spend GT to *orient* a frozen readout (probe + CCS) | weak at GPT-2; scales with model size (SciQ) |
 | Robustness | 8-seed variance; 5-seed baseline pass | exclusion by rule; 3-seed conclusions hold |
 
-<span class="small">Coverage spans the three axes, plus loss, task, and robustness checks.</span>
+<span class="small">Coverage spans the three axes, plus loss, task, robustness, and elicitation checks.</span>
 
 <!--
 Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
 that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
+Elicitation row: instead of supervising, read truth out of the frozen strong model (k-shot linear probe;
+CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
+SciQ it rises with model size (0.59 -> 0.67, gpt2 -> xl). That's the small-gap end of Anthropic's
+automated-W2S result (elicitation reaches PGR ~0.97 at a large 4B gap): elicitable knowledge grows with the
+gap, so at GPT-2 scale volume stays the only lever — the same volume-bound story.
 -->
 
 ---

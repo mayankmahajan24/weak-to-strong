@@ -716,13 +716,18 @@ section.tight li { margin-bottom: 2px; }
 <td>recovery ~linear in budget</td>
 </tr>
 <tr>
+<td>Elicitation</td>
+<td>spend GT to <em>orient</em> a frozen readout (probe + CCS)</td>
+<td>weak at GPT-2; scales with model size (SciQ)</td>
+</tr>
+<tr>
 <td>Robustness</td>
 <td>8-seed variance; 5-seed baseline pass</td>
 <td>exclusion by rule; 3-seed conclusions hold</td>
 </tr>
 </tbody>
 </table>
-<p><span class="small">Coverage spans the three axes, plus loss, task, and robustness checks.</span></p>
+<p><span class="small">Coverage spans the three axes, plus loss, task, robustness, and elicitation checks.</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="11" data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap');
@@ -1181,7 +1186,12 @@ instead — a GT label is worth about the same wherever it goes — which is the
 the allocation and combination nulls are expected rather than surprising.</p></div><div class="bespoke-marp-note" data-index="8" tabindex="0"><p>The point of stating the predictions up front: later seeds and the whole Phase-2 portfolio were out-of-sample
 tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we report as
 not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.</p></div><div class="bespoke-marp-note" data-index="9" tabindex="0"><p>Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
-that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
+that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
+Elicitation row: instead of supervising, read truth out of the frozen strong model (k-shot linear probe;
+CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
+SciQ it rises with model size (0.59 -&gt; 0.67, gpt2 -&gt; xl). That's the small-gap end of Anthropic's
+automated-W2S result (elicitation reaches PGR ~0.97 at a large 4B gap): elicitable knowledge grows with the
+gap, so at GPT-2 scale volume stays the only lever — the same volume-bound story.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
 interesting variable is the capability gap, not the supervision strategy.</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>(1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and
 that's where targeting could begin to pay. (2) is near-free and gives the mechanism behind the
 allocation null directly. (3) follows iterative-label-refinement results under weak supervision; (4)
