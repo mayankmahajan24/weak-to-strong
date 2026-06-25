@@ -172,6 +172,23 @@ the allocation and combination nulls are expected rather than surprising.
 
 ---
 
+## Read it out instead of supervising?
+
+![bg right:58% fit](figs/elicitation_scaling.png)
+
+- If supervision is volume-bound, the other lever is **elicitation** — read truth from the frozen model's activations and spend GT only to *orient* the readout, not to teach.
+- At GPT-2 scale it's **weak**: on BoolQ even the full-supervised linear probe sits at chance — but on SciQ accuracy **rises with model size**, so the elicitable signal grows with capability.
+- That's the small-gap end of the regime where elicitation **dominates at a large gap** (Anthropic's automated-W2S, PGR ~0.97) — elicitable knowledge scales with the gap.
+
+<!--
+Frozen readout: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
+even with full supervision; the SciQ full-supervised probe rises 0.59 -> 0.67 (gpt2 -> xl). This is the
+finding the Takeaways slide then draws its elicitation conclusion from. Caveat if pushed: linear readout
+only — a nonlinear / ensemble elicitor (à la their CCS + evolution-strategy) might surface more.
+-->
+
+---
+
 ## Prediction scorecard — hits and misses
 
 **Predictions for the fraction sweep** — committed before the confirming seeds
