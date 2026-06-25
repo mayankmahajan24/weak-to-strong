@@ -106,6 +106,11 @@ for m in models:
             else:
                 print(f"run_elicitation FAIL {ds}:{m}:s{seed}\n{r.stderr[-600:]}", flush=True)
 print(f"\nALL DONE: extraction {len(done)}/{len(ext_jobs)}, analysis {n_ok} configs", flush=True)
-with open(os.path.join(OUT, "elicitation_status.txt"), "w") as f:
+# Completion marker lives next to the JSONs the watcher pulls (results/elicitation/), so the
+# poller checks exactly one predictable path — not a separate /workspace location.
+status_path = os.path.join(os.path.dirname(RUNS), "elicitation_status.txt")
+os.makedirs(os.path.dirname(status_path), exist_ok=True)
+with open(status_path, "w") as f:
     f.write(f"extraction done={len(done)} failed={len(failed)}\nanalysis_ok={n_ok}\n"
             f"FAILED:\n" + "\n".join(failed) + "\n")
+print(f"wrote completion marker {status_path}", flush=True)
