@@ -176,9 +176,9 @@ the allocation and combination nulls are expected rather than surprising.
 
 ![bg right:58% fit](figs/elicitation_scaling.png)
 
-- If supervision is volume-bound, the other lever is **elicitation** — read truth from the frozen model's activations and spend GT only to *orient* the readout, not to teach.
-- At GPT-2 scale it's **weak**: on BoolQ even the full-supervised linear probe sits at chance — but on SciQ accuracy **rises with model size**, so the elicitable signal grows with capability.
-- That's the small-gap end of the regime where elicitation **dominates at a large gap** (Anthropic's automated-W2S, PGR ~0.97) — elicitable knowledge scales with the gap.
+- The other lever is **elicitation** — read truth from the frozen model's activations, spending GT only to *orient* it, not to teach.
+- **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.
+- The small-gap end of the regime where elicitation **dominates at a large gap** (Anthropic's automated-W2S, PGR ~0.97).
 
 <!--
 Frozen readout: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal

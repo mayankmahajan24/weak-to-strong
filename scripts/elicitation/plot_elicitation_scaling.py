@@ -64,7 +64,7 @@ def plot_panel(ax, ds, title, show_legend):
 
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(10.2, 4.2), sharey=True)
-plot_panel(a1, "boolq", "BoolQ — flat at chance", True)
+plot_panel(a1, "boolq", "BoolQ — flat", True)
 plot_panel(a2, "sciq", "SciQ — rises with model size", False)
 a1.set_ylabel("elicited accuracy")
 fig.tight_layout()
