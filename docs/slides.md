@@ -174,23 +174,23 @@ the allocation and combination nulls are expected rather than surprising.
 
 ## Prediction scorecard — hits and misses
 
-**Phase 1** (P1–P6, git-anchored before seeds 0/2 existed)
+**Predictions for the fraction sweep** — committed before the confirming seeds
 
 | | Prediction | Outcome |
 |---|---|---|
 | P1 | knee at ~25% | ✗ refuted — back-loaded, no knee (retracted) |
 | P2 | ≤10% GT inert | ✓ within noise |
-| P3 | mixing > GT-only | ✓ (confound named → resolved in 1b) |
+| P3 | mixing > GT-only | ✓ (confound named, then controlled) |
 | P4 | logconf null | ✓ inert at every budget |
 | P5 | scale interaction (gap → more GT) | — underpowered at GPT-2 scale |
 | P6 | 0.25–0.50 plateau | ✓ flat in that range |
 
-**Phase 2** (M1–M5, predicted before the portfolio ran): M2 ✓ null, M4 ✓ null (as flagged uncertain), **M3 ◑** (strongest bet — rescues logconf, still < xent), M1/M5 ✗ negative.
+**Predictions for the five combination methods** — committed before the run: M2 ✓ null, M4 ✓ null (as flagged uncertain), **M3 ◑** (strongest bet — rescues logconf, still < xent), M1/M5 ✗ negative.
 
 <!--
-The point of stating the predictions up front: later seeds and the whole Phase-2 portfolio were out-of-sample
-tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we report as
-not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.
+The point of stating the predictions up front: the later seeds and the whole combination sweep were
+out-of-sample tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we
+report as not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.
 -->
 
 ---

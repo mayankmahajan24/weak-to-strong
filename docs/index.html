@@ -604,7 +604,7 @@ section.tight li { margin-bottom: 2px; }
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap')
 ;" data-marpit-pagination-total="17" data-size="16:9">
 <h2 id="prediction-scorecard--hits-and-misses">Prediction scorecard — hits and misses</h2>
-<p><strong>Phase 1</strong> (P1–P6, git-anchored before seeds 0/2 existed)</p>
+<p><strong>Predictions for the fraction sweep</strong> — committed before the confirming seeds</p>
 <table>
 <thead>
 <tr>
@@ -627,7 +627,7 @@ section.tight li { margin-bottom: 2px; }
 <tr>
 <td>P3</td>
 <td>mixing &gt; GT-only</td>
-<td>✓ (confound named → resolved in 1b)</td>
+<td>✓ (confound named, then controlled)</td>
 </tr>
 <tr>
 <td>P4</td>
@@ -646,7 +646,7 @@ section.tight li { margin-bottom: 2px; }
 </tr>
 </tbody>
 </table>
-<p><strong>Phase 2</strong> (M1–M5, predicted before the portfolio ran): M2 ✓ null, M4 ✓ null (as flagged uncertain), <strong>M3 ◑</strong> (strongest bet — rescues logconf, still &lt; xent), M1/M5 ✗ negative.</p>
+<p><strong>Predictions for the five combination methods</strong> — committed before the run: M2 ✓ null, M4 ✓ null (as flagged uncertain), <strong>M3 ◑</strong> (strongest bet — rescues logconf, still &lt; xent), M1/M5 ✗ negative.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="10" data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap');
@@ -1183,9 +1183,9 @@ at exactly the wrong rows, which is what the oracle did. The next slide is why t
 help.</p></div><div class="bespoke-marp-note" data-index="7" tabindex="0"><p>This is the link between the mechanism and the two nulls. Concave recovery would mean a little
 targeted GT goes a long way, and then placement would matter. We see roughly linear recovery
 instead — a GT label is worth about the same wherever it goes — which is the condition under which
-the allocation and combination nulls are expected rather than surprising.</p></div><div class="bespoke-marp-note" data-index="8" tabindex="0"><p>The point of stating the predictions up front: later seeds and the whole Phase-2 portfolio were out-of-sample
-tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we report as
-not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.</p></div><div class="bespoke-marp-note" data-index="9" tabindex="0"><p>Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
+the allocation and combination nulls are expected rather than surprising.</p></div><div class="bespoke-marp-note" data-index="8" tabindex="0"><p>The point of stating the predictions up front: the later seeds and the whole combination sweep were
+out-of-sample tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we
+report as not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.</p></div><div class="bespoke-marp-note" data-index="9" tabindex="0"><p>Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
 that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
 Elicitation row: instead of supervising, read truth out of the frozen strong model (k-shot linear probe;
 CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
