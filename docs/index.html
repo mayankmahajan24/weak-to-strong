@@ -762,6 +762,7 @@ section.tight li { margin-bottom: 2px; }
 <li>Decomposed the budget question into <em>how much / where / how</em> — a powered null on the last two, and a back-loaded, saturating curve on the first.</li>
 <li>One account — <strong>inherited errors plus volume-bound recovery</strong> — is consistent with all three.</li>
 <li>So the binding constraint here looks like <strong>scale</strong>, not allocation or combination.</li>
+<li>And the lever that scales is <strong>elicitation, not supervision</strong>: reading truth out of the frozen model is weak at GPT-2 but grows with model size — the small-gap end of where elicitation dominates at larger gaps (Anthropic's automated-W2S result). For superhuman models, <em>elicit</em> what they know rather than <em>supervise</em> it.</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12" data-paginate="true" data-class="tight" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -1192,7 +1193,9 @@ CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supe
 SciQ it rises with model size (0.59 -&gt; 0.67, gpt2 -&gt; xl). That's the small-gap end of Anthropic's
 automated-W2S result (elicitation reaches PGR ~0.97 at a large 4B gap): elicitable knowledge grows with the
 gap, so at GPT-2 scale volume stays the only lever — the same volume-bound story.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
-interesting variable is the capability gap, not the supervision strategy.</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>(1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and
+interesting variable is the capability gap, not the supervision strategy. The last bullet is the
+alignment-relevant payoff — the lever for the no-ground-truth case is elicitation, and the elicitation
+experiment shows the signal scales with the gap.</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>(1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and
 that's where targeting could begin to pay. (2) is near-free and gives the mechanism behind the
 allocation null directly. (3) follows iterative-label-refinement results under weak supervision; (4)
 is the bootstrapping question. All but (1) fit comfortably in budget.</p></div><script>/*!! License: https://unpkg.com/@marp-team/marp-cli@4.4.0/lib/bespoke.js.LICENSE.txt */

@@ -228,10 +228,13 @@ gap, so at GPT-2 scale volume stays the only lever — the same volume-bound sto
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
 - One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
 - So the binding constraint here looks like **scale**, not allocation or combination.
+- And the lever that scales is **elicitation, not supervision**: reading truth out of the frozen model is weak at GPT-2 but grows with model size — the small-gap end of where elicitation dominates at larger gaps (Anthropic's automated-W2S result). For superhuman models, *elicit* what they know rather than *supervise* it.
 
 <!--
 The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
-interesting variable is the capability gap, not the supervision strategy.
+interesting variable is the capability gap, not the supervision strategy. The last bullet is the
+alignment-relevant payoff — the lever for the no-ground-truth case is elicitation, and the elicitation
+experiment shows the signal scales with the gap.
 -->
 
 ---
