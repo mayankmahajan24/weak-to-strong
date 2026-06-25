@@ -40,7 +40,7 @@ style: |
 
 The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective lever is *volume*, not placement or combination.
 
-<span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · pre-registered</span>
+<span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · advance predictions</span>
 
 <!--
 We take the W2SG setup and add a ground-truth budget — a fraction of strong labels mixed into the
@@ -59,7 +59,7 @@ and a mechanism that ties them together.
 - **Tasks:** **BoolQ** (required) + **SciQ** (cross-task check).
 - **Readout:** median **PGR** across the model sweep (raw accuracy primary; PGR secondary).
 
-<span class="small">3 seeds · paired per-(pair,seed) contrasts · pre-registered · gpt2-large (seed 1) excluded by rule</span>
+<span class="small">3 seeds · paired per-(pair,seed) contrasts · advance predictions · gpt2-large (seed 1) excluded by rule</span>
 
 <!--
 Within-family pairs give six strict weak-below-strong pairs per seed. BoolQ is the required task,
@@ -93,7 +93,7 @@ which is why it's dropped from here on.
 - Up to **10% GT**, the gain over the 0% baseline stays within the **0.014 noise floor**.
 - Median xent PGR is **back-loaded**: −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
 - The 0.75 point: the **0.50→0.75 step is the largest**, and **0.75→1.0 is within noise**.
-- A pre-registered concave-knee-at-25% prediction was **refuted**, and retracted after the multi-seed data.
+- A prior prediction of a concave knee at 25% was **refuted**, and retracted after the multi-seed data.
 
 <!--
 The brief suggested starting at a high fraction and lowering it to probe sample efficiency. Doing
@@ -131,7 +131,7 @@ says there's nothing to capture here.
 
 <!--
 Each method is a different hypothesis about how to use the GT rows. gt-anchored exempts GT rows from
-the confidence blend, so it was the registered most-likely-positive; it does what it's designed to —
+the confidence blend, so it was the predicted most-likely-positive; it does what it's designed to —
 fixes logconf — but doesn't beat the simplest baseline. The other four are within noise or slightly
 negative.
 -->
@@ -172,7 +172,7 @@ the allocation and combination nulls are expected rather than surprising.
 
 ---
 
-## Pre-registration scorecard — hits and misses
+## Prediction scorecard — hits and misses
 
 **Phase 1** (P1–P6, git-anchored before seeds 0/2 existed)
 
@@ -185,10 +185,10 @@ the allocation and combination nulls are expected rather than surprising.
 | P5 | scale interaction (gap → more GT) | — underpowered at GPT-2 scale |
 | P6 | 0.25–0.50 plateau | ✓ flat in that range |
 
-**Phase 2** (M1–M5, registered before the portfolio ran): M2 ✓ null, M4 ✓ null (as flagged uncertain), **M3 ◑** (strongest bet — rescues logconf, still < xent), M1/M5 ✗ negative.
+**Phase 2** (M1–M5, predicted before the portfolio ran): M2 ✓ null, M4 ✓ null (as flagged uncertain), **M3 ◑** (strongest bet — rescues logconf, still < xent), M1/M5 ✗ negative.
 
 <!--
-The point of pre-registration here: later seeds and the whole Phase-2 portfolio were out-of-sample
+The point of stating the predictions up front: later seeds and the whole Phase-2 portfolio were out-of-sample
 tests, so the misses are real misses. P1 was our own headline and we retracted it; P5 we report as
 not-testable rather than refuted, because gpt2-large's instability removes the pairs that test it.
 -->
@@ -210,7 +210,7 @@ not-testable rather than refuted, because gpt2-large's instability removes the p
 <span class="small">Coverage spans the three axes, plus loss, task, and robustness checks.</span>
 
 <!--
-Each row is a separate pre-registered or controlled experiment. The mechanism probe is the only one
+Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
 that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
 -->
 
