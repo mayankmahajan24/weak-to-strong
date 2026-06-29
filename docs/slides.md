@@ -239,8 +239,8 @@ that's explanatory rather than a test; the rest are measurements with a stated e
 Elicitation row: instead of supervising, extract the answer from the frozen strong model (k-shot linear probe;
 CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
 SciQ it rises with model size (0.59 -> 0.67, gpt2 -> xl). Elicitable knowledge grows with the gap, so at
-GPT-2 scale volume stays the only lever — the same volume-bound story; at a larger gap, elicitation should
-take over.
+GPT-2 scale volume stays the only lever — the same volume-bound story; at a larger gap, elicitation looks
+promising as the lever (a direction this trend motivates, not one these results establish).
 -->
 
 ---
@@ -251,7 +251,7 @@ take over.
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
 - One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
 - So the binding constraint here looks like **scale**, not allocation or combination.
-- And the lever that scales is **elicitation, not supervision**: extracting the answer from the frozen model is weak at GPT-2 but grows with model size — so at a larger capability gap, eliciting what the model already knows should beat supervising it. For superhuman models, *elicit*, don't *supervise*.
+- A **promising initial result**: elicitation is weak at GPT-2 today, but the elicitable answer **grows with model size** — pointing to a larger-gap regime where the lever shifts to *eliciting* what the model already knows rather than *supervising* it.
 
 <!--
 The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
