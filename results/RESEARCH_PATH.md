@@ -4,7 +4,7 @@
 bottom and you can reconstruct the whole study: the question, the operating rules, then for
 each phase *what we did → what we saw → how it changed what we did next*. Detailed numbers
 live in the per-phase `RESULTS_*.md` (linked); pre-registrations in `NOTES_*.md`; the full
-timestamped/cost record in [`../TIME_LOG.md`](../TIME_LOG.md) (sessions S1–S11). This file is
+timestamped/cost record in [`../time_logs/TIME_LOG.md`](../time_logs/TIME_LOG.md) (sessions S1–S11). This file is
 deliberately honest about predictions that were wrong and choices we revised — that trail is
 the scientific contribution as much as the numbers.
 
@@ -27,7 +27,7 @@ secondary SciQ for headline replication. Fork of `openai/weak-to-strong`. Master
 - **Compute doctrine:** one condition ≈ 60 runs (10 GPT-2 pairs × 2 losses × 3 seeds).
   Statistical power beats breadth; descriptive curves at 3 seeds, head-to-head claims at 5;
   second dataset = headline replication only, not a parallel sweep.
-- **Seed environment** (recorded in [`../NOTES_phase0.md`](../NOTES_phase0.md)): `gt_seed`,
+- **Seed environment** (recorded in [`../notes/NOTES_phase0.md`](../notes/NOTES_phase0.md)): `gt_seed`,
   weak labels, GT ceilings, and student init all **reseed per seed** so error bars capture the
   real variance sources. The correctness invariant — injected GT must come from the *transfer
   split*, never the weak model's training data — is asserted in code.
@@ -58,7 +58,7 @@ secondary SciQ for headline replication. Fork of `openai/weak-to-strong`. Master
 
 ## Phase 1 — How much supervision? Fraction curve + scale interaction
 *(detail: [`phase1/RESULTS_phase1.md`](phase1/RESULTS_phase1.md); pre-registration:
-[`../NOTES_phase1.md`](../NOTES_phase1.md); sessions S5–S6)*
+[`../notes/NOTES_phase1.md`](../notes/NOTES_phase1.md); sessions S5–S6)*
 
 - **Did.** Pre-registered six predictions (P1–P6) against seed-1 **before seeds 0/2 existed**
   (git-anchored). Ran the full 3-seed sweep on BoolQ, `gt_fraction ∈ {0.01,0.05,0.1,0.25,0.5,1.0}`,
@@ -185,7 +185,7 @@ of *plausible* approaches with rigor, so Phase 2 is **on** — but focused on th
 
 ## Phase 2 — How to combine? Combination portfolio + the mechanism
 *(detail: [`phase2/RESULTS_phase2.md`](phase2/RESULTS_phase2.md), [`phase2/MECHANISM.md`](phase2/MECHANISM.md);
-pre-reg [`../NOTES_phase2.md`](../NOTES_phase2.md); sessions S10–S13)*
+pre-reg [`../notes/NOTES_phase2.md`](../notes/NOTES_phase2.md); sessions S10–S13)*
 
 - **Did.** Pre-registered M1–M5 (anchor f3acd25) then ran the 270-run portfolio (5 methods × 6 strict
   pairs × {0.10,0.25,0.50} × 3 seeds), BoolQ, vs loss-matched naive. Then spent the budget-review's
@@ -210,7 +210,7 @@ pre-reg [`../NOTES_phase2.md`](../NOTES_phase2.md); sessions S10–S13)*
 - Narrative spine / decision log: this file.
 - Phase results: `phase0/RESULTS_phase0.md`, `phase1/RESULTS_phase1.md`, `phase1b/RESULTS_phase1b.md`;
   variance study `phase0/gpt2large_variance/SUMMARY.md`.
-- Pre-registrations: `../NOTES_phase1.md` (P1–P6), `../NOTES_phase2.md` (M1–M5), `../NOTES_phase0.md` (code map + seed table + anomaly adjudication).
+- Pre-registrations: `../notes/NOTES_phase1.md` (P1–P6), `../notes/NOTES_phase2.md` (M1–M5), `../notes/NOTES_phase0.md` (code map + seed table + anomaly adjudication).
 - Plans: `../plans/w2sg_gt_mixing_plan.md` (master), `../plans/phase0.md`, `../plans/phase1.md`,
   `../plans/phase1b.md`, `../plans/phase2.md` (combination portfolio) + `../plans/PHASE2_PROMPT.md`
   (execution spec: code/tests/invariants).
@@ -224,4 +224,4 @@ pre-reg [`../NOTES_phase2.md`](../NOTES_phase2.md); sessions S10–S13)*
   robustness pass on the phase-0 baseline **confirms the 3-seed conclusions** (nothing flips; the lone
   positive, SciQ-xent PGR, shrinks +0.19→+0.11 toward null; mid-family ceiling instability widens —
   new gpt2-medium/SciQ/s4 collapse). Used on top of the story, never to rewrite it.
-- Session / cost / lessons log: `../TIME_LOG.md` (S1–S12).
+- Session / cost / lessons log: `../time_logs/TIME_LOG.md` (S1–S12).

@@ -1,6 +1,6 @@
 # Results — Elicitation (frozen-readout) at GPT-2 scale
 
-**Question (see `plans/elicitation.md`):** does spending the GT budget to *orient elicited latent
+**Question (see `plans/phase3.md`):** does spending the GT budget to *orient elicited latent
 knowledge* (a readout from the frozen strong model) beat using it as training labels — and is there
 elicitable signal at GPT-2 scale? Methods: M1 k-shot supervised linear probe; M2 CCS (unsupervised)
 + GT-orient. Frozen pretrained models, last-token states (+ a layer chosen on a train-pool
@@ -66,6 +66,6 @@ GPT-2 scale volume remains the only lever** — exactly the volume-bound mechani
   train-pool validation split (no test-set selection).
 
 ## Reproduce
-`scripts/elicitation/{extract_activations,probe,ccs,run_elicitation,run_box}.py` (extraction = the
-only GPU step); per-config JSONs in `results/elicitation/runs/`; `analyze_elicitation.py` regenerates
+`scripts/phase3/{extract_activations,probe,ccs,run_phase3,run_box}.py` (extraction = the
+only GPU step); per-config JSONs in `results/phase3/runs/`; `analyze_phase3.py` regenerates
 the tables above against the Phase-0 GT ceilings.

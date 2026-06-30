@@ -2,7 +2,7 @@
 
 > **STATUS: FINAL** — 270/270 runs, 0 failures (S11). Analysis `scripts/phase2/analyze_phase2.py`,
 > overlay `scripts/phase2/plot_phase2.py` → `../plots/phase2_overlay.png`.
-> Pre-registration: [`../../NOTES_phase2.md`](../../NOTES_phase2.md) (anchor f3acd25, predictions frozen).
+> Pre-registration: [`../../notes/NOTES_phase2.md`](../../notes/NOTES_phase2.md) (anchor f3acd25, predictions frozen).
 
 ## Setup
 - **Question (Axis "how to combine"):** given a fixed GT budget, does *how* you combine weak + GT

@@ -180,7 +180,7 @@ the allocation and combination nulls are expected rather than surprising.
 
 ## Extract the answer instead of supervising?
 
-![bg right:58% fit](figs/elicitation_scaling.png)
+![bg right:58% fit](figs/phase3_scaling.png)
 
 - The other lever is **elicitation** — extract the answer from the frozen model's activations, spending GT only to *orient* the probe, not to teach.
 - **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.

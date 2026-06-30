@@ -13,7 +13,7 @@ torch + transformers and runs on the GPU box.
 Output (per model/ds/seed/split): an .npz with `acts_L<layer>` arrays [N, H], `hard_label` [N],
 and `txt` (for joining). Usage on the box:
   python extract_activations.py --model_size=gpt2-xl --ds=boolq --seed=0 --split=test \
-      --layers=last,half --out=results/elicitation/acts
+      --layers=last,half --out=results/phase3/acts
 """
 import numpy as np
 
@@ -101,7 +101,7 @@ def main():
     ap.add_argument("--max_ctx", type=int, default=1024)
     ap.add_argument("--batch_size", type=int, default=16)
     ap.add_argument("--device", default="cuda")
-    ap.add_argument("--out", default=str(ROOT / "results/elicitation/acts"))
+    ap.add_argument("--out", default=str(ROOT / "results/phase3/acts"))
     # CCS contrast suffixes (empty => plain readout for the k-shot probe)
     ap.add_argument("--contrast", default="")  # e.g. "boolq" or "sciq" to also emit pos/neg states
     a = ap.parse_args()

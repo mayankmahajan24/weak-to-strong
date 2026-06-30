@@ -2,7 +2,7 @@
 
 *Synthesis writeup. Detailed per-phase numbers + figures: `phase0/RESULTS_phase0.md`,
 `phase1/RESULTS_phase1.md`, `phase1b/RESULTS_phase1b.md`; decision log:
-`RESEARCH_PATH.md`; methods/pre-registration: `../NOTES_phase0.md`, `../NOTES_phase1.md`.*
+`RESEARCH_PATH.md`; methods/pre-registration: `../notes/NOTES_phase0.md`, `../notes/NOTES_phase1.md`.*
 
 ---
 

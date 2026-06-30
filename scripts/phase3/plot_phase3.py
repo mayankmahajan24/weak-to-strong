@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Elicitation scaling figure: elicited accuracy vs strong-model size, BoolQ | SciQ.
 
-Reads results/elicitation/runs/*.json. Lines: full-supervised linear probe (the ceiling on linear
+Reads results/phase3/runs/*.json. Lines: full-supervised linear probe (the ceiling on linear
 elicitation), k=256 probe, CCS@32 (unsupervised); dashed chance reference. Shows the headline:
-flat-at-chance on BoolQ, rises with model size on SciQ. -> docs/figs/elicitation_scaling.png
+flat-at-chance on BoolQ, rises with model size on SciQ. -> docs/figs/phase3_scaling.png
 """
 import glob
 import json
@@ -26,7 +26,7 @@ XLAB = ["gpt2\n124M", "medium\n355M", "large\n774M", "xl\n1.5B"]
 C_FULL, C_PROBE, C_CCS, C_CH = "#d97757", "#6a9bcc", "#788c5d", "#b0aea5"
 
 runs = {}
-for fn in glob.glob(str(ROOT / "results/elicitation/runs/*.json")):
+for fn in glob.glob(str(ROOT / "results/phase3/runs/*.json")):
     r = json.load(open(fn))
     runs[(r["ds"], r["model"], r["seed"])] = r
 seeds = sorted({k[2] for k in runs})
@@ -68,6 +68,6 @@ plot_panel(a1, "boolq", "BoolQ — flat", True)
 plot_panel(a2, "sciq", "SciQ — rises with model size", False)
 a1.set_ylabel("elicited accuracy")
 fig.tight_layout()
-out = ROOT / "docs/figs/elicitation_scaling.png"
+out = ROOT / "docs/figs/phase3_scaling.png"
 fig.savefig(out)
 print("wrote", out)

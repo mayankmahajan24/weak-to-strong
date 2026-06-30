@@ -7,10 +7,10 @@ For one (ds, model, seed): load the train/test .npz from extract_activations.py,
   - M1 full-supervised probe: the linear-readout upper bound,
   - M2 CCS (if contrast activations present): fit unsupervised on train contrasts, orient with k
     train labels, evaluate on test; plus a random-direction control,
-and write results/elicitation/runs/<ds>_<model>_s<seed>.json.
+and write results/phase3/runs/<ds>_<model>_s<seed>.json.
 
 GPU is only used by extract_activations.py; this step is pure numpy and runs anywhere.
-Usage: python run_elicitation.py --ds=boolq --model_size=gpt2-xl --seed=0 --acts=results/elicitation/acts
+Usage: python run_phase3.py --ds=boolq --model_size=gpt2-xl --seed=0 --acts=results/phase3/acts
 """
 import argparse
 import json
@@ -112,8 +112,8 @@ def main():
     ap.add_argument("--model_size", required=True)
     ap.add_argument("--seed", type=int, default=0)
     ROOT = Path(__file__).resolve().parents[2]
-    ap.add_argument("--acts", default=str(ROOT / "results/elicitation/acts"))
-    ap.add_argument("--out", default=str(ROOT / "results/elicitation/runs"))
+    ap.add_argument("--acts", default=str(ROOT / "results/phase3/acts"))
+    ap.add_argument("--out", default=str(ROOT / "results/phase3/runs"))
     a = ap.parse_args()
     res = run(a.acts, a.ds, a.model_size, a.seed)
     os.makedirs(a.out, exist_ok=True)

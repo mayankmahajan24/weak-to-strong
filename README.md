@@ -7,7 +7,7 @@
 **Start here**
 - **Findings (synthesis):** [`results/FINDINGS.md`](results/FINDINGS.md) — organized around *how much / where / how*.
 - **Decision log / narrative:** [`results/RESEARCH_PATH.md`](results/RESEARCH_PATH.md)
-- **Plans & pre-registrations:** [`plans/`](plans/) · **Time + cost log:** [`TIME_LOG.md`](TIME_LOG.md)
+- **Plans & pre-registrations:** [`plans/`](plans/) · **Time + cost log:** [`TIME_LOG.md`](time_logs/TIME_LOG.md)
 - **What we added:** new modules `weak_to_strong/label_mixing.py`, `weak_to_strong/reliability.py` +
   edits to `loss.py`/`train.py`/`train_simple.py`; orchestration & analysis in [`scripts/`](scripts/)
   (split by phase); per-phase outputs in [`results/`](results/); unit tests in [`tests/`](tests/) (`tests/run_all.sh`).
@@ -22,8 +22,6 @@ random allocation); and the confidence loss (logconf) is inert. See `results/FIN
 **STATUS**: This codebase is not well tested and does not use the exact same settings we used in the paper, but in our experience gives qualitatively similar results when using large model size gaps and multiple seeds.  Expected results can be found for two datasets below.
 
 # Weak-to-strong generalization
-
-![Our setup and how it relates to superhuman AI alignment](./weak-to-strong-setup.png)
 
 This project contains code for implementing our [paper on weak-to-strong generalization](https://cdn.openai.com/papers/weak-to-strong-generalization.pdf).
 

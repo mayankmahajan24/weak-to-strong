@@ -1,7 +1,7 @@
 # Plan — Elicitation: spend the GT budget to *orient latent knowledge*, not as labels
 
 **Status:** spec + advance predictions, **git-anchored before any elicitation run.**
-Companion analysis lands in `results/elicitation/RESULTS_elicitation.md`. Reuses the Phase-0/1
+Companion analysis lands in `results/phase3/RESULTS_phase3.md`. Reuses the Phase-0/1
 testbed (GPT-2 family, BoolQ + SciQ, the GT ceilings, the `EXCLUDE={(1,"gpt2-large")}` rule, the
 0.014 noise floor, the strict-pair PGR convention).
 
@@ -74,11 +74,11 @@ follow-up *only if* M1/M2 show signal.
 - Activation extraction replicates the model's own last-non-pad-token selection exactly.
 
 ## Implementation + tests (this PR)
-- `scripts/elicitation/extract_activations.py` — frozen forward pass; `select_last_token_states()` is
+- `scripts/phase3/extract_activations.py` — frozen forward pass; `select_last_token_states()` is
   a pure, unit-tested function replicating the model's `input_lens-1` indexing.
-- `scripts/elicitation/probe.py` — k-shot logistic probe (M1) + sign/threshold from GT.
-- `scripts/elicitation/ccs.py` — CCS probe, consistency+confidence loss, GT-orient (M2).
-- `scripts/elicitation/run_elicitation.py` — driver (extract → fit → eval across the k sweep).
-- `scripts/elicitation/analyze_elicitation.py` — PGR/accuracy/sample-efficiency vs the floor.
+- `scripts/phase3/probe.py` — k-shot logistic probe (M1) + sign/threshold from GT.
+- `scripts/phase3/ccs.py` — CCS probe, consistency+confidence loss, GT-orient (M2).
+- `scripts/phase3/run_phase3.py` — driver (extract → fit → eval across the k sweep).
+- `scripts/phase3/analyze_phase3.py` — PGR/accuracy/sample-efficiency vs the floor.
 - `tests/test_probe.py`, `tests/test_ccs.py`, `tests/test_extract_activations.py` — synthetic,
   CPU-only, no model download; verify the algorithmic core before any GPU spend.

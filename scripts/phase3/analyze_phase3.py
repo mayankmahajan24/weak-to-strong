@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Aggregate elicitation runs -> EL1 scaling + PGR/sample-efficiency vs the noise floor (CPU).
 
-Reads results/elicitation/runs/*.json (from run_elicitation.py) and the Phase-0 GT ceilings
+Reads results/phase3/runs/*.json (from run_phase3.py) and the Phase-0 GT ceilings
 (results/data/baseline/seed*/), then reports, per task:
   EL1  — elicited accuracy vs strong-model size (probe@k, full-supervised, CCS, random control).
   EL2/3 — elicitation PGR per strict (weak<strong) pair vs the weak baseline, and the k (label
@@ -41,7 +41,7 @@ def load_ceilings():
 
 def load_runs():
     runs = {}
-    for fn in glob.glob(str(ROOT / "results/elicitation/runs/*.json")):
+    for fn in glob.glob(str(ROOT / "results/phase3/runs/*.json")):
         r = json.load(open(fn))
         runs[(r["ds"], r["model"], r["seed"])] = r
     return runs
@@ -68,7 +68,7 @@ def main():
     gt = load_ceilings()
     runs = load_runs()
     if not runs:
-        print("no elicitation runs found under results/elicitation/runs/ — run the box step first")
+        print("no elicitation runs found under results/phase3/runs/ — run the box step first")
         return
     tasks = sorted({k[0] for k in runs})
     seeds = sorted({k[2] for k in runs})

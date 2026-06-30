@@ -3,7 +3,7 @@
 
 Phase 1 (GPU pool): extract frozen activations for every (model, ds, seed) × {train, test} with the
 CCS contrast prompts — forward passes only.
-Phase 2 (CPU): run_elicitation.py per (model, ds, seed) -> results/elicitation/runs/<...>.json.
+Phase 2 (CPU): run_phase3.py per (model, ds, seed) -> results/phase3/runs/<...>.json.
 
 Only the small JSONs need pulling back (the .npz stay on the box). Usage:
   python run_box.py /workspace/w2s [--only_model=gpt2-xl] [--ngpu=8]
@@ -35,8 +35,8 @@ MBS = {"gpt2": 32, "gpt2-medium": 16, "gpt2-large": 8, "gpt2-xl": 4}  # forward-
 N_TRAIN = int(opts.get("n_docs", 2000))     # train pool (k-shot + layer selection + upper bound)
 N_TEST = int(opts.get("n_test_docs", 5000))  # test eval split
 LAYERS = opts.get("layers", "last,half")
-ACTS = os.path.join(OUT, "results/elicitation/acts")
-RUNS = os.path.join(OUT, "results/elicitation/runs")
+ACTS = os.path.join(OUT, "results/phase3/acts")
+RUNS = os.path.join(OUT, "results/phase3/runs")
 ELDIR = os.path.dirname(os.path.abspath(__file__))
 
 models = [opts["only_model"]] if opts.get("only_model") else ORDER
@@ -91,12 +91,12 @@ if failed:
     print("FAILED:", failed, flush=True)
 
 # Phase 2 — CPU analysis per config
-print("\nrunning run_elicitation (CPU)...", flush=True)
+print("\nrunning run_phase3 (CPU)...", flush=True)
 n_ok = 0
 for m in models:
     for ds in DSETS:
         for seed in SEEDS:
-            cmd = ["python", os.path.join(ELDIR, "run_elicitation.py"),
+            cmd = ["python", os.path.join(ELDIR, "run_phase3.py"),
                    f"--ds={ds}", f"--model_size={m}", f"--seed={seed}",
                    f"--acts={ACTS}", f"--out={RUNS}"]
             r = subprocess.run(cmd, cwd=OUT, capture_output=True, text=True)
@@ -104,11 +104,11 @@ for m in models:
                 n_ok += 1
                 print(r.stdout.strip(), flush=True)
             else:
-                print(f"run_elicitation FAIL {ds}:{m}:s{seed}\n{r.stderr[-600:]}", flush=True)
+                print(f"run_phase3 FAIL {ds}:{m}:s{seed}\n{r.stderr[-600:]}", flush=True)
 print(f"\nALL DONE: extraction {len(done)}/{len(ext_jobs)}, analysis {n_ok} configs", flush=True)
-# Completion marker lives next to the JSONs the watcher pulls (results/elicitation/), so the
+# Completion marker lives next to the JSONs the watcher pulls (results/phase3/), so the
 # poller checks exactly one predictable path — not a separate /workspace location.
-status_path = os.path.join(os.path.dirname(RUNS), "elicitation_status.txt")
+status_path = os.path.join(os.path.dirname(RUNS), "phase3_status.txt")
 os.makedirs(os.path.dirname(status_path), exist_ok=True)
 with open(status_path, "w") as f:
     f.write(f"extraction done={len(done)} failed={len(failed)}\nanalysis_ok={n_ok}\n"

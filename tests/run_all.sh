@@ -14,7 +14,7 @@ for t in tests/test_losses.py tests/test_soft_gt.py tests/test_reliability.py \
 done
 # elicitation (numpy-only, CPU)
 for t in tests/test_extract_activations.py tests/test_probe.py tests/test_ccs.py \
-         tests/test_run_elicitation.py; do
+         tests/test_run_phase3.py; do
   echo "### $t"
   "$PY" "$t" || fail=$((fail+1))
   echo

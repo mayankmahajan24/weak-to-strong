@@ -13,8 +13,8 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts" / "elicitation"))
-import run_elicitation as R  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts" / "phase3"))
+import run_phase3 as R  # noqa: E402
 
 SIGNAL_LAYER, NOISE_LAYER, D = 12, 6, 16
 
@@ -67,4 +67,4 @@ def test_driver_end_to_end():
 if __name__ == "__main__":
     test_driver_end_to_end()
     print("  ok  test_driver_end_to_end")
-    print("test_run_elicitation: ALL PASS")
+    print("test_run_phase3: ALL PASS")
