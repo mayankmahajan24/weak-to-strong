@@ -80,13 +80,13 @@ small and unstable for closely-matched pairs.
 ![bg right:50% fit](figs/sweep_acc_boolq_gf025.png)
 
 - GPT-2 family, BoolQ, **25% ground truth mixed into the weak labels** — standard sweep format.
-- **Median PGR (xent) = +0.30** across the sweep; logconf (dashed) sits well below xent.
+- **Median PGR = +0.30** with cross-entropy training; the confidence loss (dashed) sits well below it.
 - The 0% baseline is **−0.22**, making the +0.30 a **small** positive shift.
 
 <!--
 Each coloured line is a weak teacher; the x-axis is the student labelled with its own ground-truth
 accuracy; solid is cross-entropy, dashed is the confidence loss. The inset is median PGR over the
-six strict pairs — the standardised number requested. logconf sits below xent at every student,
+six strict pairs — the standardised number requested. the confidence loss sits below cross-entropy at every student,
 which is why it's dropped from here on.
 -->
 
@@ -97,7 +97,7 @@ which is why it's dropped from here on.
 ![bg right:50% fit](figs/phase1_fraction_curve.png)
 
 - Up to **10% GT**, the gain over the 0% baseline stays within the **0.014 noise floor**.
-- Median xent PGR is **back-loaded**: −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
+- Median PGR is **back-loaded**: −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
 - The 0.75 point: the **0.50→0.75 step is the largest**, and **0.75→1.0 is within noise**.
 - A prior prediction of a concave knee at 25% was **unsupported** and retracted after the multi-seed data.
 
@@ -131,15 +131,15 @@ says there's nothing to capture here.
 
 ![bg right:50% fit](figs/phase2_delta_bars.png)
 
-- Five methods vs naive mixing at matched budget: **M1** GT up-weighting · **M2** soft-GT targets · **M3** GT-anchored logconf · **M4** reliability-weighted weak labels · **M5** GT-based early stopping.
+- Five ways to use the GT rows more cleverly than plain mixing: **(1)** weight them more · **(2)** soften their labels · **(3)** exempt them from the confidence loss · **(4)** down-weight unreliable weak labels · **(5)** use them to choose when to stop training.
 - Median Δ vs naive ≈ **0** across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.
-- **M3 (gt-anchored)** is the only method to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but it recovers logconf **without exceeding plain xent** (0.642 vs 0.697).
+- **Method 3** is the only one to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but it rescues the confidence loss **without beating plain cross-entropy** (0.642 vs 0.697).
 
 <!--
-Each method is a different hypothesis about how to use the GT rows. gt-anchored exempts GT rows from
-the confidence blend, so it was the predicted most-likely-positive; it does what it's designed to —
-fixes logconf — but doesn't beat the simplest baseline. The other four are within noise or slightly
-negative.
+Each method is a different idea for how to use the GT rows. Method 3 exempts the GT rows from the
+confidence loss, so it was the predicted most-likely-positive; it does what it's designed to —
+rescues the confidence loss — but doesn't beat the simplest baseline. The other four are within noise
+or slightly negative.
 -->
 
 ---
@@ -148,7 +148,7 @@ negative.
 
 ![bg right:50% fit](figs/mechanism.png)
 
-- Probe: gpt2 → gpt2-xl, joining teacher and student **per-example** test predictions.
+- Compared the gpt2 teacher and gpt2-xl student predictions, **example by example**.
 - On teacher-wrong rows at 0% GT, the student reproduces the teacher's wrong answer **81% (BoolQ) / 70% (SciQ)** of the time.
 - Errors are **largely inherited, not independent** — the student adopts the teacher's specific wrong answers.
 
@@ -182,15 +182,15 @@ the allocation and combination nulls are expected rather than surprising.
 
 ![bg right:58% fit](figs/phase3_scaling.png)
 
-- The other lever is **elicitation** — extract the answer from the frozen model's activations, spending GT only to *orient* the probe, not to teach.
-- **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.
+- The other lever is **elicitation** — read the answer out of the model's own internal state (no extra training), using the GT budget only to **point the readout the right way**.
+- **Weak at GPT-2**: on BoolQ, even a classifier given all the labels barely beats guessing — but on SciQ it **rises with model size**.
 - Elicitation may be impactful at a **larger capability gap** where the strong model genuinely knows the answer.
 
 <!--
-Frozen extraction: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
-even with full supervision; the SciQ full-supervised probe rises 0.59 -> 0.67 (gpt2 -> xl). This is the
-finding the Takeaways slide then draws its elicitation conclusion from. Caveat if pushed: linear probe
-only — a nonlinear / ensemble elicitor might surface more.
+Two readouts: a simple linear classifier trained on a few labels, and an unsupervised "truth-direction"
+method oriented with a few labels. BoolQ has no linear signal even with all the labels; on SciQ a
+classifier given all the labels rises 0.59 -> 0.67 (gpt2 -> xl). This is the finding the Takeaways slide
+draws its elicitation conclusion from. Caveat if pushed: linear readout only — a more complex one might surface more.
 -->
 
 ---
@@ -204,11 +204,11 @@ only — a nonlinear / ensemble elicitor might surface more.
 | P1 | knee at ~25% | ✗ refuted — back-loaded, no knee (retracted) |
 | P2 | ≤10% GT flat | ✓ within noise |
 | P3 | mixing > GT-only | ✓ (confound named, then controlled) |
-| P4 | logconf null | ✓ inferior at every fraction |
+| P4 | confidence loss null | ✓ inferior at every fraction |
 | P5 | scale interaction (gap → more GT) | — underpowered at GPT-2 scale |
 | P6 | 0.25–0.50 plateau | ✓ flat in that range |
 
-**Predictions for the five combination methods** — committed before the run: M2 ✓ null, M4 ✓ null (as flagged uncertain), **M3 ◑** (strongest bet — rescues logconf, still < xent), M1/M5 ✗ negative.
+**Predictions for the five combination methods** — committed before the run: method 2 ✓ null, method 4 ✓ null (as flagged uncertain), **method 3 ◑** (strongest bet — rescues the confidence loss, still < cross-entropy), methods 1/5 ✗ negative.
 
 <!--
 The point of stating the predictions up front: the later seeds and the whole combination sweep were
@@ -224,11 +224,11 @@ report as not-testable rather than refuted, because gpt2-large's instability rem
 |---|---|---|
 | How much | 8-point fraction sweep, 0 → 1 | back-loaded, saturates ~0.75 |
 | Where | error-targeting oracle + random control | null — within MDE |
-| How | 5 combination / loss methods | null — 1 above MDE, still < xent |
-| Loss | xent vs logconf | logconf inert → dropped |
+| How | 5 combination / loss methods | null — 1 above MDE, still < cross-entropy |
+| Loss | cross-entropy vs confidence loss | confidence loss inert → dropped |
 | Tasks | BoolQ + SciQ | replicates on both |
-| Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
-| Elicitation | spend GT to *orient* a frozen-model extraction (probe + CCS) | weak at GPT-2; scales with model size (SciQ) |
+| Mechanism | teacher-vs-student prediction analysis | recovery ~linear in budget |
+| Elicitation | read the answer out of the model (linear classifier + an unsupervised method) | weak at GPT-2; scales with model size (SciQ) |
 | Robustness | 8-seed variance; 5-seed baseline pass | exclusion by rule; 3-seed conclusions hold |
 
 <span class="small">Coverage spans the three axes, plus loss, task, robustness, and elicitation checks.</span>
@@ -236,9 +236,9 @@ report as not-testable rather than refuted, because gpt2-large's instability rem
 <!--
 Each row is a separate experiment, predicted in advance or controlled. The mechanism probe is the only one
 that's explanatory rather than a test; the rest are measurements with a stated effect size and floor.
-Elicitation row: instead of supervising, extract the answer from the frozen strong model (k-shot linear probe;
-CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
-SciQ it rises with model size (0.59 -> 0.67, gpt2 -> xl). Elicitable knowledge grows with the gap, so at
+Elicitation row: instead of supervising, read the answer out of the strong model (a linear classifier on a
+few labels; plus an unsupervised truth-direction method). At GPT-2 scale it's weak — BoolQ ~chance (even
+with all the labels), but on SciQ it rises with model size (0.59 -> 0.67, gpt2 -> xl). Elicitable knowledge grows with the gap, so at
 GPT-2 scale volume stays the only lever — the same volume-dependent story; at a larger gap, elicitation looks
 promising as the lever (a direction this trend motivates, not one these results establish).
 -->
@@ -267,8 +267,8 @@ experiment shows the signal scales with the gap.
 ## Next steps
 
 1. **Vary the capability gap.** Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to **concave**, targeted GT starts to generalize — and *where* / *how* would matter again.
-2. **Are the teacher's mistakes structured?** Train a **cheap** probe — reusing the saved predictions — to find, from the student's features, where the teacher is wrong. If it can't, the errors are scattered, with no pattern for allocation to exploit.
-3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first / annealed — recent work suggests the schedule can matter more than the loss.
+2. **Are the teacher's mistakes structured?** Train a **cheap** classifier — reusing the saved predictions — to find, from the model's own features, where the teacher is wrong. If it can't, the errors are scattered, with no pattern for allocation to exploit.
+3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first vs gradually phased — recent work suggests the schedule can matter more than the loss.
 4. **Iterate the loop.** Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?
 
 <span class="small">Ordered by relevance to the mechanism: (1) tests it directly · (2) explains it · (3–4) open new axes.</span>
@@ -276,8 +276,8 @@ experiment shows the signal scales with the gap.
 <!--
 (1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and
 that's where targeting could begin to pay. (2) is near-free and gives the mechanism behind the
-allocation null directly. (3) follows iterative-label-refinement results under weak supervision; (4)
-is the bootstrapping question. All but (1) fit comfortably in budget.
+allocation null directly. (3) follows work on refining labels over rounds under weak supervision; (4)
+is the iterate-the-loop (bootstrapping) question. All but (1) fit comfortably in budget.
 -->
 
 ---
@@ -296,7 +296,7 @@ is the bootstrapping question. All but (1) fit comfortably in budget.
 ![bg right:52% fit](figs/sweep_pgr_boolq.png)
 
 - Standard W2SG sweep, GPT-2 family, BoolQ, **0% GT**, PGR axis.
-- Median xent PGR **−0.27**; several pairs fall below the imitation line — BoolQ is low-signal at 0% GT.
+- Median PGR **−0.27**; several pairs fall below the imitation line — BoolQ is low-signal at 0% GT.
 - This is the baseline the 25%-GT sweep is measured against.
 
 ---
@@ -315,7 +315,7 @@ is the bootstrapping question. All but (1) fit comfortably in budget.
 ![bg right:52% fit](figs/phase2_overlay.png)
 
 - All five methods track naive mixing across {0.10, 0.25, 0.50}.
-- gt-anchored (logconf) is the only method above the MDE; it recovers logconf but stays under xent.
+- Method 3 (the confidence-loss variant) is the only one above the MDE; it rescues the confidence loss but stays under cross-entropy.
 
 ---
 
@@ -323,5 +323,5 @@ is the bootstrapping question. All but (1) fit comfortably in budget.
 
 ![bg right:52% fit](figs/phase1b_A_deconfound.png)
 
-- Ordering: **random < gt_only < naive mixing** (15/15 BoolQ, 18/18 SciQ pairs).
+- Ordering: **random labels < GT-only < naive mixing** (15/15 BoolQ, 18/18 SciQ pairs).
 - Replacing weak labels with noise reduces accuracy → the mixing gain reflects weak-label information, not just added rows.
