@@ -461,7 +461,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>Five methods vs naive mixing at matched budget: <strong>M1</strong> GT up-weighting · <strong>M2</strong> soft-GT targets · <strong>M3</strong> GT-anchored logconf · <strong>M4</strong> reliability-weighted weak labels · <strong>M5</strong> GT-based early stopping.</li>
 <li>Median Δ vs naive ≈ <strong>0</strong> across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.</li>
-<li><strong>M3 (gt-anchored)</strong> is the only method above the floor (+0.040 at 0.50), but it recovers logconf toward xent <strong>without exceeding plain xent</strong> (0.642 vs 0.697).</li>
+<li><strong>M3 (gt-anchored)</strong> is the only method to clear the <strong>MDE (0.0071)</strong> — peaking at +0.040 at 0.50 — but it recovers logconf toward xent <strong>without exceeding plain xent</strong> (0.642 vs 0.697).</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -764,7 +764,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>The other lever is <strong>elicitation</strong> — extract the answer from the frozen model's activations, spending GT only to <em>orient</em> the probe, not to teach.</li>
 <li><strong>Weak at GPT-2</strong>: on BoolQ even the full-supervised probe sits at chance — but on SciQ it <strong>rises with model size</strong>.</li>
-<li>The trend points to elicitation becoming the lever at a <strong>larger capability gap</strong> — where the strong model genuinely knows the answer and you orient it rather than teach it.</li>
+<li>Elicitation may be impactful at a <strong>larger capability gap</strong> — where the strong model genuinely knows the answer and we can orient it rather than teach it.</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -931,7 +931,7 @@ section.tight li { margin-bottom: 2px; }
 <tr>
 <td>How</td>
 <td>5 combination / loss methods</td>
-<td>null — 1 above floor, still &lt; xent</td>
+<td>null — 1 above MDE, still &lt; xent</td>
 </tr>
 <tr>
 <td>Loss</td>
@@ -1350,7 +1350,7 @@ section.tight li { margin-bottom: 2px; }
 
 <ul>
 <li>All five methods track naive mixing across {0.10, 0.25, 0.50}.</li>
-<li>gt-anchored (logconf) is the only method above the floor; it recovers logconf but stays under xent.</li>
+<li>gt-anchored (logconf) is the only method above the MDE; it recovers logconf but stays under xent.</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */

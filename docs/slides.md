@@ -133,7 +133,7 @@ says there's nothing to capture here.
 
 - Five methods vs naive mixing at matched budget: **M1** GT up-weighting · **M2** soft-GT targets · **M3** GT-anchored logconf · **M4** reliability-weighted weak labels · **M5** GT-based early stopping.
 - Median Δ vs naive ≈ **0** across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.
-- **M3 (gt-anchored)** is the only method above the floor (+0.040 at 0.50), but it recovers logconf toward xent **without exceeding plain xent** (0.642 vs 0.697).
+- **M3 (gt-anchored)** is the only method to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but it recovers logconf toward xent **without exceeding plain xent** (0.642 vs 0.697).
 
 <!--
 Each method is a different hypothesis about how to use the GT rows. gt-anchored exempts GT rows from
@@ -184,7 +184,7 @@ the allocation and combination nulls are expected rather than surprising.
 
 - The other lever is **elicitation** — extract the answer from the frozen model's activations, spending GT only to *orient* the probe, not to teach.
 - **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.
-- The trend points to elicitation becoming the lever at a **larger capability gap** — where the strong model genuinely knows the answer and you orient it rather than teach it.
+- Elicitation may be impactful at a **larger capability gap** — where the strong model genuinely knows the answer and we can orient it rather than teach it.
 
 <!--
 Frozen extraction: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
@@ -224,7 +224,7 @@ report as not-testable rather than refuted, because gpt2-large's instability rem
 |---|---|---|
 | How much | 8-point fraction sweep, 0 → 1 | back-loaded, saturates ~0.75 |
 | Where | error-targeting oracle + random control | null — within MDE |
-| How | 5 combination / loss methods | null — 1 above floor, still < xent |
+| How | 5 combination / loss methods | null — 1 above MDE, still < xent |
 | Loss | xent vs logconf | logconf inert → dropped |
 | Tasks | BoolQ + SciQ | replicates on both |
 | Mechanism | imitation-vs-correction probe | recovery ~linear in budget |
@@ -315,7 +315,7 @@ is the bootstrapping question. All but (1) fit comfortably in budget.
 ![bg right:52% fit](figs/phase2_overlay.png)
 
 - All five methods track naive mixing across {0.10, 0.25, 0.50}.
-- gt-anchored (logconf) is the only method above the floor; it recovers logconf but stays under xent.
+- gt-anchored (logconf) is the only method above the MDE; it recovers logconf but stays under xent.
 
 ---
 

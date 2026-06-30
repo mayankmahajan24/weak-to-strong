@@ -15,7 +15,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]; OUT = ROOT / "results/plots"
 ORDER = ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"]; RANK = {m: i for i, m in enumerate(ORDER)}
 SHORT = {"gpt2": "g2", "gpt2-medium": "M", "gpt2-large": "L", "gpt2-xl": "XL"}
-EXCLUDE = {(1, "gpt2-large")}; FLOOR = 0.014; FRACS = [0.1, 0.25, 0.5]
+EXCLUDE = {(1, "gpt2-large")}; FLOOR = 0.014; MDE = 0.0071; FRACS = [0.1, 0.25, 0.5]
 strict = [(s, w) for s in ORDER for w in ORDER if RANK[w] < RANK[s]]
 METHOD_LOSS = {"weighted": "xent", "soft_gt": "xent", "reliability": "xent", "gt_early_stop": "xent", "gt_anchored": "logconf"}
 def exc(seed, m): return (seed, m) in EXCLUDE
@@ -52,10 +52,10 @@ for i, m in enumerate(methods):
     vals = [delta(m, f) for f in FRACS]
     off = (i - (len(methods) - 1) / 2) * width
     ax.bar(x + off, [v or 0 for v in vals], width, label=f"{m} ({METHOD_LOSS[m]})", color=colors[m])
-ax.axhspan(-FLOOR, FLOOR, color="gray", alpha=0.18, label="noise floor ±0.014")
+ax.axhspan(-MDE, MDE, color="gray", alpha=0.18, label="MDE ±0.0071 (80% power)")
 ax.axhline(0, color="k", lw=0.8); ax.set_xticks(x); ax.set_xticklabels([f"{f:.2f}" for f in FRACS])
 ax.set_xlabel("GT fraction"); ax.set_ylabel("median Δacc(method − naive)")
-ax.set_title("Phase 2 — Δ vs naive (loss-matched): only gt_anchored clears the floor; none beat naive xent")
+ax.set_title("Phase 2 — Δ vs naive (loss-matched): only gt_anchored clears the MDE; none beat naive xent")
 ax.grid(alpha=0.3, axis="y"); ax.legend(fontsize=8, ncol=2)
 fig.tight_layout(); fig.savefig(OUT / "phase2_delta_bars.png", dpi=140); plt.close(fig)
 print("wrote phase2_delta_bars.png")
