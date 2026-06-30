@@ -81,7 +81,7 @@ small and unstable for closely-matched pairs.
 
 - GPT-2 family, BoolQ, **25% ground truth mixed into the weak labels** — standard sweep format.
 - **Median PGR (xent) = +0.30** across the sweep; logconf (dashed) sits well below xent.
-- The 0% baseline is **−0.27**, making the +0.30 a **small** positive shift.
+- The 0% baseline is **−0.22**, making the +0.30 a **small** positive shift.
 
 <!--
 Each coloured line is a weak teacher; the x-axis is the student labelled with its own ground-truth
