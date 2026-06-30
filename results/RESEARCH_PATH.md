@@ -148,7 +148,7 @@ of *plausible* approaches with rigor, so Phase 2 is **on** — but focused on th
   null), teacher-reliability weighting, GT-as-early-stopping — at {0.10, 0.25, 0.50}, 6 strict
   pairs, 3 seeds (~300 runs, ~$170 on 8×H100). Success = beat-naive / left-shift / ceiling-raise
   vs the 0.014 floor; report hits **and** misses. Plan: [`../plans/phase2.md`](../plans/phase2.md);
-  execution spec (code, tests, invariants): [`../plans/PHASE2_PROMPT.md`](../plans/PHASE2_PROMPT.md).
+  execution spec (code, tests, invariants): [`../plans/phase2_prompt.md`](../plans/phase2_prompt.md).
 - **Phase 3 — mechanism + robustness:** imitation analysis (does a winner fix weak-*error* rows?),
   weak-quality interaction, noisy-oversight robustness. (SciQ headline replication already done in 1b-C.)
 - **Phase 4 — synthesis:** the ≤20-min talk on the three questions (how much / where / how), with
@@ -212,7 +212,7 @@ pre-reg [`../notes/NOTES_phase2.md`](../notes/NOTES_phase2.md); sessions S10–S
   variance study `phase0/gpt2large_variance/SUMMARY.md`.
 - Pre-registrations: `../notes/NOTES_phase1.md` (P1–P6), `../notes/NOTES_phase2.md` (M1–M5), `../notes/NOTES_phase0.md` (code map + seed table + anomaly adjudication).
 - Plans: `../plans/w2sg_gt_mixing_plan.md` (master), `../plans/phase0.md`, `../plans/phase1.md`,
-  `../plans/phase1b.md`, `../plans/phase2.md` (combination portfolio) + `../plans/PHASE2_PROMPT.md`
+  `../plans/phase1b.md`, `../plans/phase2.md` (combination portfolio) + `../plans/phase2_prompt.md`
   (execution spec: code/tests/invariants).
 - Interview brief (the rubric + scope constraints): `../docs/INTERVIEW_INSTRUCTIONS.pdf`.
 - Code (by phase): `../scripts/phase1/` (consolidate/analyze/compare/robustness/plot), `../scripts/phase1b/` (power/analyze/drivers), `../scripts/phase0/` (baseline runners), `../tests/`.

@@ -8,9 +8,22 @@
 - **Findings (synthesis):** [`results/FINDINGS.md`](results/FINDINGS.md) — organized around *how much / where / how*.
 - **Decision log / narrative:** [`results/RESEARCH_PATH.md`](results/RESEARCH_PATH.md)
 - **Plans & pre-registrations:** [`plans/`](plans/) · **Time + cost log:** [`TIME_LOG.md`](time_logs/TIME_LOG.md)
-- **What we added:** new modules `weak_to_strong/label_mixing.py`, `weak_to_strong/reliability.py` +
-  edits to `loss.py`/`train.py`/`train_simple.py`; orchestration & analysis in [`scripts/`](scripts/)
-  (split by phase); per-phase outputs in [`results/`](results/); unit tests in [`tests/`](tests/) (`tests/run_all.sh`).
+
+**Repo structure** (the extension is organized in phases; phase *N* has a plan, scripts, results, and notes):
+
+| Path | Contents |
+|---|---|
+| `weak_to_strong/` | Library. Our additions: `label_mixing.py`, `reliability.py`; plus edits to `loss.py` (M1–M3 losses), `train.py`, `train_simple.py`. Rest is upstream. |
+| `scripts/phase{0,1,1b,2,3}/` | Per-phase run drivers + analysis/plot scripts (`plot_style.py` shared). |
+| `results/phase{0,1,1b,2,3}/` | Per-phase outputs: `RESULTS_phase*.md`, run JSONs, `MECHANISM.md`; top-level `FINDINGS.md` + `RESEARCH_PATH.md`. |
+| `plans/` | Per-phase plans + execution specs (`phase*.md`, `phase*_prompt.md`), master `w2sg_gt_mixing_plan.md`. |
+| `notes/` | Per-phase code maps + frozen pre-registrations (`NOTES_phase*.md`). |
+| `tests/` | Unit + integration tests — run `bash tests/run_all.sh` (numpy-only suite runs anywhere). |
+| `time_logs/` | Time + cost log (`TIME_LOG_SUMMARY.md`; full `TIME_LOG.md` kept local). |
+| `docs/` | Slide deck (`slides.md` → `index.html`) and figures. |
+| `vision/`, `notebooks/` | **Upstream** (OpenAI) — preserved from the fork; not part of this extension. |
+
+Phases: **0** baseline + mixing infra · **1/1b** the fraction curve + premise gates · **2** combination-method portfolio + mechanism · **3** elicitation (frozen-readout probing).
 
 **One-line result.** At GPT-2 scale (BoolQ + SciQ replication): GT mixing helps cross-entropy transfer
 but *gradually* (no frugal "knee"); weak labels are genuinely informative (de-confounded vs a

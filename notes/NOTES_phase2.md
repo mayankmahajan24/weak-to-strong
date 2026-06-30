@@ -6,7 +6,7 @@ Phase-2 results exist yet**).
 **Purpose:** lock the methods, success criteria, and per-method predictions before the sweep, so
 Phase 2 is a real test rather than post-hoc storytelling. Predictions below are frozen; outcomes
 get scored in `results/phase2/RESULTS_phase2.md` and any pipeline change is logged in "Deviations"
-at the bottom. Companion to `plans/phase2.md` (design) and `plans/PHASE2_PROMPT.md` (exec spec).
+at the bottom. Companion to `plans/phase2.md` (design) and `plans/phase2_prompt.md` (exec spec).
 
 ## Scope (decided by Phase 1b)
 Allocation (Axis A) is **dead** — the Phase-1b oracle (perfect error-targeting) tied random

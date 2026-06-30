@@ -176,7 +176,7 @@ of plausible attempts with rigor. The defensible contribution regardless of outc
 **cross-task-replicated characterization** (*how much* / *which* / *where*) + the gpt2-large
 instability + the logconf null. The **larger model gap** is the scientifically correct next
 lever but is **out of scope** (the brief fixes the universe to GPT-2) → future work in the talk.
-Plan: `../../plans/phase2.md`; execution spec: `../../plans/PHASE2_PROMPT.md`.
+Plan: `../../plans/phase2.md`; execution spec: `../../plans/phase2_prompt.md`.
 
 
 ## Figures (`../plots/`)

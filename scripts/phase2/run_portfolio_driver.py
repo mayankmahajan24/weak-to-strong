@@ -13,7 +13,7 @@ Hyperparameters (gt_loss_weight, soft_gt_eps) are fixed at sensible, *untuned* d
 (consistent with the repo's "LRs not particularly tuned" ethos and the "interesting even if it
 fails" framing). Override at the top if a pilot motivates it.
 
-PRE-SWEEP GATES (run before the full sweep — see plans/PHASE2_PROMPT.md):
+PRE-SWEEP GATES (run before the full sweep — see plans/phase2_prompt.md):
   1. naive reproduction (gpt2-medium<-gpt2 @0.25 seed1 ~= 0.673 bit-for-bit)
   2. M5 smoke: one gt_early_stop run trains on 0 GT rows, selects a checkpoint, sane acc.
 Use --only=<method[,method]> to run a subset (e.g. the M5 smoke), --pairs / --fracs / --seeds
