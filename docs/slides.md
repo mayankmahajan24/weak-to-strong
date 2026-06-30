@@ -64,7 +64,7 @@ and a mechanism that ties them together.
 - **Models:** **GPT-2 family only** — gpt2 / medium / large / xl, with within-family student–teacher pairs.
 - **Tasks:** **BoolQ** (required) + **SciQ** (cross-task check).
 - **Readout:** median **PGR** across the model sweep (raw accuracy primary; PGR secondary).
-- **Deliberately held fixed:** larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule — the highest-leverage unexplored axes (→ next steps).
+- **Deliberately held fixed:** larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule (see next steps).
 
 <span class="small">3 seeds · paired per-(pair,seed) contrasts · advance predictions · gpt2-large (seed 1) excluded by rule</span>
 
@@ -134,7 +134,7 @@ says there's nothing to capture here.
 
 - Five ways to use the GT rows more cleverly than plain mixing: **(1)** weight them more · **(2)** soften their labels · **(3)** exempt them from the confidence loss · **(4)** down-weight unreliable weak labels · **(5)** use them to choose when to stop training.
 - Median Δ vs naive ≈ **0** across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.
-- **Method 3** is the only one to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but it rescues the confidence loss **without beating plain cross-entropy** (0.642 vs 0.697).
+- **Method 3** is the only one to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but **without beating plain cross-entropy** (0.642 vs 0.697).
 
 <!--
 Each method is a different idea for how to use the GT rows. Method 3 exempts the GT rows from the

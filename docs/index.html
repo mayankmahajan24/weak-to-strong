@@ -86,7 +86,7 @@ section.tight li { margin-bottom: 2px; }
 <li><strong>Models:</strong> <strong>GPT-2 family only</strong> — gpt2 / medium / large / xl, with within-family student–teacher pairs.</li>
 <li><strong>Tasks:</strong> <strong>BoolQ</strong> (required) + <strong>SciQ</strong> (cross-task check).</li>
 <li><strong>Readout:</strong> median <strong>PGR</strong> across the model sweep (raw accuracy primary; PGR secondary).</li>
-<li><strong>Deliberately held fixed:</strong> larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule — the highest-leverage unexplored axes (→ next steps).</li>
+<li><strong>Deliberately held fixed:</strong> larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule (see next steps).</li>
 </ul>
 <p><span class="small">3 seeds · paired per-(pair,seed) contrasts · advance predictions · gpt2-large (seed 1) excluded by rule</span></p>
 </section>
@@ -462,7 +462,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>Five ways to use the GT rows more cleverly than plain mixing: <strong>(1)</strong> weight them more · <strong>(2)</strong> soften their labels · <strong>(3)</strong> exempt them from the confidence loss · <strong>(4)</strong> down-weight unreliable weak labels · <strong>(5)</strong> use them to choose when to stop training.</li>
 <li>Median Δ vs naive ≈ <strong>0</strong> across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.</li>
-<li><strong>Method 3</strong> is the only one to clear the <strong>MDE (0.0071)</strong> — peaking at +0.040 at 0.50 — but it rescues the confidence loss <strong>without beating plain cross-entropy</strong> (0.642 vs 0.697).</li>
+<li><strong>Method 3</strong> is the only one to clear the <strong>MDE (0.0071)</strong> — peaking at +0.040 at 0.50 — but <strong>without beating plain cross-entropy</strong> (0.642 vs 0.697).</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
