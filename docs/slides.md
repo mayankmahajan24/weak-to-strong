@@ -64,6 +64,7 @@ and a mechanism that ties them together.
 - **Models:** **GPT-2 family only** — gpt2 / medium / large / xl, with within-family student–teacher pairs.
 - **Tasks:** **BoolQ** (required) + **SciQ** (cross-task check).
 - **Readout:** median **PGR** across the model sweep (raw accuracy primary; PGR secondary).
+- **Deliberately held fixed:** larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule — the highest-leverage unexplored axes (→ next steps).
 
 <span class="small">3 seeds · paired per-(pair,seed) contrasts · advance predictions · gpt2-large (seed 1) excluded by rule</span>
 
