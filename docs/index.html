@@ -43,7 +43,7 @@ section.tight li { margin-bottom: 2px; }
 ;" data-size="16:9">
 <h1 id="a-small-supervision-budget-barely-improves-weak-to-strong-generalization">A small supervision budget barely improves weak-to-strong generalization</h1>
 <p><strong>On GPT-2 / BoolQ, mixing a ground-truth budget into the weak labels helps only modestly — and <em>where</em> and <em>how</em> it is spent show little effect.</strong></p>
-<p>The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective lever is <em>volume</em>, not placement or combination.</p>
+<p>The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective axis is <em>volume</em>, not placement or combination.</p>
 <p><span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · advance predictions</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="2" data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -259,7 +259,7 @@ section.tight li { margin-bottom: 2px; }
 <li>Up to <strong>10% GT</strong>, the gain over the 0% baseline stays within the <strong>0.014 noise floor</strong>.</li>
 <li>Median xent PGR is <strong>back-loaded</strong>: −0.22 → <strong>+0.30</strong> (0.25) → +0.28 (0.50) → <strong>+0.90</strong> (0.75) → +1.04 (1.0).</li>
 <li>The 0.75 point: the <strong>0.50→0.75 step is the largest</strong>, and <strong>0.75→1.0 is within noise</strong>.</li>
-<li>A prior prediction of a concave knee at 25% was <strong>refuted</strong>, and retracted after the multi-seed data.</li>
+<li>A prior prediction of a concave knee at 25% was <strong>unsupported</strong> and retracted after the multi-seed data.</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -360,7 +360,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>An <strong>oracle</strong> uses held-out GT to place the budget exactly on the <strong>teacher-wrong rows</strong> — an upper bound on any allocation rule.</li>
 <li>Paired against random placement at matched budget: oracle − random = <strong>+0.0006</strong> (0.10), <strong>−0.0049</strong> (0.25) — both below the <strong>MDE (0.0071)</strong> we could detect.</li>
-<li>If the best possible placement ties random, allocation heuristics have <strong>little to gain</strong> on this testbed.</li>
+<li>If the best possible placement ties random, allocation methods have <strong>little to gain</strong> on this testbed.</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -461,7 +461,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>Five methods vs naive mixing at matched budget: <strong>M1</strong> GT up-weighting · <strong>M2</strong> soft-GT targets · <strong>M3</strong> GT-anchored logconf · <strong>M4</strong> reliability-weighted weak labels · <strong>M5</strong> GT-based early stopping.</li>
 <li>Median Δ vs naive ≈ <strong>0</strong> across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.</li>
-<li><strong>M3 (gt-anchored)</strong> is the only method to clear the <strong>MDE (0.0071)</strong> — peaking at +0.040 at 0.50 — but it recovers logconf toward xent <strong>without exceeding plain xent</strong> (0.642 vs 0.697).</li>
+<li><strong>M3 (gt-anchored)</strong> is the only method to clear the <strong>MDE (0.0071)</strong> — peaking at +0.040 at 0.50 — but it recovers logconf <strong>without exceeding plain xent</strong> (0.642 vs 0.697).</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -663,7 +663,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>Recovery of teacher-wrong rows is <strong>~linear in budget</strong> — 42% / 55% of the 0→100% gap recovered at 50%, tracking <em>y = x</em> rather than a concave curve.</li>
 <li>A GT label's marginal value appears <strong>roughly independent of which row it lands on</strong>.</li>
-<li>This is the condition that produces both nulls: when recovery is volume-bound, placement (<em>where</em>) and re-weighting (<em>how</em>) have <strong>little leverage</strong>.</li>
+<li>This is the condition that produces both nulls: when recovery is volume-dependent, allocation (<em>where</em>) and re-weighting (<em>how</em>) have <strong>little leverage</strong>.</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -764,7 +764,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>The other lever is <strong>elicitation</strong> — extract the answer from the frozen model's activations, spending GT only to <em>orient</em> the probe, not to teach.</li>
 <li><strong>Weak at GPT-2</strong>: on BoolQ even the full-supervised probe sits at chance — but on SciQ it <strong>rises with model size</strong>.</li>
-<li>Elicitation may be impactful at a <strong>larger capability gap</strong> — where the strong model genuinely knows the answer and we can orient it rather than teach it.</li>
+<li>Elicitation may be impactful at a <strong>larger capability gap</strong> where the strong model genuinely knows the answer</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -848,7 +848,7 @@ section.tight li { margin-bottom: 2px; }
 </tr>
 <tr>
 <td>P2</td>
-<td>≤10% GT inert</td>
+<td>≤10% GT flat</td>
 <td>✓ within noise</td>
 </tr>
 <tr>
@@ -859,7 +859,7 @@ section.tight li { margin-bottom: 2px; }
 <tr>
 <td>P4</td>
 <td>logconf null</td>
-<td>✓ inert at every budget</td>
+<td>✓ inferior at every fraction</td>
 </tr>
 <tr>
 <td>P5</td>
@@ -999,7 +999,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.</li>
 <li>Decomposed the budget question into <em>how much / where / how</em> — a powered null on the last two, and a back-loaded, saturating curve on the first.</li>
-<li>One account — <strong>inherited errors plus volume-bound recovery</strong> — is consistent with all three.</li>
+<li>One account — <strong>inherited errors plus volume-based recovery</strong> — is consistent with all three.</li>
 <li>So the binding constraint here looks like <strong>scale</strong>, not allocation or combination.</li>
 <li>A <strong>promising initial result</strong>: elicitation is weak at GPT-2 today, but the elicitable answer <strong>grows with model size</strong> — pointing to a larger-gap regime where the lever shifts to <em>eliciting</em> what the model already knows rather than <em>supervising</em> it.</li>
 </ul>
@@ -1041,7 +1041,7 @@ section.tight li { margin-bottom: 2px; }
 <ol>
 <li><strong>Vary the capability gap.</strong> Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to <strong>concave</strong>, targeted GT starts to generalize — and <em>where</em> / <em>how</em> would matter again.</li>
 <li><strong>Are the teacher's mistakes structured?</strong> Train a <strong>cheap</strong> probe — reusing the saved predictions — to find, from the student's features, where the teacher is wrong. If it can't, the errors are scattered, with no pattern for allocation to exploit.</li>
-<li><strong>Schedule the budget over training.</strong> We mixed GT and weak labels in a fixed ratio throughout, never varying the <em>timing</em>. Compare GT-first / annealed / interleaved — recent work suggests the schedule can matter more than the loss.</li>
+<li><strong>Schedule the budget over training.</strong> We mixed GT and weak labels in a fixed ratio throughout, never varying the <em>timing</em>. Compare GT-first / annealed — recent work suggests the schedule can matter more than the loss.</li>
 <li><strong>Iterate the loop.</strong> Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?</li>
 </ol>
 <p><span class="small">Ordered by relevance to the mechanism: (1) tests it directly · (2) explains it · (3–4) open new axes.</span></p>

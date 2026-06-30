@@ -44,7 +44,7 @@ style: |
 
 **On GPT-2 / BoolQ, mixing a ground-truth budget into the weak labels helps only modestly — and *where* and *how* it is spent show little effect.**
 
-The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective lever is *volume*, not placement or combination.
+The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective axis is *volume*, not placement or combination.
 
 <span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · advance predictions</span>
 
@@ -99,7 +99,7 @@ which is why it's dropped from here on.
 - Up to **10% GT**, the gain over the 0% baseline stays within the **0.014 noise floor**.
 - Median xent PGR is **back-loaded**: −0.22 → **+0.30** (0.25) → +0.28 (0.50) → **+0.90** (0.75) → +1.04 (1.0).
 - The 0.75 point: the **0.50→0.75 step is the largest**, and **0.75→1.0 is within noise**.
-- A prior prediction of a concave knee at 25% was **refuted**, and retracted after the multi-seed data.
+- A prior prediction of a concave knee at 25% was **unsupported** and retracted after the multi-seed data.
 
 <!--
 The brief suggested starting at a high fraction and lowering it to probe sample efficiency. Doing
@@ -116,7 +116,7 @@ because of the denominator.
 
 - An **oracle** uses held-out GT to place the budget exactly on the **teacher-wrong rows** — an upper bound on any allocation rule.
 - Paired against random placement at matched budget: oracle − random = **+0.0006** (0.10), **−0.0049** (0.25) — both below the **MDE (0.0071)** we could detect.
-- If the best possible placement ties random, allocation heuristics have **little to gain** on this testbed.
+- If the best possible placement ties random, allocation methods have **little to gain** on this testbed.
 
 <!--
 The oracle is a ceiling, not a deployable method — it needs the labels it's allocating. Per-(pair,
@@ -133,7 +133,7 @@ says there's nothing to capture here.
 
 - Five methods vs naive mixing at matched budget: **M1** GT up-weighting · **M2** soft-GT targets · **M3** GT-anchored logconf · **M4** reliability-weighted weak labels · **M5** GT-based early stopping.
 - Median Δ vs naive ≈ **0** across {0.10, 0.25, 0.50}; none shifts the curve left or raises the ceiling.
-- **M3 (gt-anchored)** is the only method to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but it recovers logconf toward xent **without exceeding plain xent** (0.642 vs 0.697).
+- **M3 (gt-anchored)** is the only method to clear the **MDE (0.0071)** — peaking at +0.040 at 0.50 — but it recovers logconf **without exceeding plain xent** (0.642 vs 0.697).
 
 <!--
 Each method is a different hypothesis about how to use the GT rows. gt-anchored exempts GT rows from
@@ -167,7 +167,7 @@ help.
 
 - Recovery of teacher-wrong rows is **~linear in budget** — 42% / 55% of the 0→100% gap recovered at 50%, tracking *y = x* rather than a concave curve.
 - A GT label's marginal value appears **roughly independent of which row it lands on**.
-- This is the condition that produces both nulls: when recovery is volume-bound, placement (*where*) and re-weighting (*how*) have **little leverage**.
+- This is the condition that produces both nulls: when recovery is volume-dependent, allocation (*where*) and re-weighting (*how*) have **little leverage**.
 
 <!--
 This is the link between the mechanism and the two nulls. Concave recovery would mean a little
@@ -184,7 +184,7 @@ the allocation and combination nulls are expected rather than surprising.
 
 - The other lever is **elicitation** — extract the answer from the frozen model's activations, spending GT only to *orient* the probe, not to teach.
 - **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.
-- Elicitation may be impactful at a **larger capability gap** — where the strong model genuinely knows the answer and we can orient it rather than teach it.
+- Elicitation may be impactful at a **larger capability gap** where the strong model genuinely knows the answer
 
 <!--
 Frozen extraction: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
@@ -202,9 +202,9 @@ only — a nonlinear / ensemble elicitor might surface more.
 | | Prediction | Outcome |
 |---|---|---|
 | P1 | knee at ~25% | ✗ refuted — back-loaded, no knee (retracted) |
-| P2 | ≤10% GT inert | ✓ within noise |
+| P2 | ≤10% GT flat | ✓ within noise |
 | P3 | mixing > GT-only | ✓ (confound named, then controlled) |
-| P4 | logconf null | ✓ inert at every budget |
+| P4 | logconf null | ✓ inferior at every fraction |
 | P5 | scale interaction (gap → more GT) | — underpowered at GPT-2 scale |
 | P6 | 0.25–0.50 plateau | ✓ flat in that range |
 
@@ -249,7 +249,7 @@ promising as the lever (a direction this trend motivates, not one these results 
 
 - Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
-- One account — **inherited errors plus volume-bound recovery** — is consistent with all three.
+- One account — **inherited errors plus volume-based recovery** — is consistent with all three.
 - So the binding constraint here looks like **scale**, not allocation or combination.
 - A **promising initial result**: elicitation is weak at GPT-2 today, but the elicitable answer **grows with model size** — pointing to a larger-gap regime where the lever shifts to *eliciting* what the model already knows rather than *supervising* it.
 
@@ -268,7 +268,7 @@ experiment shows the signal scales with the gap.
 
 1. **Vary the capability gap.** Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to **concave**, targeted GT starts to generalize — and *where* / *how* would matter again.
 2. **Are the teacher's mistakes structured?** Train a **cheap** probe — reusing the saved predictions — to find, from the student's features, where the teacher is wrong. If it can't, the errors are scattered, with no pattern for allocation to exploit.
-3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first / annealed / interleaved — recent work suggests the schedule can matter more than the loss.
+3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first / annealed — recent work suggests the schedule can matter more than the loss.
 4. **Iterate the loop.** Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?
 
 <span class="small">Ordered by relevance to the mechanism: (1) tests it directly · (2) explains it · (3–4) open new axes.</span>
