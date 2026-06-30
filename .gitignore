@@ -10,6 +10,12 @@ full_results/
 # Personal time-tracking log — kept local, not part of the public deliverable.
 time_logs/TIME_LOG.md
 
+# Research write-ups, plans, and notes — kept local, not tracked.
+# (README.md, LICENSE.md, docs/slides.md, vision/README.md, and time_logs/TIME_LOG_SUMMARY.md stay tracked.)
+notes/*.md
+plans/*.md
+results/**/*.md
+
 # Track results/ (deliverables + slim run outputs), but never the large regenerable
 # model artifacts or the quarantined stale/residual runs.
 *.pkl
