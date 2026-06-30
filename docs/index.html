@@ -658,7 +658,7 @@ section.tight { font-size: 22px; }
 section.tight li { margin-bottom: 2px; }
 " lang="en-US" data-marpit-pagination="8" style="--paginate:true;--theme:default;--style:@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap')
 ;--marpit-advanced-background-split:50%;" data-marpit-pagination-total="18" data-size="16:9" data-marpit-advanced-background="content" data-marpit-advanced-background-split="right">
-<h2 id="mechanism-recovery-is-linear-in-budget-volume-bound">Mechanism: recovery is ~linear in budget (volume-bound)</h2>
+<h2 id="mechanism-recovery-is-linear-in-budget-volume-dependent">Mechanism: recovery is ~linear in budget (volume-dependent)</h2>
 
 <ul>
 <li>Recovery of teacher-wrong rows is <strong>~linear in budget</strong> — 42% / 55% of the 0→100% gap recovered at 50%, tracking <em>y = x</em> rather than a concave curve.</li>
@@ -764,7 +764,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>The other lever is <strong>elicitation</strong> — extract the answer from the frozen model's activations, spending GT only to <em>orient</em> the probe, not to teach.</li>
 <li><strong>Weak at GPT-2</strong>: on BoolQ even the full-supervised probe sits at chance — but on SciQ it <strong>rises with model size</strong>.</li>
-<li>Elicitation may be impactful at a <strong>larger capability gap</strong> where the strong model genuinely knows the answer</li>
+<li>Elicitation may be impactful at a <strong>larger capability gap</strong> where the strong model genuinely knows the answer.</li>
 </ul>
 </section>
 </foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-paginate="true" data-theme="default" data-style="/* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
@@ -999,7 +999,7 @@ section.tight li { margin-bottom: 2px; }
 <ul>
 <li>Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.</li>
 <li>Decomposed the budget question into <em>how much / where / how</em> — a powered null on the last two, and a back-loaded, saturating curve on the first.</li>
-<li>One account — <strong>inherited errors plus volume-based recovery</strong> — is consistent with all three.</li>
+<li>One account — <strong>inherited errors plus volume-dependent recovery</strong> — is consistent with all three.</li>
 <li>So the binding constraint here looks like <strong>scale</strong>, not allocation or combination.</li>
 <li>A <strong>promising initial result</strong>: elicitation is weak at GPT-2 today, but the elicitable answer <strong>grows with model size</strong> — pointing to a larger-gap regime where the lever shifts to <em>eliciting</em> what the model already knows rather than <em>supervising</em> it.</li>
 </ul>
@@ -1517,8 +1517,8 @@ that's explanatory rather than a test; the rest are measurements with a stated e
 Elicitation row: instead of supervising, extract the answer from the frozen strong model (k-shot linear probe;
 CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
 SciQ it rises with model size (0.59 -&gt; 0.67, gpt2 -&gt; xl). Elicitable knowledge grows with the gap, so at
-GPT-2 scale volume stays the only lever — the same volume-bound story; at a larger gap, elicitation looks
-promising as the lever (a direction this trend motivates, not one these results establish).</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
+GPT-2 scale volume stays the only lever — the same volume-dependent story; at a larger gap, elicitation looks
+promising as the lever (a direction this trend motivates, not one these results establish).</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>The synthesis. The constraint statement leads into next steps: if recovery is volume-dependent, the
 interesting variable is the capability gap, not the supervision strategy. The last bullet is the
 alignment-relevant payoff — the lever for the no-ground-truth case is elicitation, and the elicitation
 experiment shows the signal scales with the gap.</p></div><div class="bespoke-marp-note" data-index="12" tabindex="0"><p>(1) is the discriminating experiment — W2SG-gain theory says recovery should grow with the gap, and

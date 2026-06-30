@@ -161,7 +161,7 @@ help.
 
 ---
 
-## Mechanism: recovery is ~linear in budget (volume-bound)
+## Mechanism: recovery is ~linear in budget (volume-dependent)
 
 ![bg right:50% fit](figs/mechanism_recovery.png)
 
@@ -184,7 +184,7 @@ the allocation and combination nulls are expected rather than surprising.
 
 - The other lever is **elicitation** — extract the answer from the frozen model's activations, spending GT only to *orient* the probe, not to teach.
 - **Weak at GPT-2**: on BoolQ even the full-supervised probe sits at chance — but on SciQ it **rises with model size**.
-- Elicitation may be impactful at a **larger capability gap** where the strong model genuinely knows the answer
+- Elicitation may be impactful at a **larger capability gap** where the strong model genuinely knows the answer.
 
 <!--
 Frozen extraction: k-shot linear probe and CCS + GT-orient. BoolQ has no linearly-decodable truth signal
@@ -239,7 +239,7 @@ that's explanatory rather than a test; the rest are measurements with a stated e
 Elicitation row: instead of supervising, extract the answer from the frozen strong model (k-shot linear probe;
 CCS + GT-orient). At GPT-2 scale it's weak — BoolQ ~chance (even the full-supervised linear probe), but on
 SciQ it rises with model size (0.59 -> 0.67, gpt2 -> xl). Elicitable knowledge grows with the gap, so at
-GPT-2 scale volume stays the only lever — the same volume-bound story; at a larger gap, elicitation looks
+GPT-2 scale volume stays the only lever — the same volume-dependent story; at a larger gap, elicitation looks
 promising as the lever (a direction this trend motivates, not one these results establish).
 -->
 
@@ -249,12 +249,12 @@ promising as the lever (a direction this trend motivates, not one these results 
 
 - Reproduced W2SG on the GPT-2 family and extended it to a supervision-budget setting.
 - Decomposed the budget question into *how much / where / how* — a powered null on the last two, and a back-loaded, saturating curve on the first.
-- One account — **inherited errors plus volume-based recovery** — is consistent with all three.
+- One account — **inherited errors plus volume-dependent recovery** — is consistent with all three.
 - So the binding constraint here looks like **scale**, not allocation or combination.
 - A **promising initial result**: elicitation is weak at GPT-2 today, but the elicitable answer **grows with model size** — pointing to a larger-gap regime where the lever shifts to *eliciting* what the model already knows rather than *supervising* it.
 
 <!--
-The synthesis. The constraint statement leads into next steps: if recovery is volume-bound, the
+The synthesis. The constraint statement leads into next steps: if recovery is volume-dependent, the
 interesting variable is the capability gap, not the supervision strategy. The last bullet is the
 alignment-relevant payoff — the lever for the no-ground-truth case is elicitation, and the elicitation
 experiment shows the signal scales with the gap.
