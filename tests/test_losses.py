@@ -9,7 +9,11 @@ reduces EXACTLY to xent_loss). Run with the scratch venv that has CPU torch:
 import sys
 from pathlib import Path
 
-import torch
+try:
+    import torch
+except ImportError:
+    print("SKIP test_losses: torch not installed (run `pip install .` for the full suite)")
+    sys.exit(77)
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from weak_to_strong.loss import (  # noqa: E402

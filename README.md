@@ -4,6 +4,9 @@
 > **mixing a small fraction of ground-truth labels into weak supervision** (a "supervision budget").
 > Original upstream README is preserved below.
 
+### 📊 [**Findings & write-up → rendered slide deck**](https://mayankmahajan24.github.io/weak-to-strong/)
+The full narrative, figures, and conclusions live in the deck. This repo holds the code, tests, and run outputs behind it.
+
 **One-line result.** At GPT-2 scale (BoolQ + SciQ replication): GT mixing helps cross-entropy transfer
 but *gradually* (no frugal "knee"); weak labels are genuinely informative (de-confounded vs a
 random-label control); **where** you place the GT doesn't matter (a perfect error-targeting oracle ties
@@ -22,6 +25,17 @@ random allocation); and the confidence loss (logconf) is inert.
 | `vision/`, `notebooks/` | **Upstream** (OpenAI) — preserved from the fork; not part of this extension. |
 
 Phases: **0** baseline + mixing infra · **1/1b** the fraction curve + premise gates · **2** combination-method portfolio + mechanism · **3** elicitation (frozen-readout probing).
+
+**Reproduce the extension.** The GT-mixing flags extend `train_simple.py` (and `sweep.py`) — e.g. a 25%-budget naive mix, gpt2 → gpt2-xl on BoolQ:
+
+```
+python train_simple.py --ds_name boolq --model_size gpt2-xl --weak_model_size gpt2 \
+    --gt_fraction 0.25 --mixing_strategy naive --combination_method weighted
+```
+
+- `--gt_fraction` — supervision budget (fraction of GT mixed into weak labels)
+- `--mixing_strategy` — `naive` · `oracle` (GT on teacher-wrong rows) · `random_labels` (de-confound control)
+- `--combination_method` — `naive` · `weighted` (M1) · `soft_gt` (M2) · `gt_anchored` (M3) · `reliability` (M4) · `gt_early_stop` (M5)
 
 ---
 
