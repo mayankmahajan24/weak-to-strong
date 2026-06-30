@@ -33,6 +33,7 @@ style: |
   section.lead h1 { font-size: 44px; line-height: 1.18; }
   footer { color: #b0aea5; font-size: 14px; }
   .small { font-size: 19px; color: #6b6a63; }
+  .heldfixed { color: #6a9bcc; font-weight: 600; }
   section.tight { font-size: 22px; }
   section.tight li { margin-bottom: 2px; }
 ---
@@ -64,7 +65,7 @@ and a mechanism that ties them together.
 - **Models:** **GPT-2 family only** — gpt2 / medium / large / xl, with within-family student–teacher pairs.
 - **Tasks:** **BoolQ** (required) + **SciQ** (cross-task check).
 - **Readout:** median **PGR** across the model sweep (raw accuracy primary; PGR secondary).
-- **Deliberately held fixed:** larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule (see next steps).
+- <span class="heldfixed">Deliberately held fixed:</span> larger capability gaps, generative / reward-modeling tasks, other architectures, training schedule (see next steps).
 
 <span class="small">3 seeds · paired per-(pair,seed) contrasts · advance predictions · gpt2-large (seed 1) excluded by rule</span>
 
