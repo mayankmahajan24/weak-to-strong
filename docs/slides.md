@@ -32,7 +32,7 @@ style: |
   a { color: #6a9bcc; }
   section.lead { justify-content: center; }
   section.lead h1 { font-size: 44px; line-height: 1.18; }
-  footer { color: #b0aea5; font-size: 14px; }
+  footer { color: var(--paginate-color); font-size: 24px; bottom: 21px; }
   .small { font-size: 19px; color: #6b6a63; }
   .heldfixed { color: #6a9bcc; font-weight: 600; }
   section.tight { font-size: 22px; }
