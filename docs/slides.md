@@ -47,6 +47,8 @@ style: |
 
 The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective axis is *volume*, not placement or combination.
 
+Mayank Mahajan
+
 <span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · advance predictions</span>
 
 <!--
