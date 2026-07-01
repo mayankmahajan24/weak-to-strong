@@ -70,15 +70,3 @@ final result set as well as work that did.
 *The synthesis and Phase 2 implementation phases were local (no compute). The itemized run costs
 above sum to ~$680; the difference to the ~$1.3k actual is provisioning, idle/setup time, and
 aborted instances not captured per-run.*
-
-## What ~28.5 hours produced
-- **A complete, honest three-question result set** (how much / where / how) with a **mechanism** that
-  explains the central negative, all cross-task (BoolQ + SciQ).
-- **Pre-registration discipline** (git-anchored predictions; hits *and* misses reported) and a
-  documented self-retraction (the "knee").
-- **~1,000+ training runs**, the two largest sweeps (504 Phase-1, 270 Phase-2) finishing **0-failure**.
-- A **reproducible repo**: per-phase scripts, 54 unit tests, drivers, and writeups from which the
-  whole study rebuilds.
-
-*Efficiency note: ~28.5 hands-on hours for a pre-registered, mechanism-backed, two-task result set —
-most of the wall-clock was unattended GPU sweeps, not active work.*
