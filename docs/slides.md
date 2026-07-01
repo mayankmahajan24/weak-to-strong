@@ -4,6 +4,7 @@ theme: default
 paginate: true
 size: 16:9
 math: katex
+footer: 'Mayank Mahajan'
 style: |
   /* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
@@ -46,8 +47,6 @@ style: |
 **On GPT-2 / BoolQ, mixing a ground-truth budget into the weak labels helps only modestly — and *where* and *how* it is spent show little effect.**
 
 The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective axis is *volume*, not placement or combination.
-
-Mayank Mahajan
 
 <span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · advance predictions</span>
 
