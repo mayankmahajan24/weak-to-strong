@@ -34,6 +34,7 @@ style: |
   footer { color: #b0aea5; font-size: 14px; }
   .small { font-size: 19px; color: #6b6a63; }
   .heldfixed { color: #6a9bcc; font-weight: 600; }
+  .byline { color: #6b6a63; font-weight: 600; }
   section.tight { font-size: 22px; }
   section.tight li { margin-bottom: 2px; }
 ---
@@ -47,7 +48,7 @@ style: |
 
 The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective axis is *volume*, not placement or combination.
 
-Mayank Mahajan
+<span class="byline">Mayank Mahajan</span>
 
 <!--
 We take the W2SG setup and add a ground-truth budget — a fraction of strong labels mixed into the
