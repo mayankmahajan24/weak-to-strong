@@ -89,7 +89,7 @@ small and unstable for closely-matched pairs.
 <!--
 Each coloured line is a weak teacher; the x-axis is the student labelled with its own ground-truth
 accuracy; solid is cross-entropy, dashed is the confidence loss. The inset is median PGR over the
-six strict pairs — the standardised number requested. the confidence loss sits below cross-entropy at every student,
+six strict pairs — the standardised number requested. The confidence loss sits below cross-entropy at every student,
 which is why it's dropped from here on.
 -->
 
@@ -204,7 +204,7 @@ draws its elicitation conclusion from. Caveat if pushed: linear readout only —
 
 | | Prediction | Outcome |
 |---|---|---|
-| P1 | knee at ~25% | ✗ refuted — back-loaded, no knee (retracted) |
+| P1 | knee at ~25% | ✗ unsupported — back-loaded, no knee (retracted) |
 | P2 | ≤10% GT flat | ✓ within noise |
 | P3 | mixing > GT-only | ✓ (confound named, then controlled) |
 | P4 | confidence loss null | ✓ inferior at every fraction |
@@ -269,7 +269,7 @@ experiment shows the signal scales with the gap.
 
 ## Next steps
 
-1. **Vary the capability gap.** Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families if allowed). If recovery turns from linear to **concave**, targeted GT starts to generalize — and *where* / *how* would matter again.
+1. **Vary the capability gap.** Re-run the budget sweep with a bigger student–teacher gap (a weaker / handicapped teacher; larger families where feasible). If recovery turns from linear to **concave**, targeted GT starts to generalize — and *where* / *how* would matter again.
 2. **Are the teacher's mistakes structured?** Train a **cheap** classifier — reusing the saved predictions — to find, from the model's own features, where the teacher is wrong. If it can't, the errors are scattered, with no pattern for allocation to exploit.
 3. **Schedule the budget over training.** We mixed GT and weak labels in a fixed ratio throughout, never varying the *timing*. Compare GT-first vs gradually phased — recent work suggests the schedule can matter more than the loss.
 4. **Iterate the loop.** Use the budget-trained student as the next teacher and repeat at the same total GT. Does a budget that's null in one pass add up over rounds?
@@ -290,11 +290,11 @@ is the iterate-the-loop (bootstrapping) question. All but (1) fit comfortably in
 
 # Appendix
 
-<span class="small">frac=0 reproduction (acc + PGR) · transfer heatmap · per-method × pair detail · de-confound · cross-task</span>
+<span class="small">0% GT reproduction (acc + PGR) · transfer heatmap · per-method × pair detail · de-confound · cross-task</span>
 
 ---
 
-## Appendix — frac=0 reproduction
+## Appendix — 0% GT reproduction
 
 ![bg right:52% fit](figs/sweep_pgr_boolq.png)
 
