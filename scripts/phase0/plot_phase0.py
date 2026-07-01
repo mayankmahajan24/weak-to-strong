@@ -143,7 +143,7 @@ for ax, ds in zip(axes, TASKS):
         for si in range(4):
             if not np.isnan(M[wi, si]): ax.text(si, wi, f"{M[wi,si]:.2f}", ha="center", va="center", color="w", fontsize=8)
     fig.colorbar(im, ax=ax, fraction=0.046)
-fig.suptitle("Phase 0 — transfer accuracy matrix, xent (3 seeds)")
+fig.suptitle("Transfer accuracy matrix, xent (3 seeds)")
 fig.tight_layout(); fig.savefig(OUT / "phase0_transfer_heatmap.png", dpi=140); plt.close(fig)
 print("wrote phase0_transfer_heatmap.png")
 

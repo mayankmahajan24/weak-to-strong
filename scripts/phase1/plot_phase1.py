@@ -219,7 +219,7 @@ def draw_curve(ax, pts, seed=None, noise_pgr=None, title=""):
 def plot_fraction_curve(pts, noise_pgr):
     fig, ax = plt.subplots(figsize=(9, 6))
     draw_curve(ax, pts, seed=None, noise_pgr=noise_pgr,
-               title="Phase 1 — Supervision scaling: PGR vs gt_fraction (3-seed, BoolQ)\n"
+               title="Supervision scaling: PGR vs gt_fraction (3-seed, BoolQ)\n"
                      "solid=mixing, dotted=GT-only, blue=xent, red=logconf; shaded=seed range, "
                      "gray=noise floor")
     ax.legend(loc="upper left", fontsize=9)

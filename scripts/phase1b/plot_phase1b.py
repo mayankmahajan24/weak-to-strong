@@ -72,7 +72,7 @@ for ax, (task, mixsrc, randsrc, gtsrc) in zip(
     ax.axhline(0.5, color="k", ls=":", lw=0.8); ax.set_xticks(x); ax.set_xticklabels([f"{f:.2f}" for f in fracs])
     ax.set_xlabel("GT fraction"); ax.set_title(f"{task}"); ax.grid(alpha=0.3, axis="y"); ax.legend(fontsize=8)
 axes[0].set_ylabel("median test accuracy")
-fig.suptitle("Phase 1b · A — weak labels are INFORMATIVE: random_labels < gt_only < naive mixing\n(noise replacing weak labels HURTS → mixing's win is real information, not data quantity)")
+fig.suptitle("Weak labels are INFORMATIVE: random_labels < gt_only < naive mixing\n(noise replacing weak labels HURTS → mixing's win is real information, not data quantity)")
 fig.tight_layout(); fig.savefig(OUT / "phase1b_A_deconfound.png", dpi=140); plt.close(fig)
 print("wrote phase1b_A_deconfound.png")
 
@@ -104,7 +104,7 @@ for i, (name, src, col) in enumerate([("naive (random placement)", naive_b, "tab
     axR.bar(x + (i - 0.5) * width, [v or 0 for v in vals], width, label=name, color=col)
 axR.set_xticks(x); axR.set_xticklabels([f"{f:.2f}" for f in fracs]); axR.set_ylim(0.6, 0.72)
 axR.set_xlabel("GT fraction"); axR.set_ylabel("median acc"); axR.set_title("Oracle ≈ naive at every budget"); axR.legend(fontsize=8); axR.grid(alpha=0.3, axis="y")
-fig.suptitle("Phase 1b · B — WHERE you spend GT does not matter (allocation NULL): a perfect error-targeting oracle ties random")
+fig.suptitle("WHERE you spend GT does not matter (allocation NULL): a perfect error-targeting oracle ties random")
 fig.tight_layout(); fig.savefig(OUT / "phase1b_B_allocation.png", dpi=140); plt.close(fig)
 print("wrote phase1b_B_allocation.png")
 

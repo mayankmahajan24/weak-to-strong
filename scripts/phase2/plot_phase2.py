@@ -71,7 +71,7 @@ for m in methods:
     ax.plot(FRACS, ys, label=lbl, marker="o", color=colors.get(m), ls=ls, alpha=0.9)
 
 ax.set_xlabel("GT fraction"); ax.set_ylabel("median test accuracy (6 strict pairs × 3 seeds)")
-ax.set_title("Phase 2 — combination methods vs naive mixing (BoolQ)")
+ax.set_title("Combination methods vs naive mixing (BoolQ)")
 ax.set_xticks(FRACS); ax.grid(alpha=0.3); ax.legend(fontsize=8, loc="best")
 out = ROOT / "results/plots/phase2_overlay.png"
 out.parent.mkdir(parents=True, exist_ok=True)
