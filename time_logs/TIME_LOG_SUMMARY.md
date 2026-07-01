@@ -24,13 +24,13 @@ final result set as well as work that did.
 | Phase | Hands-on | What was produced |
 |---|---|---|
 | **Background — paper study** | ~1.5h | Read the original OpenAI Weak-to-Strong Generalization paper (problem framing, PGR metric, baseline sweep methodology) to ground the extension |
-| **0 — Infrastructure + baseline** | ~13h | Reproduced the W2SG baseline across the full GPT-2 family (BoolQ+SciQ, xent+logconf, 3 seeds); built + validated the GT-mixing harness (identity/ceiling checks). Includes scoping work that didn't make the cut: an initial multi-dataset sweep (amazon_polarity / anthropic_hh / cosmos_qa) before restricting to BoolQ+SciQ; cross-instance reproducibility re-runs of the baseline (Lambda → B200 → A100) to fix a single canonical environment; and GPU/OOM shakeout |
-| **1 — How much? (fraction curve)** | ~3h | Pre-registered P1–P6; ran the full fraction sweep; found *no knee* (P1 refuted), logconf null; retracted a single-seed "knee" headline |
+| **0 — Infrastructure + baseline** | ~13h | Reproduced the W2SG baseline across the full GPT-2 family (BoolQ+SciQ, cross-entropy + the confidence loss, 3 seeds); built + validated the GT-mixing harness (identity/ceiling checks). Includes scoping work that didn't make the cut: an initial multi-dataset sweep (amazon_polarity / anthropic_hh / cosmos_qa) before restricting to BoolQ+SciQ; cross-instance reproducibility re-runs of the baseline (Lambda → B200 → A100) to fix a single canonical environment; and GPU / out-of-memory shakeout |
+| **1 — How much? (fraction curve)** | ~3h | Pre-registered P1–P6; ran the full fraction sweep; found *no knee* (P1 refuted), confidence-loss null; retracted a single-seed "knee" headline |
 | **— Variance study** | ~0.5h | 8-seed gpt2-large study → confirmed ~27% optimization instability (exclusion principled) |
 | **1b — Premise gate** | ~1.5h | Power/MDE analysis; de-confounded "weak labels informative"; **allocation-null** (oracle ties random); SciQ cross-task validation |
 | **— Synthesis + Phase 2 design** | ~2.5h | FINDINGS writeup; read interview brief; pre-registered Phase 2 plan + exec spec |
-| **2 — Implementation** | ~4h | M1–M5 methods + loss/train plumbing; 54 unit tests; repo reorg (scripts/ by phase); driver + NOTES_phase2 pre-reg |
-| **2 — Portfolio run** | ~1.5h | 270-run combination sweep (0 fail); portfolio null/negative, M3 only floor-clearer |
+| **2 — Implementation** | ~4h | the five combination methods + training plumbing; 54 unit tests; repo reorg (scripts/ by phase); driver + NOTES_phase2 pre-reg |
+| **2 — Portfolio run** | ~1.5h | 270-run combination sweep (0 fail); methods null/negative, only method 3 cleared the noise floor |
 | **— Robustness reserve** | ~0.5h | Generated seeds 3,4 baseline (5-seed extension capability) |
 | **— Mechanism experiment** | ~0.75h | Imitation-vs-correction: explained *why* allocation + combination are null |
 | | **~28.5h** | |
@@ -44,14 +44,15 @@ final result set as well as work that did.
 - **Cross-instance reproducibility re-runs (Phase 0).** The BoolQ baseline was run on three
   separate environments (Lambda A100 → Vast B200 → Vast A100) to pin down a single reproducible
   canonical environment; the superseded copies were discarded once the canonical one was fixed.
-- **Hardware / OOM shakeout.** GPU selection and out-of-memory debugging (e.g. RTX 5090 32 GB can't
-  fit gpt2-xl on long-sequence BoolQ; transformers-version memory regressions; CUDA-driver
-  mismatches that silently fell back to CPU), plus several aborted instances.
+- **Hardware / out-of-memory shakeout.** GPU selection and out-of-memory debugging (e.g. RTX 5090
+  32 GB can't fit gpt2-xl on long-sequence BoolQ; model-library-version memory regressions;
+  CUDA-driver mismatches that silently fell back to CPU), plus several aborted instances.
 - **The retracted "knee" headline (Phase 1).** A single-seed result initially read as a sharp knee
   at 25% GT; the multi-seed re-analysis refuted it and I retracted it. The analysis effort still
   happened (and the retraction is itself part of the rigor story).
-- **logconf throughout.** Carried the logconf loss across every phase; it proved inert/harmful and
-  was dropped at the Phase 2 gate — a negative result that cost compute and analysis time.
+- **The confidence loss throughout.** Carried the paper's confidence loss across every phase; it
+  proved inert/harmful and was dropped at the Phase 2 gate — a negative result that cost compute and
+  analysis time.
 - **Robustness reserve (seeds 3, 4).** Generated a 5-seed extension capability that the final
   writeup keeps in reserve rather than folding into the headline 3-seed numbers.
 
