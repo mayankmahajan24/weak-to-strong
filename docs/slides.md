@@ -4,7 +4,6 @@ theme: default
 paginate: true
 size: 16:9
 math: katex
-footer: 'Mayank Mahajan'
 style: |
   /* Anthropic brand: Poppins headings / Lora body, warm palette, orange accent */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
@@ -32,7 +31,7 @@ style: |
   a { color: #6a9bcc; }
   section.lead { justify-content: center; }
   section.lead h1 { font-size: 44px; line-height: 1.18; }
-  footer { color: var(--paginate-color); font-size: 24px; bottom: 21px; }
+  footer { color: #b0aea5; font-size: 14px; }
   .small { font-size: 19px; color: #6b6a63; }
   .heldfixed { color: #6a9bcc; font-weight: 600; }
   section.tight { font-size: 22px; }
@@ -48,7 +47,7 @@ style: |
 
 The student largely reproduces the teacher's errors, and ground truth corrects mainly the examples it directly labels — so the effective axis is *volume*, not placement or combination.
 
-<span class="small">GPT-2 family · BoolQ + SciQ · 3 seeds · paired per-(pair,seed) contrasts · advance predictions</span>
+Mayank Mahajan
 
 <!--
 We take the W2SG setup and add a ground-truth budget — a fraction of strong labels mixed into the
